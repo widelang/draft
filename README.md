@@ -3319,7 +3319,7 @@ Wide attributes are not just markers — they're living pieces of logic you can 
 
 Wide supports annotations (called **attributes**) using a concise and composable syntax.
 
-Attributes are declared using `@{}` Intents and contain one or more calls:
+Attributes are declared using `@{}` Intents and contain one or more calls to functions and/or objects:
 
 ```lua
 @{
@@ -3369,7 +3369,7 @@ Attributes can inherit from one another using `:` or `::` just like other constr
   .[method]: "GET"
 />
 
-BookController <
+.BookController <
   @{
     <GetRoute path:"/books" />
   }
