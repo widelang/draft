@@ -2031,7 +2031,7 @@ result: (sum a:10, b:20, 30, 50)
 
 ### Changing External Entities
 
-You can change external Entities by using the `$` State Intent after function invokation and passing the variables you want to allow mutate inside:
+You can change external Entities by using the `$` State Intent after function invokation and passing the entities you want to allow mutate inside:
 
 ```lua
 (funcCall $name) $ $name
@@ -2964,7 +2964,7 @@ Interfaces can define constants literals, Meta Entities and Functions for object
 :TalkingMover :Speaker :Mover </>
 ```
 
-To use in Classes just compose and implement Interface's Functions:
+To use in objects just compose and implement Interface's Functions:
 
 ```lua
 .Person :Speaker <
@@ -3182,7 +3182,7 @@ You create Generics in Wide using `{}` Context Intent, because guess what? - you
 You can pass the Type you want to resolve to a Function or Object of any kind.
 
 ```lua
-(calculateAverage{T} A:T B:T) T: (a + b) / 2
+(calculateAverage{T} a:T b:T) T: (a + b) / 2
 
 a: 32
 b: 50
@@ -3198,7 +3198,7 @@ average: (calculateAverage{int} a, c) -- int and float are not the same
 
 ```lua
 .Calculate{T}<
-    .(average A:T B:T) T: (a + b) / 2
+    .(average a:T b:T) T: (a + b) / 2
 >
 
 calculator: <Calculate {int} />
