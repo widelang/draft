@@ -60,7 +60,7 @@ Wide is strongly typed and it uses this new concept called **Intent**.
 
 Intent is mainly just a language concept, not to be used in daily jargon, but if you wish, you can.
 
-Therea are 2 most fundamental intents.
+There are 2 most fundamental intents.
 
 ### `:` Type Intent
 
@@ -75,7 +75,7 @@ Whenever you see the Type Intent `:` (colon symbol) you can think:
 
 Whenever you see the Assignment Intent `=` (equal symbol) you can think:
 
-- is assigns a value *(of, from or constant of)*
+- it assigns a value *(of, from or constant of)*
 
 There's also `space` assignment operator in Wide, it's implicit in the space after any value Entity `:` Type Intent and you don't need to explicitly use `=` Intent.
 
