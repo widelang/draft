@@ -77,8 +77,6 @@ Whenever you see the Assignment Intent `=` (equal symbol) you can think:
 
 - it assigns a value *(of, from or constant of)*
 
-There's also `space` assignment operator in Wide, it's implicit in the space after any value Entity `:` Type Intent and you don't need to explicitly use `=` Intent.
-
 ## Entities
 
 Now that you know the 2 most basic intents, let's see some syntax.
@@ -95,7 +93,7 @@ If not, don't worry and just let Wide help you!
 
 The value of the `composer` Entity is of type text `"Amadeus Mozart"`.
 
-Notice that the Type `:` and the Assignment `space` Intents together assign the type and text value to `composer`.
+Notice that the Type `:` Intent and the `space` together assign the type and text value to `composer`  no need for `=`.
 
 `composer` is the name of an Entity, what most programming languages call *variables*.
 
