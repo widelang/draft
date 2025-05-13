@@ -1636,7 +1636,7 @@ day?
   .
 ```
 
-By default all cases in a *Switch-like* Question break at `,` comma symbol. If wanna to let fall throught the next case,
+By default all cases in a *Switch-like* Question break at `,` comma symbol. If wanna to let fall through the next case, you can use the  `>>` Intent.
 
 In the *Switch-like* Question its case doesn't return values, so that if you place `""` after the `:` you actually will get those same texts printed.
 
@@ -1647,7 +1647,7 @@ a: 2
   1:  "one",
   2:  "two" "two again" "two again again",
   3:  "three",
-  4:  "Four" >>,
+  4:  "Four" >>, -- Fall through here
   (4, 5, 6, 7): -- when grouping you must use a tuple
       "mistery number"
   .   "other number"
