@@ -414,7 +414,7 @@ By default Entities are immutable:
 ```lua
 name: "John"
 age: 34
-salary: '10000.00'
+salary: 10000.00
 ```
 
 Which mean they can't change their state (inner value).
