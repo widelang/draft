@@ -69,7 +69,7 @@ Whenever you see the Type Intent `:` (colon symbol) you can think:
 - it has type
 - it returns type
 - it checks type
-- or it's just a block separator 🙃
+- or it's just an intent separator 🙃
 
 ### `=` Assignment Intent
 
