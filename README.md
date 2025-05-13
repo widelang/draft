@@ -126,7 +126,7 @@ Every data type in Wide is implicitly an object behind the scenes with it's own 
 
 It's built-in core data types looks like this:
 
-| Símbolo | English Alias | Exemplos |
+| Symbol | English Alias | Example |
 |:---:|--------|--------|
 | ? | bool (1: true, 0: fale ) | true/false, yes/no, on/off |
 | '' | char  | letter 'A', number '1', symbol '$' |
@@ -191,7 +191,7 @@ Those words are not syntax, they are English words, you can call it whatever you
 
 ```lua
 boolEntity: ?
-intEntity: ''
+charEntity: ''
 stringEntity: ""
 intEntity: 0
 floatEntity: 0.0
@@ -204,7 +204,7 @@ objectEntity: <>
 
 ```lua
 boolEntity: bool
-intEntity: char
+charEntity: char
 stringEntity: string
 intEntity: int
 floatEntity: float
@@ -217,7 +217,7 @@ That would be the same explicitly as:
 
 ```lua
 boolEntity:? = 0
-intEntity:'' = '0'
+charEntity:'' = '0'
 stringEntity:"" = ""
 intEntity:0 = 0
 floatEntity:0.0 = 0.0
@@ -971,7 +971,7 @@ Entities created by destructuring a Collection will cause to create Constant-lik
 ```lua
 user: ["Mary", 35, 10000.00]
 
-{name, age, salary}: languages
+{name, age, salary}: user
 
 "{name} is {age} years old and makes {salary} monthly"
 
