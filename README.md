@@ -1275,7 +1275,7 @@ $counter: 1
 
 ~(counter <= 10):
   "Counter value is: {counter}"
-  $counter = counter + 1
+  $counter = $counter + 1
 
 ```
 
@@ -1286,7 +1286,7 @@ $counter: 1
 
 ~(counter <= 10)..: -- Extent intent here
   "Counter value is: {counter}"
-  $counter = counter + 1
+  $counter = $counter + 1
 
 ```
 
@@ -1311,7 +1311,7 @@ $counter: 1
 
 ~(counter <= 10)..3:
   "Counter value is: {counter}"
-  $counter = counter + 1
+  $counter = $counter + 1
 
 ```
 
@@ -1322,7 +1322,7 @@ $counter: 1
 
 ~(counter <= 10) 3..:
   "Counter value is: {counter}"
-  $counter = counter + 1
+  $counter = $counter + 1
 
 ```
 
@@ -1333,24 +1333,22 @@ $counter: 1
 
 ~(counter <= 10) 3..6:
   "Counter value is: {counter}"
-  $counter = counter + 1
+  $counter = $counter + 1
 ```
 
 ### Interrupting Repetition
 
 ```lua
 $counter: 1
-
-~(counter <= 10):
+~($counter <= 10):
   "Counter value is: {counter}"
 
-  $counter = counter + 1
+  `break`
+  . ? $counter == 5
 
   `continue`
-  > ? count % 2 == 0
-
-  `break`
-  . ? count == 5
+  > ? $counter % 2 == 0
+  $counter = $counter + 1
 ```
 
 ### Loop
