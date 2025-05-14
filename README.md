@@ -66,7 +66,7 @@ Wide was born from the need to universalize HTML and make it reactive! React its
 That's why Objects in Wide are <> and </> symbols, because in Wide you can do this when going HTML mode:
 
 ```html
-// loop.wide.html
+// loop.wide
 <ul>
   <~(counter <= 10):>
     <li>
