@@ -1517,30 +1517,6 @@ name == "Alice" ?
 
 ⚠️ Pay attention to identation! If put on same level, it will mean different things.
 
-You can simulate a Ternary Operator by inlining a simple Question like so:
-
-```lua
-age: 17
-authorized: "Authorized" ? age > 17 . "Not Authorized"
-```
-
-The above reads:
-
-```text
-Authorized if age is greater than 17 else Not Authorized
-```
-
-Same as:
-
-```lua
-age: 17
-authorized: age > 17
-
-authorized ?
-  "Authorized"
-. "Not Authorized"
-```
-
 Case when there are multiple expressions to question:
 
 ```lua
