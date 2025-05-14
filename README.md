@@ -1,12 +1,20 @@
 # 🧩 Wide Language
 
-Welcome to **Intent-Oriented Programming** – Where code expresses *what you mean*, not *how you fight the compiler*.
+```html
+// hello.wide.html
+<div>
+  <script type="wide">
+  (greet name:string): <p>"Hello, {name}!"</p>
+  </script>
+  (greet "World")
+</div>
+```
+
+Welcome to a Web-first **Intent-Oriented Programming**.
 
 Wide is a symbol-based, declarative, paradigm-unifying programming language designed to feel natural, composable, and deeply readable.
 
 It doesn't have keywords (at least not for aliased types).
-
-It doesn't waste your time.
 
 It lets **humans speak logic** – cleanly, expressively, and across paradigms.
 
@@ -14,10 +22,15 @@ Wide isn’t just about code - it's about communication.
 
 It's about intent — and Wide delivers it.
 
+
 ## Introduction
 
-Wide is a keyword-less, intent-driven programming language inspired by years of experience across many real-world languages. Its design takes direct cues from:
+Wide is a keyword-less, intent-driven programming language inspired by years of experience across many real-world languages and the Web. 
 
+Its design takes direct cues from:
+
+- HTML - for its wide used markup on the Web
+- CSS - for its abstract way of selecting elements
 - Python — for its clean syntax and readability-first philosophy
 - Go — for its simplicity and strong opinions on structure
 - Rust — for its safety, scope-aware semantics, and move-inspired modeling
@@ -28,14 +41,10 @@ Wide is a keyword-less, intent-driven programming language inspired by years of 
 
 Wide doesn't try to copy them — it extracts the intent behind them, strips away the noise, and rebuilds a language model based purely on semantic clarity, symbolic consistency, and developer expression.
 
-I’ve spent 25 years programming in languages like Python, Go, Rust, TypeScript, PHP, and OCaml. Wide is what happened when I asked myself:
-
-“What if none of them had keywords?”
-
-And then... made it actually work.
 
 ### Why Wide?
 
+- Web ready!
 - No keywords — only symbols that express intent
 - Immutable by default, reactive when needed (`$`, `@`)
 - Real functions and lambdas with context inclusion
@@ -47,6 +56,49 @@ And then... made it actually work.
 This document is designed to grab Opinions and Criticism about Wide.
 
 Be aware the the syntax presented here is just what makes its basics up until now and may change in the future.
+
+I cannot assure I'm the best communicator in the world nor here in the draft, but I can assure I just wanna create a better place for everyone!
+
+## HTML in its core
+
+Wide was born from the need to universalize HTML and make it reactive! React itself did a great job, and I could get a lot of ideas from the last 10 years fighting it when not using Node.JS, and just wanted to use it server-side. So I said to myself: Why not a language that speaks the web, so that anylanguage could transpile itself into Wide?
+
+That's why Objects in Wide are <> and </> symbols, because in Wide you can do this when going HTML mode:
+
+```html
+// loop.wide.html
+<ul>
+  <~(counter <= 10):>
+    <li>
+      counter == 1 ?
+        <span class="one">
+          "{ counter } is one"
+        </span>
+      counter == 2 ??
+        <span class="two">
+          "{ counter } is two"
+        </span>
+      counter == 3 ??
+        <span class="three">
+          "{ counter } is three"
+        </span>
+      . <span class="another">
+          "{ counter } is another"
+        </span>
+    </li>
+  </>
+</ul>
+```
+
+But if you were just vanilla Wide cli you can do just so:
+
+```lua
+~(counter <= 10):
+  counter == 1 ? "{ counter } is one"
+  counter == 2 ?? "{ counter } is two"
+  counter == 3 ?? "{ counter } is three"
+  . "{ counter } is another"
+```
 
 ## Symbols and keywords
 
