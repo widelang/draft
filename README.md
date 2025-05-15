@@ -2,12 +2,14 @@
 
 ```html
 // hello.wide.html
-<template type="wide">
-  (greet name:string): <p>"Hello, {name}!"</p>
-  <h1>(greet "World")</h1>
-  <p>HTML first language!</p>
-</template>
-<script type="wide" />
+<html type="wide">
+  <body>
+    (greet name:string): <p>"Hello, {name}!"</p>
+    <h1>(greet "World")</h1>
+    <p>HTML first language!</p>
+  </body>
+</html>
+
 
 <-- output -->
 <h1>Hello, World!</h1>
