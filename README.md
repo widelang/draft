@@ -2,7 +2,7 @@
 
 ```html
 // hello.wide.html
-<!DOCTYPE wide>
+<!DOCTYPE html wide>
 <html>
   <body>
     (greet name:string): <p>"Hello, {name}!"</p>
@@ -12,8 +12,13 @@
 </html>
 
 <!-- output -->
-<h1>Hello, World!</h1>
-<p>HTML first language!</p>
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Hello, World!</h1>
+    <p>HTML first language!</p>
+  </body>
+</html>
 ```
 
 Welcome to a Web-first **Intent-Oriented Programming**.
