@@ -2,12 +2,16 @@
 
 ```html
 // hello.wide.html
-<script type="wide" />
-<div>
+<template type="wide">
   (greet name:string): <p>"Hello, {name}!"</p>
   <h1>(greet "World")</h1>
   <p>HTML first language!</p>
-</div>
+</template>
+<script type="wide" />
+
+<-- output -->
+<h1>Hello, World!</h1>
+<p>HTML first language!</p>
 ```
 
 Welcome to a Web-first **Intent-Oriented Programming**.
