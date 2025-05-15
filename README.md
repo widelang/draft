@@ -11,7 +11,7 @@
   </body>
 </html>
 
-<-- output -->
+<!-- output -->
 <h1>Hello, World!</h1>
 <p>HTML first language!</p>
 ```
