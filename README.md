@@ -1029,7 +1029,7 @@ user: ["Mary", 35, 10000.00]
 
 languages: ["PHP", "Python", "JavaScript", "Rust", "Go", "C++", "Wide"]
 
-{...language}: languages
+{..language}: languages
 
 "The first 3 languages to learn this year are:"
 "1 - {language.1}"
@@ -1048,7 +1048,7 @@ For Tuples, Sets, and Dictionaries you'll mostly do the same, but Sets won't pre
 
 "{name} is {age} years old and lives in {city}"
 
-{...user}: ("Alice", 25)
+{..user}: ("Alice", 25)
 
 "{user.1} is {user.2} years old and ives in {user.3}"
 ```
@@ -1065,7 +1065,7 @@ lotteryCompetitors: {"Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"}
 " #2 {secondWinner}"
 " #3 {thirdWinner}"
 
-{...winners}: lotteryCompetitors
+{..winners}: lotteryCompetitors
 
 "Winners are:"
 " #1 {winners.1}"
@@ -1102,7 +1102,7 @@ message: "Hello, Wide!"
 "{message.1}" -- H
 "{message.8}" -- W
 
-...letter: message
+..letter: message
 "{letter.1}" -- H
 "{letter.2}" -- e
 "{letter.3}" -- l
@@ -1396,10 +1396,10 @@ $counter: 1
   "Counter value is: {counter}"
 
   `break`
-  . ? $counter == 5
+  $counter == 5 ? .
 
   `continue`
-  > ? $counter % 2 == 0
+  $counter % 2 == 0 ? >>
   $counter = $counter + 1
 ```
 
@@ -2666,7 +2666,7 @@ Thing.(doSomething)
 
 🤣 I'm with you in this hard moment of your life!
 
-Why not make everthing accessible this whey?
+Why not make everthing accessible this way?
 
 Now the Resolution Intent is using "Thing" Object in its own Context and like in the file Context you can access the ordinary Entity and Function like that. But as the ordinary Function has () in its name, you can't use just `Thing.doSomething` because it would imply that it is an Entity not a Function.
 
