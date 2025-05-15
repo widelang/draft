@@ -2,14 +2,14 @@
 
 ```html
 // hello.wide.html
-<html type="wide">
+<!DOCTYPE wide>
+<html>
   <body>
     (greet name:string): <p>"Hello, {name}!"</p>
     <h1>(greet "World")</h1>
     <p>HTML first language!</p>
   </body>
 </html>
-
 
 <-- output -->
 <h1>Hello, World!</h1>
