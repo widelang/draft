@@ -777,7 +777,7 @@ Can be shadowed:
 
 ```lua
 speed_of_light: 299792458.0
-speed_of_light: 1 ✅ overrides the original
+speed_of_light: 1 ✅ -- overrides the original
 ```
 
 Can also be shadowed:
@@ -791,14 +791,20 @@ Cannot be shadowed — sealed inside context:
 
 ```lua
 {SPEED_OF_LIGHT: 299792458.0}
-SPEED_OF_LIGHT: 1  ❌ Error: constant is opaque and cannot be redefined
+SPEED_OF_LIGHT: 1  ❌ -- Error: constant is opaque and cannot be redefined
 ```
 
 ---
 
 ## Entity Context
 
-Entities are constrained to the Context they exist, you must use them in the same context they are create, or their nested ones.
+First, remember that Entities must exist previously to be used, shadowed, or mutated.
+
+```lua
+"Message is: {message}" ❌ -- Error: Entity "message" is not defined
+```
+
+Entities are constrained to the Context they exist, you must use them in the same context they are created, or their nested ones.
 
 ⚠️ The exception being for Constant Entities because they fall through all contexts after usage.
 
