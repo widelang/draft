@@ -615,6 +615,103 @@ SPEED_OF_LIGHT: 1  ❌ Error: constant is opaque and cannot be redefined
 
 ---
 
+## Entity Context
+
+Entities are constrained to the Scope they exist, you must use them in the same context they are create, or their nested ones.
+
+⚠️ The exception being for Constant Entities because they fall through all contexts after usage.
+
+```lua
+{
+  CONSTANT: true
+}
+
+message:= "Hi"
+
+CONSTANT? {
+  "Message is: {message}" ✅ -- Ok, same context
+}
+```
+
+Error for Constant defined after usage:
+
+```lua
+message:= "Hi"
+
+CONSTANT? { ❌ -- Error: Entity "CONSTANTE" is not defined
+  "Message is: {message}" -- Won't execute due to previous error
+}
+
+{
+  CONSTANT: true
+}
+
+```
+
+⚠️ You haven't seen much more than Entities yet, but the rule is that every construct that has a proper body has a proper context like Functions, Lambdas, Objects, Enums and Structs.
+
+Following the message Entity inside Function does not exist because Function has its own context!
+
+```lua
+{
+  CONSTANT: true
+}
+
+message:= "Hi"
+"Message is: {message}" ✅ -- Ok, same context
+
+printMessage() => {
+  CONSTANT? {  ✅ -- Ok, CONSTANT previously defined
+    "Message is: {message}" ❌ -- Error: Entity "message" is not defined in printMessage() context
+  }
+}
+
+printMessage()
+```
+
+You can't do this as well (message is inside Function context):
+
+```lua
+printMessage() => {
+  message:= "Hi"
+}
+
+printMessage()
+
+"Message is: {message}" ❌ -- Error: Entity "message" is not defined
+```
+
+Nor this (message here is only a Function parameter):
+
+```lua
+
+printMessage(message:string) => {
+  "Message is: {message}"  ✅ -- Ok, same context
+}
+
+printMessage("Hi")
+"Message is: {message}" ❌ -- Error: Entity "message" is not defined
+```
+
+You can move the context of an Entity using the Move Intent, but you can't move the context of a Constant.
+
+```lua
+message:= "Hi"
+"Message is: {message}" ✅ -- Ok, same context
+
+printMessage(message:string) => {
+  "Message is: {message}" ✅ -- Ok, context will be moved ahead
+}
+
+printMessage() << message
+
+"Message is: {message}" ❌ -- Error: Entity "message" is moved
+```
+
+Moving can be an advanced topic, but it's simple in Wide, and that's just cited here for you to know it exists as a subject of Context.
+
+---
+
 ## Comments
 
 Wide has 3 ways to comment code:
