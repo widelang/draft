@@ -269,7 +269,7 @@ It's built-in core data types looks like this:
 
 | Type-Value | English Alias | Examples |
 |:---:|--------|--------|
-| ? | bool (1: true, 0: fale ) | true/false, yes/no, on/off |
+| ? | bool (1: true, 0: false ) | true/false, yes/no, on/off |
 | '' | char  | letter 'A', number '1', symbol '$' |
 | " | string  | "hello", "sweet potatoes", "How are you?" |
 | 0 | int | 1, 10, 100, 999 |
