@@ -1806,6 +1806,11 @@ greet(name:string) => {} -- No return type
 greet("World") -- Output: Hello, World!
 ```
 
+### `;` Return Intent
+
+The `;` Return Intent is used to mean that a value must be return.
+It's the only place where it's used in Wide.
+
 **Returning Values:**
 
 To return values you use the `;` Return Intent at the end of the line that you want to return the value or resulting value from an expression.
