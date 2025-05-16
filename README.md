@@ -112,6 +112,63 @@ But if you were just vanilla Wide cli you can do just so:
 }
 ```
 
+But you can be very expressive with the language:
+
+```lua
+.Node <
+  (
+    .$id: string
+    .$edges: Map{string, int}
+  )
+/>
+
+Graph: Map{string, Node} = {
+  "A": <Node (id: "A", edges: { "B": 2, "C": 4 }) />,
+  "B": <Node (id: "B", edges: { "C": 1, "D": 7 }) />,
+  "C": <Node (id: "C", edges: { "D": 3 }) />,
+  "D": <Node (id: "D", edges: {}) />
+}
+
+dijkstra(start: string) => {
+  $distances: Map{string, int} = {}
+  $visited: Set{string} = {}
+
+  Graph.keys().forEach(id => {
+    $distances[id] = ...
+  })
+
+  $distances[start] = 0
+
+  ~($visited.size() < Graph.keys().count()) {
+    $unvisited = Graph.keys().filter(id => !$visited.has(id))
+
+    current = $unvisited.reduce((min, id) => {
+      $distances[id] < $distances[min] ? id : min;
+    })
+
+    node = Graph[current]
+    distance = $distances[current]
+
+    node.edges.keys().forEach(neighbor => {
+      weight = node.edges[neighbor]
+      total = distance + weight
+      (total < $distances[neighbor]) ? {
+        $distances[neighbor] = total
+      }
+    })
+
+    $visited.add(current)
+  }
+
+  $distances;
+}
+
+result:= dijkstra("A")
+result.keys().map(nodeId => {
+  "Distance from A to {nodeId}: {result[nodeId]}"
+)
+```
+
 ## Symbols and keywords
 
 Wide has no keywords. Just some symbols to represent **Intent**. But some types maybe aliased.
