@@ -168,7 +168,7 @@ dijkstra(start: string) => {
 result:= dijkstra("A")
 result.keys().map(nodeId => {
   "Distance from A to {nodeId}: {result[nodeId]}"
-})
+)
 ```
 
 **Bellman-Ford Algorithm?**
@@ -274,6 +274,76 @@ floyd_warshall = () => {
 }
 
 result = (floyd_warshall)
+(result)
+```
+
+**Tarjan's Algorithm in Wide**
+
+```lua
+Node <(
+  .$id: string
+  .$edges: List{string}
+)/>
+
+Graph: Map{string, Node} = {
+  "A": <Node (id: "A", edges: ["B"]) />,
+  "B": <Node (id: "B", edges: ["C"]) />,
+  "C": <Node (id: "C", edges: ["A", "D"]) />,
+  "D": <Node (id: "D", edges: ["E"]) />,
+  "E": <Node (id: "E", edges: ["F"]) />,
+  "F": <Node (id: "F", edges: ["D", "G"]) />,
+  "G": <Node (id: "G", edges: []) />
+}
+
+tarjan = () => {
+  $index: int = 0
+  $stack: List{string} = []
+  $onStack: Set{string} = {}
+  $indexes: Map{string, int} = {}
+  $lowLinks: Map{string, int} = {}
+  $components: List{List{string}} = []
+
+  strongConnect = (v: string) => {
+    $indexes[v] = $index
+    $lowLinks[v] = $index
+    $index += 1
+
+    $stack.push(v)
+    $onStack.add(v)
+
+    Graph[v].edges ~ (w) : {
+      (!($indexes.has(w))) >> (
+        (strongConnect w)
+        $lowLinks[v] = $lowLinks[v].min($lowLinks[w])
+      )
+
+      $onStack.has(w) >> (
+        $lowLinks[v] = $lowLinks[v].min($indexes[w])
+      )
+    }
+
+    ($lowLinks[v] == $indexes[v]) >> (
+      $component: List{string} = []
+
+      ~ (true) {
+        $w = $stack.pop()
+        $onStack.delete($w)
+        $component.push($w)
+        ($w == v) || ()
+      }
+
+      $components.push($component)
+    )
+  }
+
+  Graph.keys() ~ (v) : {
+    (!($indexes.has(v))) >> (strongConnect v)
+  }
+
+  $components;
+}
+
+result = (tarjan)
 (result)
 ```
 
@@ -1536,19 +1606,28 @@ $counter:= 1
 
 ```lua
 $counter:= 1
+
 ~($counter <= 10) {
   "Counter value is: {counter}"
 
   $counter == 5 ? {
     "break, please!"
-    || -- Wall operator used alone in line
+    || -- Wall operator used alone in line inside question body
   }
 
-  `>> same as continue`
+  ($counter == 5) || (
+    "break, please!"
+  )
+
   $counter % 2 == 0 ? {
     "continue, please!"
-     >> -- Flow operator used alone in line
+     >> -- Flow operator used alone in line inside questoin body
   }
+
+  -- you could do like so:
+  ($counter % 2 == 0) >> (
+    "continue, please"
+  )
 
   $counter++
 }
