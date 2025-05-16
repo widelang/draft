@@ -617,7 +617,7 @@ SPEED_OF_LIGHT: 1  ❌ Error: constant is opaque and cannot be redefined
 
 ## Entity Context
 
-Entities are constrained to the Scope they exist, you must use them in the same context they are create, or their nested ones.
+Entities are constrained to the Context they exist, you must use them in the same context they are create, or their nested ones.
 
 ⚠️ The exception being for Constant Entities because they fall through all contexts after usage.
 
@@ -638,10 +638,11 @@ Error for Constant defined after usage:
 ```lua
 message:= "Hi"
 
-CONSTANT? { ❌ -- Error: Entity "CONSTANTE" is not defined
+CONSTANT? { ❌ -- Error: Entity "CONSTANT" is not defined
   "Message is: {message}" -- Won't execute due to previous error
 }
 
+-- defined after usage
 {
   CONSTANT: true
 }
