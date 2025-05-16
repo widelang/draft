@@ -246,7 +246,7 @@ number:int = 1
 number:string = "One"
 ```
 
-`:=` Infer Intent
+### `:=` Infer Intent
 
 Whenever you what the compiler to infer the type, you must join intents `:=` together to intent inference.
 
