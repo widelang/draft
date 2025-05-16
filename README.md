@@ -3542,11 +3542,9 @@ result: userInput
 You can go Async with Pipes:
 
 ```lua
-@(
-  fetchURL( "https://example.com/api/data")
+@fetchURL( "https://example.com/api/data")
   >> parseJSON()
   >> filter( isValid)
   >> map( extractName)
   >> saveToDB()
-)
 ```
