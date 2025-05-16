@@ -168,7 +168,7 @@ dijkstra(start: string) => {
 result:= dijkstra("A")
 result.keys().map(nodeId => {
   "Distance from A to {nodeId}: {result[nodeId]}"
-)
+})
 ```
 
 **Bellman-Ford Algorithm?**
