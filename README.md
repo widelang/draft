@@ -1831,7 +1831,7 @@ message: greet("World")
 "{message}" -- Hello, World!
 ```
 
-As you saw, the `;` Return Intent is used to return a value from a Function, but you can inline it using the `=>` Lambda Intent alone:
+As you saw, the `;` Return Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Return Intent on inlined functions.
 
 ```lua
 -- Inlined function
