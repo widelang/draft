@@ -112,7 +112,9 @@ But if you were just vanilla Wide cli you can do just so:
 }
 ```
 
-But you can be very expressive with the language:
+But you can be very expressive with the language!
+
+**Dijkstra's Algorithm in Wide**
 
 ```lua
 .Node <
@@ -169,6 +171,112 @@ result.keys().map(nodeId => {
 )
 ```
 
+**Bellman-Ford Algorithm?**
+
+```lua
+Edge <(
+  .$from: string
+  .$to: string
+  .$weight: int
+)/>
+
+Graph: List{Edge} = [
+  <Edge (from: "A", to: "B", weight: 4) />,
+  <Edge (from: "A", to: "C", weight: 5) />,
+  <Edge (from: "B", to: "C", weight: -3) />,
+  <Edge (from: "B", to: "D", weight: 6) />,
+  <Edge (from: "C", to: "D", weight: 2) />
+]
+
+Nodes: Set{string} = Graph.reduce((acc, e) => {
+  acc.add(e.from)
+  acc.add(e.to)
+  acc;
+}, Set{})
+
+bellman_ford = (start: string) => {
+  $dist: Map{string, int} = {}
+  Nodes ~ (n) : $dist[n] = +..
+  $dist[start] = 0
+
+  $passes = Nodes.size - 1
+  ~ (i: 0 .. $passes) {
+    Graph ~ (edge) : {
+      $u = edge.from
+      $v = edge.to
+      $w = edge.weight
+      ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
+        $dist[$v] = $dist[$u] + $w
+      }
+    }
+  }
+
+  -- detect negative weight cycles
+  $hasNegativeCycle: bool = false
+  Graph ~ (edge) : {
+    $u = edge.from
+    $v = edge.to
+    $w = edge.weight
+    ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
+      $hasNegativeCycle = true
+    }
+  }
+
+  {
+    distances: $dist,
+    negativeCycle: $hasNegativeCycle
+  };
+}
+
+result = (bellman_ford "A")
+(result)
+
+```
+
+**Floyd-Warshall in Wide?**
+
+```lua
+Nodes: List{string} = ["A", "B", "C", "D"]
+
+INF: int = +..
+
+Graph: Map{string, Map{string, int}} = {
+  "A": { "A": 0, "B": 3, "C": INF, "D": 7 },
+  "B": { "A": 8, "B": 0, "C": 2, "D": INF },
+  "C": { "A": 5, "B": INF, "C": 0, "D": 1 },
+  "D": { "A": 2, "B": INF, "C": INF, "D": 0 }
+}
+
+floyd_warshall = () => {
+  $dist: Map{string, Map{string, int}} = {}
+
+  Nodes ~ (i) : {
+    $dist[i] = {}
+    Nodes ~ (j) : {
+      $dist[i][j] = Graph[i][j] ?? INF
+    }
+  }
+
+  Nodes ~ (k) : {
+    Nodes ~ (i) : {
+      Nodes ~ (j) : {
+        $ik = $dist[i][k]
+        $kj = $dist[k][j]
+        $ij = $dist[i][j]
+        ~ ($ik != INF && $kj != INF && $ik + $kj < $ij) {
+          $dist[i][j] = $ik + $kj
+        }
+      }
+    }
+  }
+
+  $dist;
+}
+
+result = (floyd_warshall)
+(result)
+```
+
 ## Symbols and keywords
 
 Wide has no keywords. Just some symbols to represent **Intent**. But some types maybe aliased.
@@ -189,6 +297,9 @@ Whenever you see the Type Intent `:` (colon symbol) you can think:
 
 - it has type
 - it checks type
+- it implies type
+- it assigns type
+- it defines value *(edge cases)*
 
 ### `=` Assignment Intent
 
