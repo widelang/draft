@@ -1191,13 +1191,13 @@ user:= {
 
 -- Nested data for a blog post
 post:= {
-  "title": "Why Python Rocks",
+  "title": "Why Wide Rocks",
   "author": {
     "name": "Bob",
     "id": 42
   },
-  "tags": ["python", "programming", "tutorial"],
-  "published": True
+  "tags": ["wide", "programming", "tutorial"],
+  "published": true
 }
 
 "{post.title} by {post.author.name}"
