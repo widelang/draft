@@ -114,7 +114,7 @@ But if you were just vanilla Wide cli you can do just so:
 
 But you can be very expressive with the language!
 
-**Dijkstra's Algorithm in Wide**
+**Dijkstra's Algorithm?**
 
 ```lua
 .Node <
@@ -168,7 +168,7 @@ dijkstra(start: string) => {
 result:= dijkstra("A")
 result.keys().map(nodeId => {
   "Distance from A to {nodeId}: {result[nodeId]}"
-)
+})
 ```
 
 **Bellman-Ford Algorithm?**
@@ -196,12 +196,14 @@ Nodes: Set{string} = Graph.reduce((acc, e) => {
 
 bellman_ford = (start: string) => {
   $dist: Map{string, int} = {}
-  Nodes ~ (n) : $dist[n] = +..
+  Nodes ~ (n) {
+    $dist[n] = +..
+  }
   $dist[start] = 0
 
   $passes = Nodes.size - 1
-  ~ (i: 0 .. $passes) {
-    Graph ~ (edge) : {
+  ~ (0..$passes) {
+    Graph ~ (edge) {
       $u = edge.from
       $v = edge.to
       $w = edge.weight
@@ -213,10 +215,11 @@ bellman_ford = (start: string) => {
 
   -- detect negative weight cycles
   $hasNegativeCycle: bool = false
-  Graph ~ (edge) : {
+  Graph ~ (edge) {
     $u = edge.from
     $v = edge.to
     $w = edge.weight
+
     ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
       $hasNegativeCycle = true
     }
@@ -233,7 +236,7 @@ result = (bellman_ford "A")
 
 ```
 
-**Floyd-Warshall in Wide?**
+**Floyd-Warshall Algorithm?**
 
 ```lua
 Nodes: List{string} = ["A", "B", "C", "D"]
@@ -250,16 +253,16 @@ Graph: Map{string, Map{string, int}} = {
 floyd_warshall = () => {
   $dist: Map{string, Map{string, int}} = {}
 
-  Nodes ~ (i) : {
+  Nodes ~ (i) {
     $dist[i] = {}
-    Nodes ~ (j) : {
+    Nodes ~ (j) {
       $dist[i][j] = Graph[i][j] ?? INF
     }
   }
 
-  Nodes ~ (k) : {
-    Nodes ~ (i) : {
-      Nodes ~ (j) : {
+  Nodes ~ (k) {
+    Nodes ~ (i) {
+      Nodes ~ (j) {
         $ik = $dist[i][k]
         $kj = $dist[k][j]
         $ij = $dist[i][j]
@@ -277,7 +280,7 @@ result = (floyd_warshall)
 (result)
 ```
 
-**Tarjan's Algorithm in Wide**
+**Tarjan's Algorithm?**
 
 ```lua
 Node <(
@@ -311,7 +314,7 @@ tarjan = () => {
     $stack.push(v)
     $onStack.add(v)
 
-    Graph[v].edges ~ (w) : {
+    Graph[v].edges ~ (w) {
       (!($indexes.has(w))) >> (
         (strongConnect w)
         $lowLinks[v] = $lowLinks[v].min($lowLinks[w])
@@ -336,7 +339,7 @@ tarjan = () => {
     )
   }
 
-  Graph.keys() ~ (v) : {
+  Graph.keys() ~ (v) {
     (!($indexes.has(v))) >> (strongConnect v)
   }
 
@@ -369,7 +372,7 @@ Whenever you see the Type Intent `:` (colon symbol) you can think:
 - it checks type
 - it implies type
 - it assigns type
-- it defines value *(edge cases)*
+- it defines type
 
 ### `=` Assignment Intent
 
@@ -1452,30 +1455,52 @@ There's more to slices, but that's just a taste for you to meat Ranges after Ite
 
 Wide has a revamped approach to iterating over Collections data.
 
+Iterating in Wide is done with lambdas and mostly an Iterator is implicit.
+
 Following Wide's idea of not having keywords, you'll be able to iterate data without `for`, `while`,  `do-while`, `foreach` in a simple way.
 
 ### `~` Iteration Intent
 
 Whenever you see the Iteration Intent `~` (tilde symbol) you can think:
 
-- **it has repeation**
-- **it has continuity**
-- or **it has recursion**
+- it has repeation
+- it has continuity
+- it has recursion
+- it has iterator
 
 All Collections in Wide are Iterables and you can iterate over equally.
 
-### Iterating with Collections
+```lua
+list = [1, 2, 3, 4, 5, 6]
+list ~ (item) {
+  "Item is {item}
+}
+```
 
-Iterating in Wide is done with lambdas.
+Enumeration is also implicit:
+
+```lua
+list = [1, 2, 3, 4, 5, 6]
+list ~ (item) {
+  "Item at {item.} is {item}"
+  -- Item at 1 is 1
+  "Item at {item[]} is {item}"
+  -- Item at 0 is 1
+}
+```
+
+### Destructive Iterations
 
 You can get the index of the current iteration using `.` or `[]` after the name of the collection Entity.
 
 ```lua
 numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-~(number : numbers) {
+~(number = numbers) {
   "Number at #{numbers.} is {number}"
   -- Number at #1 is 1
+  -- "Number at #{numbers[]} is {number}"
+  -- Number at #0 is 1
 }
 
 /*
@@ -1485,8 +1510,8 @@ numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 */
 squared(number:int) int => number ** 2
 
--- or passing function to lambda
-~(squared(number) : numbers) {
+-- or passing function to transform directly
+~(squared(number) = numbers) {
   "Number at #{numbers.} squared is {number}"
 }
 ```
@@ -1494,7 +1519,7 @@ squared(number:int) int => number ** 2
 ```lua
 uniqueColors:= {"red", "green" , "blue" }
 
-~(color : uniqueColors) {
+~(color = uniqueColors) {
   "Color is {color}"
 }
 
@@ -1502,7 +1527,7 @@ uniqueColors:= {"red", "green" , "blue" }
 upper(input:string) => string.upper()
 
 -- or passing function to lambda
-~(upper(color) : uniqueColors) {
+~(upper(color) = uniqueColors) {
   "{color}"
 }
 ```
@@ -1510,11 +1535,11 @@ upper(input:string) => string.upper()
 ```lua
 uniqueColors:= {"red":'R', "green":'G', "blue":'B'}
 
-~({key, value} : uniqueColors) {
+~({key, value} = uniqueColors) {
   "{key.(capitalize)} is represented by the letter: {value}"
   }
 
-~(color : uniqueColors) {
+~(color = uniqueColors) {
   "Color is {color}"
 }
 ```
@@ -1621,6 +1646,7 @@ $counter:= 1
     || -- Wall operator used alone in line inside question body
   }
 
+  -- you could do like so:
   ($counter == 5) || (
     "break, please!"
   )
@@ -1672,36 +1698,36 @@ The following example start all at 1
 ```lua
 range:= ~(6)
 
-~(val : range) {
+~(val = range) {
   "{val}" -- 1 2 3 4 5 6
 }
 
 -- no need for temporary entity
-~(val : (6)) {
+~(val = (6)) {
   "{val}" -- 1 2 3 4 5 6
 }
 ```
 
 ```lua
 range:= ~(3..6)
-~(val : range) {
+~(val = range) {
   "{val}" -- 3 4 5 6
 }
 
 -- no need for temporary entity
-~(val : (3..6)) {
+~(val = (3..6)) {
   "{val}" -- 3 4 5 6
 }
 ```
 
 ```lua
 range:= ~(3..10:2)
-~(val : range) {
+~(val = range) {
   "{val}" -- 3 5 7 9
 }
 
 -- no need for temporary entity
-~(val : (3..10:2)) {
+~(val = (3..10:2)) {
   "{val}" -- 3 5 7 9
 }
 ```
@@ -1710,24 +1736,24 @@ range:= ~(3..10:2)
 
 ```lua
 range:= ~([6])
-~(val : range) {
+~(val = range) {
   "{val}" -- 0 1 2 3 4 5
 }
 
 -- no need for temporary entity
-~(val : ([6])) {
+~(val = ([6])) {
   "{val}" -- 0 1 2 3 4 5
 }
 ```
 
 ```lua
 range:= ~([3:6])
-~(val : range) {
+~(val = range) {
   "{val}" -- 3 4 5
 }
 
 -- no need for temporary entity
-~(val : ([3:6])) {
+~(val = ([3:6])) {
   "{val}" -- 3 4 5
 }
 ```
@@ -1735,12 +1761,12 @@ range:= ~([3:6])
 ```lua
 range:= ~([3:10:2])
 
-~(val : range) {
+~(val = range) {
   "{val}" -- 3 5 7 9
 }
 
 -- no need for temporary entity
-~(val : ([3:10:2])) {
+~(val = ([3:10:2])) {
    "{val}" -- 3 5 7 9
 }
 ```
@@ -1821,7 +1847,7 @@ name:= "Mary"
 . "Welcome, Stranger!"
 ```
 
-⚠️ Parenthesis are optional! `{}` are optional when no body make visibility bad.
+⚠️ Parentheses are optional! `{}` are optional when no body make visibility bad.
 
 You can also nest Questions:
 
@@ -1874,12 +1900,15 @@ Regular Expression in Wide is done using the `//` Inclusion Intent.
 ```lua
 animal:= "bird"
 
-"matched" ? /cat|dog/ animal  . "did not match!"
+/cat|dog/ animal ? {
+  "matched"
+}
+. "did not match!"
 
 
 text:= "my dog is a beautiful dog and I love my dog"
 
-~({match} /cat|dog/ text){
+~({match} = /cat|dog/ text){
   "{match}"
 }
 ```
@@ -1887,9 +1916,9 @@ text:= "my dog is a beautiful dog and I love my dog"
 You must always pass an entity after the expression:
 
 ```lua
-"matched" ? /cat|dog/ . "did not match!" ❌ -- No entity to match after expression
-
-~({match} /cat|dog/) "{match}" ❌ -- No entity to match after expression
+~({match} /cat|dog/) {  ❌ -- No entity to match after expression
+  "{match}"
+}
 ```
 
 Another way to Question in a *Switch-like*:
@@ -1973,7 +2002,7 @@ message:string = item ? {
 "{message}"
 ```
 
-If you want to both return and print you it can you must enclose between `{}`.
+If you want to both return and print you it can you must enclose between `{}` and use the `;` Return Intent in the final of the returning expression.
 
 You can also give a temporary name for the match expression:
 
@@ -2222,7 +2251,7 @@ If don't want to name your parameters you just do so with the  `..` Extent Inten
 add(..numbers:int) => {
   $sum:= 0
 
-  ~(number:numbers) {
+  ~(number = numbers) {
     $sum += number
   }
 
@@ -2246,7 +2275,7 @@ You can also mix with positional once they come first:
 ```lua
 add(a:int, b:int, ..numbers:int) => {
   $sum:= 0
-  ~(number:numbers) {
+  ~(number = numbers) {
     $sum += number
   }
 
@@ -2545,7 +2574,7 @@ printUserData() => {
   @("error fetching data") {
     users:= query("select from users")
 
-    ~(user: user) {
+    ~(user = user) {
       "{user.name}"
     }
   }
@@ -2576,7 +2605,7 @@ Just destructuring?
 @result = fetchUserData()
 
 !@ ? {
-  ~({name, age} : users) ? {
+  ~({name, age} = users) ? {
     "{name} is {age} years old!"
   }
 } . "{@}" -- Will print "error fetching users" -- if an error occur
@@ -2611,7 +2640,7 @@ Just pass the error inside () and its an awaited error checking:
 
 ```lua
 @(fetchUserData()) ? {
-  ~({name, age} : users) {
+  ~({name, age} = users) {
     "{name} is {age} years old!"
   }
 }  . "{@}"
@@ -2625,7 +2654,7 @@ Same as:
 @result = fetchUserData()
 
 !@ ? {
-  ~({name, age} : users) {
+  ~({name, age} = users) {
     "{name} is {age} years old!"
   }
 }  . "{@}"
@@ -3147,7 +3176,7 @@ When NOT promoted parameters are used you can also segment it like unnamed param
 ```lua
 .Thing <
   (..params:int ) => {
-    ~(param : params) {
+    ~(param = params) {
       "{param}"
     }
   }
@@ -3847,3 +3876,17 @@ You can go Async with Pipes:
   >> map( extractName)
   >> saveToDB()
 ```
+
+## Infinity
+
+In Wide the Infinity is represented by `...`.
+
+The `..` Extent Intent is a cousing of it.
+
+Wide has 3 symbols for representing Infinity:
+
+`..-` is like a number that's unbelievably small (negative).
+
+`...` is like something that's not even a proper number.
+
+`+..` is like a number that's unbelievably big (positive).
