@@ -2481,6 +2481,26 @@ greet("Hello") << $name
 "{$name}" ❌ -- Error '$name' does not exist in this scope
 ```
 
+### Generators
+
+You can create functions that return an Iterator just using the `~` Iteration Intent and using multiple return intent lines.
+
+```lua
+generator() ~> {
+    1;
+    2;
+    3;
+}
+
+~(value = generator()) {
+    "Value is {value}"
+}
+
+-- Will output: 1 2 3
+```
+
+⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
+
 ### `@` Event Intent
 
 Whenever you see the Type Intent `@` you can think:
