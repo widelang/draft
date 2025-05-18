@@ -29,9 +29,9 @@ Wide is a symbol-based, declarative, paradigm-unifying programming language desi
 
 It doesn't have keywords (at least not for aliased types).
 
-It lets **humans speak logic** – cleanly, expressively, and across paradigms.
+It lets **humans speak logic** — cleanly, expressively, and across paradigms.
 
-Wide isn’t just about code - it's about communication.
+Wide isn’t just about code — it's about communication.
 
 It's about intent — and Wide delivers it.
 
@@ -41,8 +41,8 @@ Wide is a keyword-less, intent-driven programming language inspired by years of 
 
 Its design takes direct cues from:
 
-- HTML - for its wide used markup on the Web
-- CSS - for its abstract way of selecting elements
+- HTML — for its wide used markup on the Web
+- CSS — for its abstract way of selecting elements
 - Python — for its clean syntax and readability-first philosophy
 - Go — for its simplicity and strong opinions on structure
 - Rust — for its safety, scope-aware semantics, and move-inspired modeling
