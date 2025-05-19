@@ -384,25 +384,21 @@ Whenever you see the Assignment Intent `=` (equal symbol) you can think:
 
 Now that you know the 2 most basic intents, let's see some syntax.
 
+Everything you can name in Wide is called an Entity.
+
 E.g.:
 
 ```lua
-composer:string = "Amadeus Mozart"
+name:string = "Amadeus Mozart"
 ```
 
-Can you spot what were the intents when you read that line of code?
-
-The value of the `composer` Entity is of type text `"Amadeus Mozart"`.
-
-`composer` is the name of an Entity, what most programming languages call *variables*.
-
-⚠️ Wide doesn't have the concept of *variables* like most programming languages do. When you assign a value to a thing you are assigning a value to an **Entity** that is immutable by default.
+The value of the `name` Entity is of type text `"Amadeus Mozart"`.
 
 If reused the same name of an entity, the previous value will be **shadowed** and no longer exists after that point in code.
 
 ```lua
-composer:string = "Amadeus Mozart"
-composer:string = "Antonio Vivaldi"
+name:string = "Amadeus Mozart"
+name:string = "Antonio Vivaldi"
 ```
 
 Above there exist 2 distinct Entities but the first has to die in order the last to live!
@@ -410,15 +406,15 @@ Above there exist 2 distinct Entities but the first has to die in order the last
 You can't do this:
 
 ```lua
-composer:string = "Amadeus Mozart"
-composer = "Antonio Vivaldi" ❌ Error: Immutables can't be reassigned
+name:string = "Amadeus Mozart"
+name = "Antonio Vivaldi" ❌ Error: Immutables can't be reassigned
 ```
 
 But you could've done so:
 
 ```lua
-composer:string = "Amadeus Mozart"
-composer:= "Antonio Vivaldi"
+name:string = "Amadeus Mozart"
+name:= "Antonio Vivaldi"
 ```
 
 That says the compiler to infer the type again.
@@ -721,20 +717,20 @@ $salary = 20000.00
 
 Constant Entities are similar to Immutable Entities, but with an important difference, they can't be shadowed.
 
-If you want to create a Constant Entity, you must enclose the Immutable Entity into the `{}` Context Intent.
+If you want to create a Constant Entity, you must enclose the Immutable Entity into the `{}` Context Intent, give it a name and a value.
 
 You say that it's opaqued inside `{}` and can't be move down to be shadowed.
 
 ```lua
-{PI: 3.14159265358979323846}
-{SPEED_OF_LIGHT: 299792458.0}
-{GRAVITATIONAL_CONSTANT: 6.67430e-11}
-{DEFAULT_TIMEOUT_MS: 5000}
-{STATUS_OK: 200}
-{AVOGADRO: 6.02214076e23}
-{API_URL: "https://api.example.com/v1/"}
-{DEBUG_MODE: 1}
-{ENV: "dev"}
+{ PI: 3.14159265358979323846 }
+{ SPEED_OF_LIGHT: 299792458.0 }
+{ GRAVITATIONAL_CONSTANT: 6.67430e-11 }
+{ DEFAULT_TIMEOUT_MS: 5000 }
+{ STATUS_OK: 200 }
+{ AVOGADRO: 6.02214076e23 }
+{ API_URL: "https://api.example.com/v1/" }
+{ DEBUG_MODE: 1 }
+{ ENV: "dev" }
 
 -- or grouped
 {
@@ -750,7 +746,7 @@ You say that it's opaqued inside `{}` and can't be move down to be shadowed.
 }
 ```
 
-Constants don't use the `=` intent nor `:=` Infer Intent beause the compiler will always know what type it must be infered, and because they are like unnabled Structs, as you'll see later.
+Constants don't use the `=` intent nor `:=` Infer Intent beause the compiler will always know what type it must be infered, and because they are like unnabled Enums, as you'll see later.
 
 ⚠️ You don't need to name your Constant Entities in CAMEL_CASE, but it's a good convention to adopt since it gives Visual Intent to your code making them visually different from Immutables!
 
@@ -796,6 +792,128 @@ Cannot be shadowed — sealed inside context:
 {SPEED_OF_LIGHT: 299792458.0}
 SPEED_OF_LIGHT: 1  ❌ -- Error: constant is opaque and cannot be redefined
 ```
+
+---
+
+### Grouped Entities
+
+Whenever you want to define multiple Entities, you can just group them.
+
+Doing so will cause to create a Homogeneous Record.
+
+```lua
+n1:int
+n2:int
+n3:int
+
+n4:float
+n5:float
+n6:float
+
+first:string
+last:string
+```
+
+Same as:
+
+```lua
+{ n1, n2, n3 }:int
+
+{ n4, n5, n6 }:float
+
+{ first, last}:string
+```
+
+You can assign values as well:
+
+```lua
+{ n1 = 1, n2 = 2, n3 = 3 }:int
+
+{ first = "Alice", last = "Smith" }:string
+```
+
+All the above examples are Immutables, but you can use them to group mutables as well.
+
+All at once:
+
+```lua
+${
+  n1 = 1,
+  n2 = 2,
+  n3 = 3
+}:int
+
+
+${ first = "Alice", last = "Smith" }:string
+```
+
+Or separately:
+
+```lua
+{
+  $n1 = 1,
+  $n2 = 2,
+  n3 = 3
+}:int
+
+{ $first = "Alice", last = "Smith" }:string
+
+```
+
+And you can name them:
+
+```lua
+$data{ n1 = 1, n2 = 2, n3 = 3 }:int
+
+$fullName{ first = "Alice", last = "Smith" }:string
+```
+
+And you can access them statically:
+
+```lua
+$data..n1
+$data..n2
+$data..n3
+
+$fullName..first
+$fullName..last
+```
+
+Or go indexed (you'll see indexing very soon)
+
+```lua
+$data..1
+$data..2
+$data..3
+
+$fullName..1
+$fullName..2
+```
+
+Or even iterate over them (you'll see iteration very soon):
+
+```lua
+~(n = $data) {
+  "Value is {n}"
+}
+```
+
+Wide automatically binds utility methods to Entity Groups based on type.
+
+```lua
+$nums{ a = 1, b = 2, c = 3 }:int
+$nums.sum()       -- 6
+$nums.avg()       -- 2
+$nums.toList()    -- [1, 2, 3]
+
+$name{ first = "Alice", last = "Smith" }:string
+$name.join(" ")    -- "Alice Smith"
+
+$stats.map(n => n * 2)
+$words.filter(w => w.length > 4)
+```
+
+⚠️ Noticed that when using methods you just used one dot? That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
 
 ---
 
@@ -1232,7 +1350,7 @@ Entities created by destructuring a Collection will cause to create Constant-lik
 ```lua
 user:= ["Mary", 35, 10000.00]
 
-{name, age, salary}:= users
+{name, age, salary}:= languages
 
 "{name} is {age} years old and makes {salary} monthly"
 
@@ -2366,7 +2484,7 @@ $number2: 20 -- Mutable now
 
 "{number1}"
 "{number2}"
-sum:= (add number1, $number2) << $number2 -- $number2 moved to sum Function scope
+sum:= add(number1, $number2) << $number2 -- $number2 moved to sum Function scope
 "{sum}"
 "{number1}"
 "{number2}" ❌ -- Error '$number2' does not exist in this scope
@@ -2386,7 +2504,7 @@ fn = () => { "Do nothing" }
 fn() -- will print nothing!
 
 
-msg:= (fn)
+msg:= fn()
 
 "{msg}" -- will ouput "Do nothing"
 ```
@@ -2659,7 +2777,7 @@ On Function Call you just prefix the name with `@` and it says `await` event sta
     error,
     "error fetching users"
   ) {
-    users: (@query "select name, age from users")
+    users:= @query("select name, age from users")
   }
 
   users;
@@ -2770,8 +2888,6 @@ HomePage() => {
   </>;
 }
 ```
-
---- CONTINUE FROM HERE ---
 
 ## Functional Object Programming 🤣
 
@@ -3177,7 +3293,7 @@ But you can make explict you intentions and separate constructor promoted entiti
 
 **NOT promoted Entities**
 
-With NOT promoted Entities you enclose them between parenthesis normally and access them like static Entities internally, and you must always have a body when using one or more NOT promoted Entities.
+With NOT promoted Entities you enclose them between parentheses normally and access them like static Entities internally, and you must always have a body when using one or more NOT promoted Entities.
 
 ```lua
 .Thing <
@@ -3222,8 +3338,6 @@ thing:= <Thing (1, 2, 3, 4)/>
 ```
 
 ### Abstract Extent Objects
-
--- CONTINUE FROM HERE --
 
 If want to just blueprint an Object's Intents that provides or not some default behaviour you can abstract placing a `!` Not Intent before the Object's name, its Entities and/or Functions.
 
@@ -3513,7 +3627,7 @@ You create Generics in Wide using `{}` Context Intent, because guess what? - you
 You can pass the use Generics with Functions, Objects, Interfaces, Traits, Enums, and Structs.
 
 ```lua
-calculateAverage{T}(a:T b:T) T => (a + b) / 2
+calculateAverage{T}(a:T, b:T) T => (a + b) / 2
 
 a:int = 32
 b:int = 50
@@ -3682,7 +3796,7 @@ printItem(doc)
 
 ### Enums
 
-Enum are not objects `</>`, it's kinda a named struct if default values.
+Enum are not objects `</>`, it's kinda a named struct with default values.
 
 Enums are created using `#` in prefixing its name.
 
@@ -3922,3 +4036,19 @@ Wide has 3 symbols for representing Infinity:
 `...` is like something that's not even a proper number.
 
 `+..` is like a number that's unbelievably big (positive).
+
+Like other Core Type-Values, you can alias at will:
+
+```lua
+{
+  -Infinity:...-,
+  Infinity:...,
+  +Infinity:+..,
+}
+--or?
+{
+  -Inf:..-,
+  Inf:...,
+  +Inf:+..,
+}
+```
