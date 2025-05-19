@@ -2553,7 +2553,7 @@ m:= 0
 
 -- no need for : Type intent, just assignment.
 -- @ will check for the error
-@result = division(n, m)
+@(result) = division(n, m)
 
 result ? {
   "result is {result}"
@@ -2564,7 +2564,7 @@ result ? {
 You can also check directly agains `@` or destructure:
 
 ```lua
-@result = division(n, m)
+@(result) = division(n, m)
 
 !@ ? {
   "Result is {result}"
@@ -2593,7 +2593,7 @@ So can I get just the error? yep!
 You can also default to a value (in this case 0) using question.
 
 ```lua
-@result = division(n, m))?.0
+@(result) = division(n, m))?.0
 
 "{result}"
 ```
@@ -2634,7 +2634,7 @@ fetchUserData() []User => {
 Just destructuring?
 
 ```lua
-@result = fetchUserData()
+@(result) = fetchUserData()
 
 !@ ? {
   ~({name, age} = users) ? {
