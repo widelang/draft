@@ -2646,9 +2646,9 @@ On Function Call you just prefix the name with `@` and it says `await` event sta
   !@(
     error,
     "error fetching users"
-  ):
+  ) {
     users: (@query "select name, age from users")
-  .
+  }
 
   users;
 }
