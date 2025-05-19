@@ -3526,7 +3526,7 @@ But you can have multiple slots, but in this case, they must all be manually cal
 /Self>
 ```
 
-No you can do this:
+Now you can do this:
 
 ```lua
 <Person ("Alice")>
