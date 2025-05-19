@@ -3536,9 +3536,11 @@ Now you can do this:
 </Person>
 ```
 
-**All the above cases where done at runtime, but you can access slots at compile time.**
+### !Not Intent: Structural Invocation on slots
 
-Just use `!` Not Intent after the Function name to say you are not calling it like a function at runtime, and you've created a Rust-like macro.
+All the above cases where done at runtime, but you can access slots at compile time.
+
+Use ! after a function or object name to invoke its slot expansion logic at compile time. This allows components or functions to act as macros without losing runtime behavior.
 
 ```lua
 println(input:obj, ..args) => {
