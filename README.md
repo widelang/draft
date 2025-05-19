@@ -2931,8 +2931,6 @@ But you could alias that to an immutable, or as a self reference as you'll see v
 
 $person.name = "Alice"
 $person.age = 34
-
-
 ```
 
 ### Resolution Objects
@@ -3390,6 +3388,154 @@ This is how Something will look after abstracting an Extent:
 /{Self}>
 ```
 
+### Slot Objects
+
+Wide supports composable slot-based object definitions with named or default render lambdas.
+
+When using objects like HTML tags, you got free slots:
+
+```lua
+.Person <
+/>
+```
+
+same as:
+
+```lua
+.Person <
+/
+  -- enter slot mode if used
+  (slot) => slot
+/>
+```
+
+And that's why you can do this in code:
+
+```lua
+<Person></Person>
+```
+
+Custom Slot Objects have access to all the members from the Object that creates it on the slot context because they are inside `//` and can have a custom body.
+
+To get them you just use the Object name or the alias.
+
+Slots are like normal lambdas and are enclosed by the `//` Inclusion Intent.
+
+They work like Static Functions and are accessed by `..`.
+
+```lua
+.Person <
+  (.name:string = "Stranger")
+/
+  (slot) => {
+    slot?.<div id="person-slot">
+      <p>"Welcome, {Self.name}"</p>
+    </div>
+  }
+/Self>
+
+ -- No slot content passed, will ouput default static slot content from Object
+<Person ("Alice")>
+</Person>
+
+ -- With Slot, will output passed slot content to Object
+<Person ("Alice")>
+  <h1>{person.name}</h1>
+  <p>"Hello, {person.name}"</p>
+</Person {person}>
+```
+
+You can emulate the same behaviour on Functions as well, but in this case you don't need to use the Function name to get the parameters.
+
+Like Objects you get them for free:
+
+```lua
+Greet() => {}
+```
+
+same as:
+
+```lua
+Greet() => {
+  -- default return ; or output from body
+
+  -- enter slot mode if used
+/
+  (slot) => slot
+/}
+```
+
+And that's why you can do this in code:
+
+```lua
+<Greet>
+  <div>
+    "Hello, person!"
+  </div>
+</Greet>
+```
+
+That alone would be senseless!
+
+An useful example using the previous Person object together:
+
+```lua
+Greet(name:string) => {
+  -- default return ; or output from body
+  <p>"Hello, {name} from Function"</p>;
+
+  -- enter slot mode if used
+/
+  () => <p>"Hello, {name} from Function Slot"</p>
+/}
+
+<Person ("Alice")>
+  <h1>{person.name}</h1>
+
+  -- no slot, default return or ouputs from body
+  <Greet name={person.name} />
+
+  -- using Function slot
+  <Greet>
+    <p>"Hello, {person..name}"</p>
+  </Greet>
+</Person {person}>
+```
+
+For both Objects and Functions you can't name the default Slot.
+
+But you can have multiple slots, but in this case, they must all be manually called in your code, the default inclusively.
+
+```lua
+.Person <
+  (.name:string = "Stranger")
+/
+  (slot) => {
+    slot?.<div id="person-slot">
+      <p>"Welcome, {Self.name}"</p>
+    </div>
+  }
+
+  header(slot) => {
+    slot?.<header>"My App"</header>
+  }
+
+  footer(slot) => {
+    slot?.<footer>"My Footer"</footer>
+  }
+/Self>
+```
+
+No you can do this:
+
+```lua
+<Person ("Alice")>
+  { Person..header() }
+  { Person..() }
+  { Person..footer() }
+</Person>
+```
+
 ### Interfaces
 
 Interfaces are usable Objects with empty Functions. You can use them in other Objects. Once used you are forcebly required to implement their Functions' bodies in the Object they are used.
@@ -3550,6 +3696,7 @@ You can mix conflict resolution and aliasing
 ```
 
 ⚠️ Traits allow abstract Functions like Abstract Extent Objects.
+
 ⚠️ Traits allow static Static Entities and Static Functions
 
 ### Structs
