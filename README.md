@@ -865,7 +865,7 @@ And you can name them:
 ```lua
 $data{ n1 = 1, n2 = 2, n3 = 3 }:int
 
-$fullName{ first = "Alice", last = "Smith" }:string
+$name{ first = "Alice", last = "Smith" }:string
 ```
 
 And you can access them statically:
@@ -875,8 +875,8 @@ $data..n1
 $data..n2
 $data..n3
 
-$fullName..first
-$fullName..last
+$name..first
+$name..last
 ```
 
 Or go indexed (you'll see indexing very soon)
@@ -886,8 +886,8 @@ $data..1
 $data..2
 $data..3
 
-$fullName..1
-$fullName..2
+$name..1
+$name..2
 ```
 
 Or even iterate over them (you'll see iteration very soon):
