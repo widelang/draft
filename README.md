@@ -1232,7 +1232,7 @@ Entities created by destructuring a Collection will cause to create Constant-lik
 ```lua
 user:= ["Mary", 35, 10000.00]
 
-{name, age, salary}:= languages
+{name, age, salary}:= users
 
 "{name} is {age} years old and makes {salary} monthly"
 
