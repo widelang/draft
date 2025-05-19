@@ -2499,6 +2499,18 @@ generator() ~> {
 -- Will output: 1 2 3
 ```
 
+You can go really fancy!
+
+```lua
+~(item = () ~> {
+    1;
+    2;
+    3;
+}) {
+  "{item}"
+}
+```
+
 ⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
 
 ### `@` Event Intent
