@@ -3112,6 +3112,53 @@ thing:= Thing..newStaticFunction() -- not a meta entity
 thing.do ? thing.doSomething()
 ```
 
+### Keyword-less `new`
+
+Wide does not require or support the new keyword. Instead, object instantiation is represented by calling the object's own factory method or builder pattern.
+
+The new() method is a convention, not a keyword - typically returning a self-like instance or a related Entity.
+
+```lua
+.Dog <
+  new() => () => <Dog/>
+  makeSound() => "A dog is barking!"
+/>
+```
+
+Then:
+
+```lua
+dog:= Dog..new()
+dog.makeSound()
+
+-- or just
+Dog..new().makeSound()
+```
+
+Or you can go full builder patter too:
+
+```lua
+.Animal<
+  (.name:string)
+>
+
+.Dog <
+  new(name:string) => () => <Animal name />
+  makeSound() => "{.name} is barking!"
+/>
+
+Dog..new("Marley").makeSound()
+```
+
+Why Wide doesn't have new? Because things can get more simpler!
+
+```lua
+makeDog(name:string) => <Dog name />
+
+dog:= makeDog("Marley")
+dog.makeSound()
+```
+
 ### Object Internal Grouping
 
 When you have multiple Meta Entities you can just group them using the `[]` Meta Intent:
