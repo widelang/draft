@@ -3114,20 +3114,23 @@ thing.do ? thing.doSomething()
 
 ### Keyword-less `new`
 
-Wide does not require or support the new keyword. Instead, object instantiation is represented by calling the object's own factory method or builder pattern.
+Wide does not require or support the `new` keyword. Instead, object instantiation is expressed through a conventional `new()` method or factory-style functions.
 
-The new() method is a convention, not a keyword - typically returning a self-like instance or a related Entity.
+The `new()` method is:
+
+- Not a keyword
+- Just a callable entity
+- Often returns a self-like or related object
+- May accept parameters for initialization
+
+#### Example
 
 ```lua
 .Dog <
   new() => () => <Dog/>
   makeSound() => "A dog is barking!"
 />
-```
 
-Then:
-
-```lua
 dog:= Dog..new()
 dog.makeSound()
 
@@ -3135,29 +3138,31 @@ dog.makeSound()
 Dog..new().makeSound()
 ```
 
-Or you can go full builder patter too:
+Builder style:
 
 ```lua
-.Animal<
-  (.name:string)
+.Animal <
+  (.name: string)
 >
 
 .Dog <
-  new(name:string) => () => <Animal name />
+  new(name: string) => () => <Animal name/>
   makeSound() => "{.name} is barking!"
 />
 
 Dog..new("Marley").makeSound()
 ```
 
-Why Wide doesn't have new? Because things can get more simpler!
+Factory-style:
 
 ```lua
-makeDog(name:string) => <Dog name />
+makeDog(name: string) => <Dog name/>
 
-dog:= makeDog("Marley")
+dog := makeDog("Marley")
 dog.makeSound()
 ```
+
+⚠️ Wide supports shorthand prop injection, so `<Animal name/>` implies `name=name`, allowing clean, modern syntax with no loss of clarity.
 
 ### Object Internal Grouping
 
