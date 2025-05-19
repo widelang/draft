@@ -3536,6 +3536,26 @@ Now you can do this:
 </Person>
 ```
 
+**All the above cases where done at runtime, but you can access slots at compile time.**
+
+Just use `!` Not Intent after the Function name to say you are not calling it like a function at runtime, and you've created a Rust-like macro.
+
+```lua
+println(input:obj, ..args) => {
+/
+  (slot)=> {
+    output:string = ""
+    ~(arg = args) {
+      output+= input.replace("{}", arg)
+    }
+  }
+/}
+
+println!("{}, {}!", "Hello", "Rust")
+```
+
+⚠️ Experimental Feature! 🤣
+
 ### Interfaces
 
 Interfaces are usable Objects with empty Functions. You can use them in other Objects. Once used you are forcebly required to implement their Functions' bodies in the Object they are used.
