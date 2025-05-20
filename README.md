@@ -224,7 +224,6 @@ But you can be very expressive with the language!
       }
     }
 
-    -- detect negative weight cycles
     $hasNegativeCycle: bool = false
     Graph ~ (edge) {
       $u = edge.from
@@ -491,7 +490,7 @@ In wide you can create a **Custom Type** opening a context or not and where to p
 
 But that would serve no purpose! It's lost in the vaccumm of nonsense!
 
-So you can just prefix it with an existing type-value in Wide:
+For core Wide **Type-Values** you can give it the type you want it to be:
 
 ```lua
 "":string
@@ -499,18 +498,16 @@ So you can just prefix it with an existing type-value in Wide:
 
 ⚠️ That's an Aliased Type-Value.
 
-You can also assign a type-value with the `=` Assignment Intent to a custom type. Also you can put them inside a context (optional):
+You can also create a type by assigning a type-value with the `=` Assignment Intent to a custom type.
 
 ```lua
-{
-  :char = ''
-  :string = ""
-  :int = 0
-  :float = 0.0
-  :double = 0.00
-  :obj = <>
-  :fn = ()
-}
+:char = ''
+:string = ""
+:int = 0
+:float = 0.0
+:double = 0.00
+:obj = <>
+:fn = ()
 ```
 
 You can also even alias from an already existing type aliased:
@@ -526,39 +523,37 @@ You can even go more specialized mixing anything that might represent a type gro
 Besides not having keywords in its syntax, some words are impossible to avoid when talking to types, and as you can **alias** types, and in order to help newcomers and professionals with parity with other languages, Wide has built-in aliases for them in plain English:
 
 ```lua
-{
-  ?:bool {
-    0:false,
-    1:true
-  },
-  '':char,
-  "":string,
-  0:int,
-  0.0:float,
-  0.00:double
-  ():fn
-  </>:obj
+?:bool {
+  0:false
+  1:true
 }
+'':char
+"":string
+0:int
+0.0:float
+0.00:double
+():fn
+</>:obj
 ```
 
 Those words are not syntax, they are English words the compiler knows by default they were aliased. You can rename at any time just using the core Wide types as of the previous table and examples or from already English aliased types.
 
+In the case of `?:bool`, it aliased it's possible values because they are also Type-Values. If that's the case, you use `{}` a context for them and follow the same pattern.
+
 ***Wide is made in Brazil***, so types could be aliased like so:
 
 ```lua
-{
-  ?:booleano {
-    0:falso,
-    1:verdadeiro
-  },
-  '':caractere,
-  "":texto,
-  0:inteiro,
-  0.0:flutuante,
-  0.00:real
-  ():funcal
-  </>:objeto
+?:booleano {
+  0:falso,
+  1:verdadeiro
 }
+'':caractere
+"":texto
+0:inteiro
+0.0:flutuante
+0.00:real
+():funcal
+</>:objeto
 ```
 
 ⚠️ Wide is able to understand both English and Portuguese alias in this case.
@@ -569,7 +564,7 @@ When creating aliases you can't create them anywhere.
 
 They must be the first lines of code if there are no imports, or the first lines of code after the imports if there are imports.
 
-They can't be inside the Entry function.
+They can't be inside the Entry function nor elsewhere.
 
 ## Entry function
 
@@ -593,9 +588,11 @@ Back to custom types. This how you would do that for `:string` cited previously:
 
 ```lua
 :string = ""
+:Text = string
 
 () => {
   name:string = "Alice"
+  name:Text = "Alice"
 }
 ```
 
@@ -738,13 +735,20 @@ age: float
 salary: double
 ```
 
-Yes, but it can makes no sense if you never assign them a value and just use the default provided by the type system! If you try to do so you'll get a compiler warning and this code will be removed when compiled if not used. So don't waste yours nor yours computer energy doing that!
+Yes, but it makes no sense if you never assign them a value and just use the default provided by the type system! If you try to do so you'll get a compiler warning and this code will be removed when compiled if not used. So don't waste yours nor yours computer energy doing that!
 
 You can create a new Entity with the same name by **Shadowing** it, but as you already know, the previous will cease to exist in order for the new to live. Besides that you can also change the initial type when shadowing:
 
 ```lua
 value:= 123
 value:= "Alice"
+```
+
+But remember, you can reassign Immutables:
+
+```lua
+value:= 123
+value= "Alice" ❌ -- Error: Entity value cannot be reassigned
 ```
 
 ### `$` State Intent
