@@ -954,7 +954,7 @@ You cannot change them:
 ```lua
 #PI:double = 3.14159265358979323846
 #PI = 3 ❌ -- Error cannot change constant PI
-PI = 3 ❌ -- Error Undefined Entity PI
+PI = 3 ❌ -- Error Entity PI is not defined
 ```
 
 ⚠️ You don't need to name your Constant Entities in CAMEL_CASE, but it's a good convention to adopt since it gives Visual Intent to your code making them visually different from Immutables!
@@ -1083,13 +1083,11 @@ Entities are constrained to the Context they exist, you must use them in the sam
 ⚠️ The exception being for Constant Entities because they fall through all contexts after usage.
 
 ```lua
-{
-  CONSTANT: true
-}
+#CONSTANT = true
 
 message:= "Hi"
 
-CONSTANT? {
+#CONSTANT ? {
   "Message is: {message}" ✅ -- Ok, same context
 }
 ```
@@ -1099,15 +1097,12 @@ Error for Constant defined after usage:
 ```lua
 message:= "Hi"
 
-CONSTANT? { ❌ -- Error: Entity "CONSTANT" is not defined
+#CONSTANT ? {❌ -- Error: Entity "CONSTANT" is not defined
   "Message is: {message}" -- Won't execute due to previous error
 }
 
 -- defined after usage
-{
-  CONSTANT: true
-}
-
+#CONSTANT = true
 ```
 
 ⚠️ You haven't seen much more than Entities yet, but the rule is that every construct that has a proper body has a proper context like Functions, Lambdas, Objects, Enums and Structs.
@@ -1115,15 +1110,13 @@ CONSTANT? { ❌ -- Error: Entity "CONSTANT" is not defined
 Following the message Entity inside Function does not exist because Function has its own context!
 
 ```lua
-{
-  CONSTANT: true
-}
+#CONSTANT = true
 
 message:= "Hi"
 "Message is: {message}" ✅ -- Ok, same context
 
 printMessage() => {
-  CONSTANT? {  ✅ -- Ok, CONSTANT previously defined
+  #CONSTANT ? {  ✅ -- Ok, CONSTANT previously defined
     "Message is: {message}" ❌ -- Error: Entity "message" is not defined in printMessage() context
   }
 }
@@ -1172,7 +1165,7 @@ printMessage() << message
 
 Moving can be an advanced topic, but it's simple in Wide, and that's just cited here for you to know it exists as a subject of Context.
 
----
+----
 
 ## Comments
 
