@@ -969,6 +969,8 @@ You output them likewise other entities but using the Constant `#`Constant Inten
 "The speed of light is {#SPEED_OF_LIGHT}."
 ```
 
+⚠️ You don't need to use # when using a Constant, but it can make explicit your are using them, so in the examples it will be used.
+
 You can group them between a context `{}`:
 
 ```lua
@@ -1033,8 +1035,8 @@ You can't have the same Constants grouped with different names because that woul
 }
 
 #Weekend { ❌ -- Error Constant Entities Cannot be shadowed in Groups
-   Sunday = 0
-   Saturday = 6
+  Sunday = 0
+  Saturday = 6
 }
 ```
 
@@ -1046,26 +1048,26 @@ Take a look at Enums section later, but the most comparison that we can make now
 
 ```lua
 #Day{int} <
-    Sunday = 0,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday
+  Sunday = 0,
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday
 
-    clip() => Self ? {
-      Self..Sunday => "Sun",
-      Self..Monday => "Mon",
-      Self..Tuesday => "Tue",
-      Self..Wednesday => "Wed",
-      Self..Thursday => "Thu",
-      Self..Saturday => "Sat",
-    }
-/Self>
+  clip() => Day ? {
+    Monday => "Mon",
+    Tuesday => "Tue",
+    Wednesday => "Wed",
+    Thursday => "Thu",
+    Saturday => "Sat",
+    Sunday => "Sun",
+  }
+/>
 
-"Sunday is {#Days..Sunday}" -- Output 0
-"Sunday is {#Days..Sunday.clip()}" -- Output "Sun"
+"Sunday is {#Day..Sunday}" -- Output 0
+"Sunday is {#Day..Sunday.clip()}" -- Output "Sun"
 
 day:Day = #Sunday
 "Sunday is {day}" -- Output 0
@@ -3212,8 +3214,6 @@ thing:= <Thing do=doSomething />
 thing.do ? thing.doSomething()
 ```
 
-⚠️ It won't make sense to use Immutable Meta Entities in the example above since you can't use `=` alone with Immutables.
-
 ### Object static scope
 
 Objects can have static scope removing the (.) accessor on naming and usage.
@@ -3371,14 +3371,16 @@ Every object can have 4 ways for you to access them called:
 - protected *(using `..` preserves scope characteristics)*
 - private *(using `#` - local to object)*
 
-⚠️ It made sense keep the OOP jargons for me because I didn't want to change the World of programming by calling them like:
+⚠️ In this documentation it made sense keep the OOP jargons, but for Wide core it has other names:
 
 - contextual (*static*)
 - resolvable (*public*)
 - extendable (*protected*)
 - individual (*private*)
 
-But if you like to promote hate you can call'em like so!
+They mean the same thing as in every OOPL.
+
+Example of extending an Object:
 
 ```lua
 .Thing <
@@ -3419,7 +3421,7 @@ As you can see only the `#instance` Entity and `#intance()` weren't extended.
 Somethings to notice:
 
 **#1**
-Static Entities or Functions are accessed without `.` Intent.
+Static Entities or Functions are accessed without `.` Intent but with `..`.
 
 **#2**
 Non-static Entities or Functions are accessed with only one `.` Intent independent of their characteristic (`.`,`..`,`#`).
@@ -3429,6 +3431,44 @@ When used inside an Object `.` Intent means both *Self* but never *static*.
 
 **3**
 Entities and Function can have the same name because `()` makes their distinction.
+
+Special notice is due to the `#` private symbol. In Wide you can define constants and Enums using them. But how could you create constants inside Objects? At the end all you need is an Immutable Meta Entity or Immutable Static Entity to reproduce constants. But what about Enums? Yes! You can create them both, and the syntax gets clear enough for you that they are not a private members.
+
+Look:
+
+```lua
+.Network {
+  -- Constant
+  #INITIAL_STATUS{int} = 0
+
+  -- Enum
+  #Status{int} <
+    Disconnected = #INITIAL_STATUS
+    Connected
+    Error
+  >
+
+  -- cannot be used outside
+  #privateMember:= true
+  #anotherPrivate: string = "ok"
+  #[
+    groupedPrivateMember1:int = 1
+    groupedPrivateMember2:int = 2
+  ]
+}
+
+$status:Network.Status = Network.#Status..Disconnect
+
+$status == #INITIAL_STATUS ? {
+  $status = Network.#Status..Connected
+}
+```
+
+⚠️ It's clear that `#INITIAL_STATUS` constant and `#Status` Enum are not a Private Entities.
+
+The constant MUST be create using Generics and you can only use `=` Assignment Intent.
+
+The Enumeration MUST be created using Generics and itself has `</>` body.
 
 ### Constructor Object Lambdas
 
@@ -4175,7 +4215,9 @@ Enums are very close to Constants, but you can have behaviour and create it with
 
 They are created using `#` prefixed to its name.
 
-They're constants are accessed using the Static context with `..`
+They're constants are accessed using the Static context with `..`.
+
+⚠️ You don't use `#` when defining the Type, but when assigning values with them it makes it more explicit you are using enums, so in this examples they will be used.
 
 ```lua
 -- Numeric enum
@@ -4187,10 +4229,12 @@ They're constants are accessed using the Static context with `..`
 >
 
 requestStatus:StatusCodes = #StatusCodes..OK
+-- requestStatus:StatusCodes = StatusCodes..OK
 
 -- or just
 
 requestStatus:= #StatusCodes..OK
+-- requestStatus:= StatusCodes..OK
 
 -- String enum
 #CardinalDirections <
@@ -4224,38 +4268,45 @@ You can be quite creative with them:
 
 ```lua
 #Day{int} <
-    Sunday = 0,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday
+  Sunday = 0,
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday
 
-    clip() => Self ? {
-      Self..Sunday => "Sun",
-      Self..Monday => "Mon",
-      Self..Tuesday => "Tue",
-      Self..Wednesday => "Wed",
-      Self..Thursday => "Thu",
-      Self..Saturday => "Sat",
-    }
+  clip() => Day ? {
+    -- Day.. in the match expresions are not necessary
+    -- because Members of Enum are static themselves
+    Day..Monday => "Mon",
+    Day..Tuesday => "Tue",
+    Day..Wednesday => "Wed",
+    -- If you aliased you can use anywhere inside like aliased objects
+    Self..Thursday => "Thu",
+    Self..Friday => "Fri",
+    -- No need for Self..
+    Saturday => "Sat",
+    Sunday => "Sun",
+  }
 /Self>
 
-"Sunday is {#Days..Sunday}" -- Output 0
-"Sunday is {#Days..Sunday.clip()}" -- Output "Sun"
+"Sunday is {#Day..Sunday}" -- Output 0
+"Sunday is {#Day..Sunday.clip()}" -- Output "Sun"
 
 day:Day = #Sunday
+day:Day = #Day..Sunday
+day:= #Day..Sunday
 "Sunday is {day}" -- Output 0
 "Sunday is {day.clip()}" -- Output "Sun"
 ```
 
-Or you can push your creativity to the limits and extremely generic:
+Enum members have Lambda Constructors like Objects, so you can push your creativity to the limits and go extremely generic:
 
 ```lua
 #Message{T} <
   Text(T),
-  Binary(Vec{int}),
+  Binary([]{int}),
   Control(Command),
 />
 
@@ -4274,15 +4325,15 @@ process_message{T}(msg: Message{T}) => msg ? {
 }
 
 () => {
-    msg1:= #Message..Text(String::from("Hello!"));
-    msg2:= #Message..Binary([0xDE, 0xAD, 0xBE, 0xEF])
-    msg3:= #Message..Control(Command..Ping)
-    msg4:= #Message..Text(123)
+  msg1:= #Message..Text(String::from("Hello!"));
+  msg2:= #Message..Binary([0xDE, 0xAD, 0xBE, 0xEF])
+  msg3:= #Message..Control(Command..Ping)
+  msg4:= #Message..Text(123)
 
-    process_message(msg1)
-    process_message(msg2)
-    process_message(msg3)
-    process_message(msg4)
+  process_message(msg1)
+  process_message(msg2)
+  process_message(msg3)
+  process_message(msg4)
 }
 ```
 
@@ -4294,9 +4345,9 @@ You can also bind traits to Enums:
 />
 
 #Message{T::Serialize} <
-    Text(T),
-    Binary(Vec<u8>),
-    Control(Command),
+  Text(T),
+  Binary(Vec{int}),
+  Control(Command),
 />
 ```
 
