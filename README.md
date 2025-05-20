@@ -1,14 +1,18 @@
-***⚠️⚠️⚠️ This is a draft illustrating potential syntax, not a beginner's tutorial. There is no current implementation; it's a preliminary concept open to feedback. This syntax may evolve based on your input, and there's no guarantee of future implementation. I'm gathering opinions and constructive criticism to assess its viability. Feel free to share this link with AI language models for syntax validation. This is envisioned as a web-first language. I'm an independent developer exploring potential solutions, not promoting a product or representing a large corporation. Wide prioritizes its own design principles and isn't focused on maintaining compatibility with C-based languages, just as those languages differ from binary and assembly. Ultimately, Wide aims to extend HTML functionality.***
+***⚠️⚠️⚠️ This is a draft illustrating potential syntax, not a beginner's tutorial. There is no current implementation; it's a preliminary concept open to feedback. This syntax may evolve based on your input, and there's no guarantee of future implementation. I'm gathering opinions and constructive criticism to assess its viability. Feel free to share this link with AI language models for syntax validation. This is envisioned as a web-first language. I'm an independent developer exploring potential solutions, not promoting a product or representing a large corporation. Wide prioritizes its own design principles and is not tied to any programming language. Ultimately, Wide aims to extend HTML functionality as full programming language.***
 
 # 🧩 Wide Language
 
 ```html
-// hello.wide.html
+<!-- hello.wide.html -->
+()=> {
+  greet() => <p>"Hello, {name}!"</p>
+}
+
+<!-- html wide is used to say it must be parsed as Wide -->
 <!DOCTYPE html wide>
 <html>
   <body>
-    (greet() => <p>"Hello, {name}!"</p>)
-    <h1>greet("World")</h1>
+    <h1>{ greet("World") }</h1>
     <p>HTML first language!</p>
   </body>
 </html>
@@ -72,43 +76,47 @@ I cannot assure I'm the best communicator in the world nor here in the draft, bu
 
 ## HTML in its core
 
-Wide was born from the need to universalize HTML and make it reactive! React itself did a great job, and I could get a lot of ideas from the last 10 years fighting it when not using Node.JS, and just wanted to use it server-side. So I said to myself: Why not a language that speaks the web, so that anylanguage could transpile itself into Wide?
+Wide was born from the need to universalize HTML and make it a full and reactive programming language! React itself did a great job in putting HTML as a layer inside a Javascript library, and I could get a lot of ideas from the last 10 years fighting it when using Node.JS and just wanted to use it server-side. So I said to myself: Why not a language that speaks the web, so that any language could transpile itself into Wide and be itself a programming language?
 
 That's why Objects in Wide are <> and </> symbols, because in Wide you can do this when going HTML mode:
 
 ```html
-// loop.wide
-<ul>
-  <~(counter <= 10)>
-    <li>
-      counter == 1 ?
-        <span class="one">
-          "{ counter } is one"
-        </span>
-      counter == 2 ??
-        <span class="two">
-          "{ counter } is two"
-        </span>
-      counter == 3 ??
-        <span class="three">
-          "{ counter } is three"
-        </span>
-      . <span class="another">
-          "{ counter } is another"
-        </span>
-    </li>
-  </>
-</ul>
+<!-- looping.wide -->
+() => {
+  <ul>
+    <~(counter <= 10)>
+      <li>
+        counter == 1 ?
+          <span class="one">
+            "{ counter } is one"
+          </span>
+        counter == 2 ??
+          <span class="two">
+            "{ counter } is two"
+          </span>
+        counter == 3 ??
+          <span class="three">
+            "{ counter } is three"
+          </span>
+        . <span class="another">
+            "{ counter } is another"
+          </span>
+      </li>
+    </>
+  </ul>
+}
 ```
 
-But if you were just vanilla Wide cli you can do just so:
+But if you were just vanilla Wide cli you could do just so:
 
 ```lua
-~(counter <= 10) {
-  counter == 1 ? "{ counter } is one"
-  counter == 2 ?? "{ counter } is two"
-  counter == 3 ?? "{ counter } is three"
-  . "{ counter } is another"
+() => {
+  ~(counter <= 10) {
+    counter == 1 ? "{ counter } is one"
+    counter == 2 ?? "{ counter } is two"
+    counter == 3 ?? "{ counter } is three"
+    . "{ counter } is another"
+  }
 }
 ```
 
@@ -117,248 +125,256 @@ But you can be very expressive with the language!
 **Dijkstra's Algorithm?**
 
 ```lua
-.Node <
-  (
-    .$id: string
-    .$edges: Map{string, int}
-  )
-/>
+() => {
+  .Node <
+    (
+      .$id: string
+      .$edges: Map{string, int}
+    )
+  />
 
-Graph: Map{string, Node} = {
-  "A": <Node (id: "A", edges: { "B": 2, "C": 4 }) />,
-  "B": <Node (id: "B", edges: { "C": 1, "D": 7 }) />,
-  "C": <Node (id: "C", edges: { "D": 3 }) />,
-  "D": <Node (id: "D", edges: {}) />
-}
-
-dijkstra(start: string) => {
-  $distances: Map{string, int} = {}
-  $visited: Set{string} = {}
-
-  Graph.keys().forEach(id => {
-    $distances[id] = ...
-  })
-
-  $distances[start] = 0
-
-  ~($visited.size() < Graph.keys().count()) {
-    $unvisited = Graph.keys().filter(id => !$visited.has(id))
-
-    current = $unvisited.reduce((min, id) => {
-      $distances[id] < $distances[min] ? id : min;
-    })
-
-    node = Graph[current]
-    distance = $distances[current]
-
-    node.edges.keys().forEach(neighbor => {
-      weight = node.edges[neighbor]
-      total = distance + weight
-      (total < $distances[neighbor]) ? {
-        $distances[neighbor] = total
-      }
-    })
-
-    $visited.add(current)
+  Graph: Map{string, Node} = {
+    "A": <Node (id: "A", edges: { "B": 2, "C": 4 }) />,
+    "B": <Node (id: "B", edges: { "C": 1, "D": 7 }) />,
+    "C": <Node (id: "C", edges: { "D": 3 }) />,
+    "D": <Node (id: "D", edges: {}) />
   }
 
-  $distances;
-}
+  dijkstra(start: string) => {
+    $distances: Map{string, int} = {}
+    $visited: Set{string} = {}
 
-result:= dijkstra("A")
-result.keys().map(nodeId => {
-  "Distance from A to {nodeId}: {result[nodeId]}"
-})
+    Graph.keys().forEach(id => {
+      $distances[id] = ...
+    })
+
+    $distances[start] = 0
+
+    ~($visited.size() < Graph.keys().count()) {
+      $unvisited = Graph.keys().filter(id => !$visited.has(id))
+
+      current = $unvisited.reduce((min, id) => {
+        $distances[id] < $distances[min] ? id : min;
+      })
+
+      node = Graph[current]
+      distance = $distances[current]
+
+      node.edges.keys().forEach(neighbor => {
+        weight = node.edges[neighbor]
+        total = distance + weight
+        (total < $distances[neighbor]) ? {
+          $distances[neighbor] = total
+        }
+      })
+
+      $visited.add(current)
+    }
+
+    $distances;
+  }
+
+  result:= dijkstra("A")
+  result.keys().map(nodeId => {
+    "Distance from A to {nodeId}: {result[nodeId]}"
+  })
+}
 ```
 
 **Bellman-Ford Algorithm?**
 
 ```lua
-Edge <(
-  .$from: string
-  .$to: string
-  .$weight: int
-)/>
+() => {
+  Edge <(
+    .$from: string
+    .$to: string
+    .$weight: int
+  )/>
 
-Graph: List{Edge} = [
-  <Edge (from: "A", to: "B", weight: 4) />,
-  <Edge (from: "A", to: "C", weight: 5) />,
-  <Edge (from: "B", to: "C", weight: -3) />,
-  <Edge (from: "B", to: "D", weight: 6) />,
-  <Edge (from: "C", to: "D", weight: 2) />
-]
+  Graph: List{Edge} = [
+    <Edge (from: "A", to: "B", weight: 4) />,
+    <Edge (from: "A", to: "C", weight: 5) />,
+    <Edge (from: "B", to: "C", weight: -3) />,
+    <Edge (from: "B", to: "D", weight: 6) />,
+    <Edge (from: "C", to: "D", weight: 2) />
+  ]
 
-Nodes: Set{string} = Graph.reduce((acc, e) => {
-  acc.add(e.from)
-  acc.add(e.to)
-  acc;
-}, Set{})
+  Nodes: Set{string} = Graph.reduce((acc, e) => {
+    acc.add(e.from)
+    acc.add(e.to)
+    acc;
+  }, Set{})
 
-bellman_ford = (start: string) => {
-  $dist: Map{string, int} = {}
-  Nodes ~ (n) {
-    $dist[n] = +..
-  }
-  $dist[start] = 0
+  bellman_ford = (start: string) => {
+    $dist: Map{string, int} = {}
+    Nodes ~ (n) {
+      $dist[n] = +..
+    }
+    $dist[start] = 0
 
-  $passes = Nodes.size - 1
-  ~ (0..$passes) {
+    $passes = Nodes.size - 1
+    ~ (0..$passes) {
+      Graph ~ (edge) {
+        $u = edge.from
+        $v = edge.to
+        $w = edge.weight
+        ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
+          $dist[$v] = $dist[$u] + $w
+        }
+      }
+    }
+
+    -- detect negative weight cycles
+    $hasNegativeCycle: bool = false
     Graph ~ (edge) {
       $u = edge.from
       $v = edge.to
       $w = edge.weight
+
       ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
-        $dist[$v] = $dist[$u] + $w
+        $hasNegativeCycle = true
       }
     }
+
+    {
+      distances: $dist,
+      negativeCycle: $hasNegativeCycle
+    };
   }
 
-  -- detect negative weight cycles
-  $hasNegativeCycle: bool = false
-  Graph ~ (edge) {
-    $u = edge.from
-    $v = edge.to
-    $w = edge.weight
-
-    ~ ($dist[$u] != +.. && $dist[$u] + $w < $dist[$v]) {
-      $hasNegativeCycle = true
-    }
-  }
-
-  {
-    distances: $dist,
-    negativeCycle: $hasNegativeCycle
-  };
+  result = (bellman_ford "A")
+  (result)
 }
-
-result = (bellman_ford "A")
-(result)
-
 ```
 
 **Floyd-Warshall Algorithm?**
 
 ```lua
-Nodes: List{string} = ["A", "B", "C", "D"]
+() => {
 
-INF: int = +..
+  Nodes: List{string} = ["A", "B", "C", "D"]
 
-Graph: Map{string, Map{string, int}} = {
-  "A": { "A": 0, "B": 3, "C": INF, "D": 7 },
-  "B": { "A": 8, "B": 0, "C": 2, "D": INF },
-  "C": { "A": 5, "B": INF, "C": 0, "D": 1 },
-  "D": { "A": 2, "B": INF, "C": INF, "D": 0 }
-}
+  INF:int = +..
 
-floyd_warshall = () => {
-  $dist: Map{string, Map{string, int}} = {}
-
-  Nodes ~ (i) {
-    $dist[i] = {}
-    Nodes ~ (j) {
-      $dist[i][j] = Graph[i][j] ?? INF
-    }
+  Graph: Map{string, Map{string, int}} = {
+    "A": { "A": 0, "B": 3, "C": INF, "D": 7 },
+    "B": { "A": 8, "B": 0, "C": 2, "D": INF },
+    "C": { "A": 5, "B": INF, "C": 0, "D": 1 },
+    "D": { "A": 2, "B": INF, "C": INF, "D": 0 }
   }
 
-  Nodes ~ (k) {
+  floyd_warshall = () => {
+    $dist: Map{string, Map{string, int}} = {}
+
     Nodes ~ (i) {
+      $dist[i] = {}
       Nodes ~ (j) {
-        $ik = $dist[i][k]
-        $kj = $dist[k][j]
-        $ij = $dist[i][j]
-        ~ ($ik != INF && $kj != INF && $ik + $kj < $ij) {
-          $dist[i][j] = $ik + $kj
+        $dist[i][j] = Graph[i][j] ?? INF
+      }
+    }
+
+    Nodes ~ (k) {
+      Nodes ~ (i) {
+        Nodes ~ (j) {
+          $ik = $dist[i][k]
+          $kj = $dist[k][j]
+          $ij = $dist[i][j]
+          ~ ($ik != INF && $kj != INF && $ik + $kj < $ij) {
+            $dist[i][j] = $ik + $kj
+          }
         }
       }
     }
+
+    $dist;
   }
 
-  $dist;
+  result = (floyd_warshall)
+  (result)
 }
-
-result = (floyd_warshall)
-(result)
-```
+  ```
 
 **Tarjan's Algorithm?**
 
-```lua
-Node <(
-  .$id: string
-  .$edges: List{string}
-)/>
+  ```lua
+() => {
+  Node <(
+    .$id: string
+    .$edges: List{string}
+  )/>
 
-Graph: Map{string, Node} = {
-  "A": <Node (id: "A", edges: ["B"]) />,
-  "B": <Node (id: "B", edges: ["C"]) />,
-  "C": <Node (id: "C", edges: ["A", "D"]) />,
-  "D": <Node (id: "D", edges: ["E"]) />,
-  "E": <Node (id: "E", edges: ["F"]) />,
-  "F": <Node (id: "F", edges: ["D", "G"]) />,
-  "G": <Node (id: "G", edges: []) />
-}
+  Graph: Map{string, Node} = {
+    "A": <Node (id: "A", edges: ["B"]) />,
+    "B": <Node (id: "B", edges: ["C"]) />,
+    "C": <Node (id: "C", edges: ["A", "D"]) />,
+    "D": <Node (id: "D", edges: ["E"]) />,
+    "E": <Node (id: "E", edges: ["F"]) />,
+    "F": <Node (id: "F", edges: ["D", "G"]) />,
+    "G": <Node (id: "G", edges: []) />
+  }
 
-tarjan = () => {
-  $index: int = 0
-  $stack: List{string} = []
-  $onStack: Set{string} = {}
-  $indexes: Map{string, int} = {}
-  $lowLinks: Map{string, int} = {}
-  $components: List{List{string}} = []
+  tarjan = () => {
+    $index: int = 0
+    $stack: List{string} = []
+    $onStack: Set{string} = {}
+    $indexes: Map{string, int} = {}
+    $lowLinks: Map{string, int} = {}
+    $components: List{List{string}} = []
 
-  strongConnect = (v: string) => {
-    $indexes[v] = $index
-    $lowLinks[v] = $index
-    $index += 1
+    strongConnect = (v: string) => {
+      $indexes[v] = $index
+      $lowLinks[v] = $index
+      $index += 1
 
-    $stack.push(v)
-    $onStack.add(v)
+      $stack.push(v)
+      $onStack.add(v)
 
-    Graph[v].edges ~ (w) {
-      (!($indexes.has(w))) >> (
-        (strongConnect w)
-        $lowLinks[v] = $lowLinks[v].min($lowLinks[w])
-      )
+      Graph[v].edges ~ (w) {
+        (!($indexes.has(w))) >> (
+          (strongConnect w)
+          $lowLinks[v] = $lowLinks[v].min($lowLinks[w])
+        )
 
-      $onStack.has(w) >> (
-        $lowLinks[v] = $lowLinks[v].min($indexes[w])
+        $onStack.has(w) >> (
+          $lowLinks[v] = $lowLinks[v].min($indexes[w])
+        )
+      }
+
+      ($lowLinks[v] == $indexes[v]) >> (
+        $component: List{string} = []
+
+        ~ (true) {
+          $w = $stack.pop()
+          $onStack.delete($w)
+          $component.push($w)
+          ($w == v) || ()
+        }
+
+        $components.push($component)
       )
     }
 
-    ($lowLinks[v] == $indexes[v]) >> (
-      $component: List{string} = []
+    Graph.keys() ~ (v) {
+      (!($indexes.has(v))) >> (strongConnect v)
+    }
 
-      ~ (true) {
-        $w = $stack.pop()
-        $onStack.delete($w)
-        $component.push($w)
-        ($w == v) || ()
-      }
-
-      $components.push($component)
-    )
+    $components;
   }
 
-  Graph.keys() ~ (v) {
-    (!($indexes.has(v))) >> (strongConnect v)
-  }
-
-  $components;
+  result = (tarjan)
+  (result)
 }
-
-result = (tarjan)
-(result)
 ```
 
 ## Symbols and keywords
 
-Wide has no keywords. Just some symbols to represent **Intent**. But some types maybe aliased.
+Wide has no keywords. Just some symbols to represent **Intent**. But some types maybe aliased. That can make the language portable from people coming from other languages.
 
 ## Intents
 
 Wide is strongly typed and it uses this new concept called **Intent**.
 
-**Intent** means the state of mind and/or desire when the person creates code.
+**Intent** means the state of mind and/or desire when people create code.
 
 Intent is mainly just a language concept, not to be used in daily jargon, but if you wish, you can.
 
@@ -380,9 +396,11 @@ Whenever you see the Assignment Intent `=` (equal symbol) you can think:
 
 - it assigns a value *(of, from or constant of)*
 
+----
+
 ## Entities
 
-Now that you know the 2 most basic intents, let's see some syntax.
+From that you cansee how stated is managed in Wide.
 
 Everything you can name in Wide is called an Entity.
 
@@ -441,11 +459,13 @@ You might be thinking that you can't change an Entity's value in Wide, and it's 
 
 ⚠️ You will learn how to handle **Mutable Entities** and **Constant Entities** as you will see later.
 
-With all that information we can move further on basic data types.
+----
 
-## Built-in Data Types
+## Built-in Data Types - Type-Values
 
-It's built-in core data types looks like this:
+Wide has a different core data Type built to be aliased called **Type-Values**.
+
+It's built-in core Type-Values looks like this:
 
 | Type-Value | English Alias | Examples |
 |:---:|--------|--------|
@@ -458,18 +478,18 @@ It's built-in core data types looks like this:
 | () | fn \| lambda | (add), (subtract), (print), (click)  |
 | <> | obj | Person, Vehicle, Dropdown, Box, Header, Provider |
 
-⚠️ Wide can infer those types! So you don't need to explicitly declare them as you will see.
-
-The beauty of them is that their Intent is both the type and the value they default to,
+Their Intent is both the type and the value they default to,
 with exception to the Boolean `?` and the Object `<>`, most values mean exactly what they read.
 
-But if want create a Custom Type you name it and prefix with the `:` Type Intent:
+Yes, the name of the type is that internally.
+
+In wide you can create a **Custom Type** opening a context or not and where to place it and just naming it and prefixing with the `:` Type Intent:
 
 ```lua
 :string
 ```
 
-But that would serve no purpose right?
+But that would serve no purpose! It's lost in the vaccumm of nonsense!
 
 So you can just prefix it with an existing type-value in Wide:
 
@@ -477,29 +497,31 @@ So you can just prefix it with an existing type-value in Wide:
 "":string
 ```
 
-**That's a core Type alias!**
+⚠️ That's an Aliased Type-Value.
 
-But you can also assign a type-value:
+You can also assign a type-value with the `=` Assignment Intent to a custom type. Also you can put them inside a context (optional):
 
 ```lua
-:char = ''
-:string = ""
-:int = 0
-:float = 0.0
-:double = 0.00
-:obj = <>
-:fn = ()
+{
+  :char = ''
+  :string = ""
+  :int = 0
+  :float = 0.0
+  :double = 0.00
+  :obj = <>
+  :fn = ()
+}
 ```
 
-Or even from an already existing type/alias:
+You can also even alias from an already existing type aliased:
 
 ```lua
 :Text = string
 ```
 
-⚠️ As you'll learn in Objects section, Types are close to Interfaces and they can beautifully implement each other!
+⚠️ As you'll learn in Objects section, Types are close cousins to Interfaces and they can beautifully implement each other!
 
-Or even go more specialized mixing anything that might represent a type grouping them all together.
+You can even go more specialized mixing anything that might represent a type grouping them all together.
 
 Besides not having keywords in its syntax, some words are impossible to avoid when talking to types, and as you can **alias** types, and in order to help newcomers and professionals with parity with other languages, Wide has built-in aliases for them in plain English:
 
@@ -519,7 +541,63 @@ Besides not having keywords in its syntax, some words are impossible to avoid wh
 }
 ```
 
-Those words are not syntax, they are English words, if you want you can rename at will just using the core Wide types as of the previous table and examples or from already English aliased types.
+Those words are not syntax, they are English words the compiler knows by default they were aliased. You can rename at any time just using the core Wide types as of the previous table and examples or from already English aliased types.
+
+***Wide is made in Brazil***, so types could be aliased like so:
+
+```lua
+{
+  ?:booleano {
+    0:falso,
+    1:verdadeiro
+  },
+  '':caractere,
+  "":texto,
+  0:inteiro,
+  0.0:flutuante,
+  0.00:real
+  ():funcal
+  </>:objeto
+}
+```
+
+⚠️ Wide is able to understand both English and Portuguese alias in this case.
+
+### Rules for Aliasing
+
+When creating aliases you can't create them anywhere.
+
+They must be the first lines of code if there are no imports, or the first lines of code after the imports if there are imports.
+
+They can't be inside the Entry function.
+
+## Entry function
+
+You haven't been presented to them yet, but Wide has an entry function - more properly a lambda - that signs to the compiler where to start the file first execution entry point.
+
+That's like so:
+
+```lua
+() => {
+
+}
+```
+
+Whatever you place before it is structural code that you can reuse inside the Entry function.
+
+⚠️ When you see `{}` anywhere its very Intent is to bind itself as a **context** for anything. It's called **Context Intent**. A context can be used to create different things, but you don't need to memorize them all as you learn, they'll get so implicit into your head that you will understand them as you go.
+
+⚠️❌ From now own, other than very specific, the Entry Function may not be  used for fragment code samples.
+
+Back to custom types. This how you would do that for `:string` cited previously:
+
+```lua
+:string = ""
+
+() => {
+  name:string = "Alice"
+}
+```
 
 ## Printing on Screen
 
@@ -528,7 +606,9 @@ That seems nice, but how do you print on screen?
 To print on screen you just enclose what you want to print inside double quotes `""` alone in a single line and depending on were you are running wide it will be printed.
 
 ```lua
-"Hello, Wide!"
+() => {
+  "Hello, Wide!"
+}
 ```
 
 That will output:
@@ -542,7 +622,9 @@ Hello, Wide!
 If you need to print `""` double quotes inside a string you just use 2 pairs double quotes instead of one.
 
 ```lua
-""Hello, "Wide"!""
+() => {
+  ""Hello, "Wide"!""
+}
 ```
 
 That will output:
@@ -553,14 +635,16 @@ Hello, "Wide"!
 
 ### Interpolation
 
-You can use curly braces inside those quotes `"{}"` to dinamically output values:
+You can use curly braces inside those quotes `"{}"` to dinamically output values inside text output or just to compose dynamic strings of text:
 
 ```lua
-name:= "Wide"
-"Hello, {name}!"
+() => {
+  name:= "Wide"
+  "Hello, {name}!"
 
-price:= 9.99
-"It's ${9.99}."
+  price:= 9.99
+  "It's ${9.99}."
+}
 ```
 
 Those lines will output:
@@ -571,19 +655,20 @@ Hello, Wide!
 It's, $9.99.
 ```
 
-⚠️ When you see `{}` anywhere its very Intent is to bind itself as a **context** for anything. It's called **Context Intent**. A context can be used to create different things, but you don't need to memorize them all as you learn, they'll get so implicit into your head that you will understand them as you go.
-
 ### Printing Entity Type
 
-Wheneven you wanna know the type of an Entity:
+Wheneven you wanna know the type of an Entity you enclose the Entity name with `:` and you can get its type name:
 
 ```lua
-number:= 10
-name:= "Alice"
-isActive:= true
-"{:number:}" -- int
-"{:name:}" -- string
-"{:isActive:}" -- bool
+() => {
+  number:= 10
+  name:= "Alice"
+  isActive:= true
+
+  "{:number:}" -- int
+  "{:name:}" -- string
+  "{:isActive:}" -- bool
+}
 ```
 
 ### Printing Entity Name
@@ -594,29 +679,36 @@ Wheneven you wanna know the name of an Entity:
 - `::<ENTITY>::` prints the name of the value of an Entity in case it's been aliased.
 
 ```lua
+() => {
+  number:= 10
+  "{:<number>:} value is {number}" -- number value is 10
 
-number:= 10
-"{:<number>:} value is {number}" -- number value is 10
+  name:= "Alice"
+  "{:<name>:} is {name}" -- name is Alice
 
-name:= "Alice"
-"{:<name>:} is {name}" -- name is Alice
-
-isActive:= true
-"{:<isActive>: is {isActive}" -- isActive is 1
-"{:<isActive>: is {::<isActive>::}" -- isActive is true
+  isActive:= true
+  "{:<isActive>: is {isActive}" -- isActive is 1
+  "{:<isActive>: is {::<isActive>::}" -- isActive is true
+}
 ```
 
 ## Immutable, Mutable, and Constant Entities
 
-In wide you everything you name is an Entity.
+In wide you everything you name is an Entity, Functions and Objects inclusive.
 
 When talking about Entities you might read just Immutable, Mutable or Constant not having the need to write down nor say "Entity". In this guide, there will be cases when the word Entity will be ommited on purpose.
+
+### Notes on "Variables"
+
+Some people say that there's not such a thing like Immutables and Mutables, that they are all "variables" at the end, and that Wide can't call'em "Entities"
+
+Yes, at the end - in Assembly that's true.
+
+But wide is not Assembly!
 
 ### Immutable Entities
 
 As talked previously, Wide has **Entities** that work like variables or contants in other programming languages.
-
-⚠️ Don't call them variables, please! They are not!
 
 By default Entities are immutable:
 
@@ -2218,6 +2310,8 @@ To invoke a Function you do like so:
 ```lua
 () -- Does nothing
 ```
+
+⚠️ In Wide ()=> {} alone in a file is the Entry Function.
 
 Named Function:
 
@@ -4271,5 +4365,21 @@ Like other Core Type-Values, you can alias at will:
   -Inf:..-,
   Inf:...,
   +Inf:+..,
+}
+```
+
+And you can even specify the types you wanna to work with:
+
+```lua
+{
+  -Infinity:int = ...-,
+  Infinity:int = ...,
+  +Infinity:int = +..,
+}
+--or?
+{
+  -Inf:int = ..-,
+  Inf:int = ...,
+  +Inf:int = +..,
 }
 ```
