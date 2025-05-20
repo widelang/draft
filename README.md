@@ -805,88 +805,6 @@ $salary = 20000.00
 "{name} is {age} old. Salary: {$salary}"
 ```
 
-### Constant Entities
-
-Constant Entities are similar to Immutable Entities, but with an important difference, they can't be shadowed.
-
-If you want to create a Constant Entity, you must enclose the Immutable Entity into the `{}` Context Intent, give it a name and a value.
-
-You say that it's opaqued inside `{}` and can't be move down to be shadowed.
-
-```lua
-{ PI: 3.14159265358979323846 }
-{ SPEED_OF_LIGHT: 299792458.0 }
-{ GRAVITATIONAL_CONSTANT: 6.67430e-11 }
-{ DEFAULT_TIMEOUT_MS: 5000 }
-{ STATUS_OK: 200 }
-{ AVOGADRO: 6.02214076e23 }
-{ API_URL: "https://api.example.com/v1/" }
-{ DEBUG_MODE: 1 }
-{ ENV: "dev" }
-
--- or grouped
-{
-  PI: 3.14159265358979323846,
-  SPEED_OF_LIGHT: 299792458.0,
-  GRAVITATIONAL_CONSTANT: 6.67430e-11,
-  DEFAULT_TIMEOUT_MS: 5000,
-  STATUS_OK: 200,
-  AVOGADRO: 6.02214076e23,
-  API_URL: "https://api.example.com/v1/",
-  DEBUG_MODE: 1,
-  ENV: "dev",
-}
-```
-
-Constants don't use the `=` intent nor `:=` Infer Intent beause the compiler will always know what type it must be infered, and because they are like unnabled Enums, as you'll see later.
-
-⚠️ You don't need to name your Constant Entities in CAMEL_CASE, but it's a good convention to adopt since it gives Visual Intent to your code making them visually different from Immutables!
-
-You output them likewise other entities:
-
-```lua
-"The speed of light is {SPEED_OF_LIGHT}."
-```
-
-### 🌕 Visual Metaphor for Shadowing Entities
-
-|  | Meaning          | Shadowable? | Notes                        |
-| ------ | ---------------- | ----------- | ---------------------------- |
-| `speed_of_light:`    | Immutable Entity | ✅ Yes       | Exposed to scope, visible    |
-| `$speed_of_light:`    | Mutable Entity   | ✅ Yes       | Visible, but may mutate      |
-| `{speed_of_light:}`   | Constant Entity  | ❌ No        | Opaqued, contextually sealed |
-
-**🧪 Examples**
-
-```lua
-speed_of_light: 299792458.0
-$speed_of_light: 299792458.0
-{SPEED_OF_LIGHT: 299792458.0}
-```
-
-Can be shadowed:
-
-```lua
-speed_of_light: 299792458.0
-speed_of_light: 1 ✅ -- overrides the original
-```
-
-Can also be shadowed:
-
-```lua
-$speed_of_light: 299792458.0
-$speed_of_light: 1
-```
-
-Cannot be shadowed — sealed inside context:
-
-```lua
-{SPEED_OF_LIGHT: 299792458.0}
-SPEED_OF_LIGHT: 1  ❌ -- Error: constant is opaque and cannot be redefined
-```
-
----
-
 ### Grouped Entities
 
 Whenever you want to define multiple Entities, you can just group them.
@@ -1007,7 +925,150 @@ $words.filter(w => w.length > 4)
 
 ⚠️ Noticed that when using methods you just used one dot? That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
 
----
+### Constant Entities
+
+Constant Entities are similar to Immutable Entities and Enumerations themselves, but with an important difference, they can't be shadowed.
+
+To create a Constant Entity you prefix its name with `#`:
+
+```lua
+#PI = 3.14159265358979323846
+#SPEED_OF_LIGHT = 299792458.0
+#GRAVITATIONAL_CONSTANT = 6.67430e-11
+#DEFAULT_TIMEOUT_MS = 5000
+#STATUS_OK = 200
+#AVOGADRO = 6.02214076e23
+#API_URL = "https://api.example.com/v1/"
+#DEBUG_MODE = 1
+#ENV = "dev"
+```
+
+Constants can just use the `=` because the compiler will always know what type it must be infered, but you can type them if you wish:
+
+```lua
+#PI:double = 3.14159265358979323846
+```
+
+You cannot change them:
+
+```lua
+#PI:double = 3.14159265358979323846
+#PI = 3 ❌ -- Error cannot change constant PI
+PI = 3 ❌ -- Error Undefined Entity PI
+```
+
+⚠️ You don't need to name your Constant Entities in CAMEL_CASE, but it's a good convention to adopt since it gives Visual Intent to your code making them visually different from Immutables!
+
+You output them likewise other entities but using the Constant `#`Constant Intent:
+
+```lua
+"The speed of light is {#SPEED_OF_LIGHT}."
+```
+
+You can group them between a context `{}`:
+
+```lua
+#{
+  Sunday = 0
+  Monday = 1
+  Tuesday = 2
+  Wednesday = 3
+  Thursday = 4
+  Friday = 5
+  Saturday = 6
+}
+
+"Sunday is {#Sunday}"
+```
+
+You can also name grouped Constants :
+
+```lua
+#Day {
+  Sunday = 0
+  Monday = 1
+  Tuesday = 2
+  Wednesday = 3
+  Thursday = 4
+  Friday = 5
+  Saturday = 6
+}
+```
+
+And use like so:
+
+```lua
+"Sunday is {#Day..Sunday}"
+```
+
+Or just:
+
+```lua
+"Sunday is {#Sunday}"
+```
+
+You can't have the same Constants grouped with different names because that would cause to be shadowing them, and they can't!
+
+```lua
+#Day {
+  Sunday = 0
+  Monday = 1
+  Tuesday = 2
+  Wednesday = 3
+  Thursday = 4
+  Friday = 5
+  Saturday = 6
+}
+
+#Weekday { ❌ -- Error Constant Entities Cannot be shadowed in Groups
+  Monday = 1
+  Tuesday = 2
+  Wednesday = 3
+  Thursday = 4
+  Friday = 5
+}
+
+#Weekend { ❌ -- Error Constant Entities Cannot be shadowed in Groups
+   Sunday = 0
+   Saturday = 6
+}
+```
+
+Enums are closely related to Enums, with the main difference that enums enclose their constants with `</>` and can have Generics in their name and Functions to behave on selection.
+
+Take a look at Enums section later, but the most comparison that we can make now may be overhead, so just abstract the concepts until you reach Enums.
+
+**Enums Example:**
+
+```lua
+#Day{int} <
+    Sunday = 0,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
+
+    clip() => Self ? {
+      Self..Sunday => "Sun",
+      Self..Monday => "Mon",
+      Self..Tuesday => "Tue",
+      Self..Wednesday => "Wed",
+      Self..Thursday => "Thu",
+      Self..Saturday => "Sat",
+    }
+/Self>
+
+"Sunday is {#Days..Sunday}" -- Output 0
+"Sunday is {#Days..Sunday.clip()}" -- Output "Sun"
+
+day:Day = #Sunday
+"Sunday is {day}" -- Output 0
+"Sunday is {day.clip()}" -- Output "Sun"
+```
+
+----
 
 ## Entity Context
 
@@ -4111,34 +4172,36 @@ printItem(doc)
 
 ### Enums
 
-Enum are not objects `</>`, it's kinda a named struct with default values.
+Enums are very close to Constants, but you can have behaviour and create it with Generics Type.
 
-Enums are created using `#` in prefixing its name.
+They are created using `#` prefixed to its name.
+
+They're constants are accessed using the Static context with `..`
 
 ```lua
 -- Numeric enum
-#StatusCodes {
-  OK: 200
-  BadRequest: 400
+#StatusCodes <
+  OK = 200
+  BadRequest = 400
   Unauthorized -- Auto-incremented to 401
-  NotFound: 404
-}
+  NotFound = 404
+>
 
-requestStatus:StatusCodes = StatusCodes.OK
+requestStatus:StatusCodes = #StatusCodes..OK
 
 -- or just
 
-requestStatus:= StatusCodes.OK
+requestStatus:= #StatusCodes..OK
 
 -- String enum
 #CardinalDirections <
-  North: "North"
-  East: "East"
-  South: "South"
-  West: "West"
+  North = "North"
+  East = "East"
+  South = "South"
+  West = "West"
 />
 
-currentDirection:= CardinalDirections.East
+currentDirection:= #CardinalDirections..East
 
 -- Heterogeneous enum (must make explict with Generics))
 #MixedValues{string|int} <
@@ -4147,14 +4210,80 @@ currentDirection:= CardinalDirections.East
 />
 
 handleResponse(code: StatusCodes) => code ? {
-  StatusCodes.OK => {
+  #StatusCodes..OK => {
     -- Handle successful response
   },
-  StatusCodes.NotFound => {
+  #StatusCodes..NotFound => {
     -- Handle resource not found
   }
   -- ... other cases
   . => {}
+}
+```
+
+You can be quite creative with them:
+
+```lua
+#Day{int} <
+    Sunday = 0,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
+
+    clip() => Self ? {
+      Self..Sunday => "Sun",
+      Self..Monday => "Mon",
+      Self..Tuesday => "Tue",
+      Self..Wednesday => "Wed",
+      Self..Thursday => "Thu",
+      Self..Saturday => "Sat",
+    }
+/Self>
+
+"Sunday is {#Days..Sunday}" -- Output 0
+"Sunday is {#Days..Sunday.clip()}" -- Output "Sun"
+
+day:Day = #Sunday
+"Sunday is {day}" -- Output 0
+"Sunday is {day.clip()}" -- Output "Sun"
+```
+
+Or you can push your creativity to the limits and extremely generic:
+
+```lua
+#Message{T} <
+  Text(T),
+  Binary(Vec{int}),
+  Control(Command),
+/>
+
+#Command <
+  Ping,
+  Disconnect,
+/>
+
+process_message{T}(msg: Message{T}) => msg ? {
+  #Message..Text(content) => { "Text message: {content}" },
+  #Message..Binary(data) => { "Binary message of {data.len()} bytes" },
+  #Message..Control(cmd) => cmd ? {
+    #Command..Ping => { "Ping received." },
+    #Command..Disconnect => { "Disconnecting..." },
+  },
+}
+
+() => {
+    msg1:= #Message..Text(String::from("Hello!"));
+    msg2:= #Message..Binary([0xDE, 0xAD, 0xBE, 0xEF])
+    msg3:= #Message..Control(Command..Ping)
+    msg4:= #Message..Text(123)
+
+    process_message(msg1)
+    process_message(msg2)
+    process_message(msg3)
+    process_message(msg4)
 }
 ```
 
