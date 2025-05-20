@@ -3242,7 +3242,7 @@ Thing..do
 Thing..doSomething()
 ```
 
-But that's by design, Javascript doesn't make distinction between public and static and PHP, C++, Rust `::` would be too much for the visual flow.
+But that's by design because other language that use `.` may not make the distinction between static. PHP and Rust use `::`, but in Wide it has other purpose: Traits!
 
 ```lua
 .Thing <
@@ -3850,14 +3850,16 @@ You create traits using `::` symbols.
 />
 ```
 
-You can use Traits like this:
+You can use Traits like this for extending and simulating Multiple Inheritance:
 
 ```lua
 .HelloWide <
   ::Hello, Wide
+
   -- Or individually
-  `::Hello`
-  `::Wide`
+
+  ::Hello
+  ::Wide
 
   .exclamation() => "!"
 />
@@ -4287,6 +4289,20 @@ process_message{T}(msg: Message{T}) => msg ? {
 }
 ```
 
+You can also bind traits to Enums:
+
+```lua
+#Serialize <
+  -- Somewhere in code...
+/>
+
+#Message{T::Serialize} <
+    Text(T),
+    Binary(Vec<u8>),
+    Control(Command),
+/>
+```
+
 ## Attributes in Wide Language
 
 In Wide, **attributes** are metadata-like constructs that can be applied to functions, meta entities, objects, and more — very much like annotations in other languages. But unlike traditional attributes, they are full-fledged **objects** in Wide, with support for inheritance, traits, macros, and default parameters.
@@ -4336,7 +4352,7 @@ You can chain multiple attributes inside the same block separated by commas:
 
 ### Attribute Inheritance
 
-Attributes can inherit from one another using `:` or `::` just like other constructs:
+Attributes can inherit from one another using `:` Interfaces or `::` Traits just like other constructs:
 
 ```lua
 :HttpRouteAttribute<
@@ -4389,7 +4405,7 @@ Since attributes are objects, they can **implement traits** or even **use other 
   .auditLog(message:string) => "..."
 />
 
-:AuditAttribute :Auditable<
+:AuditAttribute ::Auditable<
   .logLevel:= "INFO"
 />
 
