@@ -552,7 +552,7 @@ In the case of `?:bool`, it aliased it's possible values because they are also T
 0:inteiro
 0.0:flutuante
 0.00:real
-():funcal
+():funcao
 </>:objeto
 ```
 
@@ -3216,7 +3216,7 @@ thing.do ? thing.doSomething()
 
 ### Object static scope
 
-Objects can have static scope removing the (.) accessor on naming and usage.
+Objects can have static scope internally themselves just removing the (.) accessor when using them.
 
 ```lua
 .Thing <
@@ -3232,14 +3232,23 @@ Objects can have static scope removing the (.) accessor on naming and usage.
 
 The `.` Resolution Intent were removed from Entity and Function Object, what now when used outside?
 
-Angry Birds mode! Outside you use the `..` Extent Intent (there's a phylosophical theory behind that, but let's skip that for now!)
+Angry Birds mode! Outside in any case you can use the `..` Extent Intent, but when you are using the Object name itself, you can just use a single `.`, this is possible because there's no way for an Object name being redefined.
 
 ```lua
 Thing..do
 Thing..doSomething()
 ```
 
-But that's by design because other language that use `.` may not make the distinction between static. PHP and Rust use `::`, but in Wide it has other purpose: Traits!
+But in that case, as you directly using the Object name, you can just use just one dot.:
+
+```lua
+Thing.do
+Thing.doSomething()
+```
+
+But that's by design because other language that use `.` may not make the distinction between static. Other languages use `::`, but in Wide it has other purpose, it's used with Traits!
+
+Some examples using static:
 
 ```lua
 .Thing <
@@ -3258,15 +3267,17 @@ But that's by design because other language that use `.` may not make the distin
 
 
 thing:= Thing..newLambdaEntity -- not a function nor meta entity
+thing:= Thing.newLambdaEntity -- not a function nor meta entity
 thing.do ? thing.doSomething()
 
 thing:= Thing..newStaticFunction() -- not a meta entity
+thing:= Thing.newStaticFunction() -- not a meta entity
 thing.do ? thing.doSomething()
 ```
 
 ### Keyword-less `new`
 
-Wide does not require or support the `new` keyword. Instead, object instantiation is expressed through a conventional `new()` method or factory-style functions.
+Wide does not require or support the `new` keyword, because objects are instantiated using `</>`. Instead, object instantiation can be expressed through a conventional `new()` method or factory-style functions.
 
 The `new()` method is:
 
@@ -3283,12 +3294,14 @@ The `new()` method is:
   makeSound() => "A dog is barking!"
 />
 
-dog:= Dog..new()
+dog:= Dog.new()
 dog.makeSound()
 
 -- or just
 Dog..new().makeSound()
 ```
+
+See why using `..` can have some visual appeal?
 
 Builder style:
 
@@ -3354,6 +3367,7 @@ You create Extent Objects using `..` before its name:
 
 ```lua
 ..Thing</>
+
 .SomeThing ..Thing </>
 
 thing:Something = </> -- Ok,  no problem!
