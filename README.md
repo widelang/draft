@@ -929,6 +929,42 @@ $words.filter(w => w.length > 4)
 
 ⚠️ Noticed that when using methods you just used one dot? That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
 
+### Shadowing Exchange
+
+You can shadow Entities from Immutable to Immutable. But be carefull because excessive shadowing can be confusing. That's why using $ in Immutables usage is the best whay to go!
+
+Without signaling $ state intent:
+
+```lua
+n:= 1
+n:= 2
+
+$n:= 3
+
+-- after lines of code
+n = 4
+
+n:= 5 -- not clear if is Mutable or Immutable
+n = 6 ❌ -- Error: cannot assign twice to immutable
+```
+
+Signalling $ state intent:
+
+```lua
+n:= 1
+n:= 2
+
+$n:= 3
+
+-- after lines of code
+$n = 4 -- clear that is Mutable
+
+n:= 5
+n = 6 ❌ -- Error: cannot assign twice to immutable
+```
+
+See? Always using $ Change state makes it clearer when multiple shadowing.
+
 ### Constant Entities
 
 Constant Entities are similar to Immutable Entities and Enumerations themselves, but with an important difference, they can't be shadowed.
