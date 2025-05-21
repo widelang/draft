@@ -2153,7 +2153,7 @@ name:= "Mary"
 . "Welcome, Stranger!"
 ```
 
-⚠️ Parentheses are optional! `{}` are optional when no body make visibility bad.
+⚠️ Parentheses are optional!  And `{}` are also optional when inlined like above.
 
 You can also nest Questions:
 
@@ -2170,7 +2170,10 @@ authorized:= false
 } . "Welcome, Stranger!"
 ```
 
+In the above example, you must use {} to nest, because that could mean totally different logic.
+
 Wide has no null, nil, void, None, Option madness keywords to mean voidness.
+
 If you need to check the existence of a value, you check agains it's state just passing the Entity and using the `?.` symbols together.
 
 ```lua
