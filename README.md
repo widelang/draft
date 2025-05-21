@@ -630,6 +630,53 @@ That will output:
 Hello, "Wide"!
 ```
 
+### Printing Multiple lines
+
+When printing multiple lines you can use `\` character to ignore line break, or just break the line to include line break.
+
+```text
+() => {
+  "
+  This is paragraph 1.\
+  This is paragraph 2.\
+  This is paragraph 3.
+  "
+
+  "\
+  This is paragraph 1.\
+  This is paragraph 2.\
+  This is paragraph 3.\
+  "
+  "
+  This is paragraph 1.
+  This is paragraph 2.
+  This is paragraph 3.
+  "
+}
+```
+
+The first will print the tab before the first paragraph and a new line with a tab:
+
+```text
+  This is paragraph 1. This is paragraph 2. This is paragraph 3.
+  -- tab and line here!
+```
+
+And the second will print the 3 paragraphs inline and no empty line nor tabs:
+
+```text
+This is paragraph 1. This is paragraph 2. This is paragraph 3.
+```
+
+And the last will print a tab before every paragraph and a new line with a tab:
+
+```text
+  This is paragraph 1.
+  This is paragraph 2.
+  This is paragraph 3.
+  -- tab and line here!
+```
+
 ### Interpolation
 
 You can use curly braces inside those quotes `"{}"` to dinamically output values inside text output or just to compose dynamic strings of text:
@@ -640,7 +687,7 @@ You can use curly braces inside those quotes `"{}"` to dinamically output values
   "Hello, {name}!"
 
   price:= 9.99
-  "It's ${9.99}."
+  "It's ${price}."
 }
 ```
 
@@ -650,6 +697,40 @@ Those lines will output:
 Hello, Wide!
 
 It's, $9.99.
+```
+
+You can also just use {} as placeholders and pass a list of values you want to place in them:
+
+```lua
+() => {
+  name:= "Wide"
+  "Hello, {}!",  name
+
+  price:= 9.99
+  "It's ${price}.", price
+
+
+  "Hello, {}. This hot-dog costs ${}", name, price
+}
+```
+
+When using multiple placeholders you can align them in multiple lines:
+
+```lua
+name:= "Alice
+age:= 34
+occupation:= "Wide Developer"
+salary:= 99999.99
+
+"\
+Employee {} is {} years old. \
+Occupies the hole of {}. \
+And makes ${}.\
+",
+  name,
+  age,
+  occupation,
+  salary
 ```
 
 ### Printing Entity Type
@@ -665,6 +746,10 @@ Wheneven you wanna know the type of an Entity you enclose the Entity name with `
   "{:number:}" -- int
   "{:name:}" -- string
   "{:isActive:}" -- bool
+
+  "{}", :number:
+  "{}", :name:
+  "{}", :isActive:
 }
 ```
 
@@ -679,13 +764,19 @@ Wheneven you wanna know the name of an Entity:
 () => {
   number:= 10
   "{:<number>:} value is {number}" -- number value is 10
+  "{} value is {}", :<number>:, number
+
 
   name:= "Alice"
   "{:<name>:} is {name}" -- name is Alice
+  "{} is {}", :<name>:, name
 
   isActive:= true
-  "{:<isActive>: is {isActive}" -- isActive is 1
-  "{:<isActive>: is {::<isActive>::}" -- isActive is true
+  "{:<isActive>:} is {isActive}" -- isActive is 1
+  "{:<isActive>:} is {::<isActive>::}" -- isActive is true
+
+  "{} is {}", :<isActive>:, isActive
+  "{} is {}", :<isActive>:, ::<isActive>::
 }
 ```
 
