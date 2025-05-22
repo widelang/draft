@@ -792,7 +792,7 @@ And makes ${}.\
 
 ### Printing Entity Type
 
-Wheneven you wanna know the type of an Entity you enclose the Entity name with `:` and you can get its type name:
+Wheneven you wanna know the type of an Entity you enclose the Entity name with `:` and you can get its string type name:
 
 ```lua
 () => {
@@ -814,8 +814,8 @@ Wheneven you wanna know the type of an Entity you enclose the Entity name with `
 
 Wheneven you wanna know the name of an Entity:
 
-- `:<ENTITY>:` prints the name of an Entity
-- `::<ENTITY>::` prints the name of the value of an Entity in case it's been aliased.
+- `:<ENTITY>:` prints the string name of an Entity
+- `::<ENTITY>::` prints the string name of the value of an Entity in case it's been aliased.
 
 ```lua
 () => {
@@ -1112,6 +1112,15 @@ n = 6 ❌ -- Error: cannot assign twice to immutable
 ```
 
 See? Always using $ Change state makes it clearer when multiple shadowing.
+
+## `#` Enumerable Intent
+
+Whenever you see the Enumerable Intent # (hashtag symbol) you can think:
+
+- it can be countable
+- it can be enumerable
+- it can define constant value
+- it can define enumerable constants
 
 ### Constant Entities
 
@@ -1458,11 +1467,11 @@ You can check the type:
 
 ```lua
 printId(id: int | string) => {
-  :id: == string  ? "{id.upper()}" . "{id}"
+  // id string  ? "{id.upper()}" . "{id}"
 }
 ```
 
-⚠️ To check a type in Wide you just surround the Entity with `:ENTITY:` and check equality with the type alias in a Question case. You can use it in Match Expression!
+⚠️ Check the section "Type Checking" for more information on type checking.
 
 You can also do some interesting things with Type Unions using string literals.
 
@@ -1828,13 +1837,13 @@ Whenever you see the Type Intent `//` you can think:
 
 ### Counting Collections
 
-Every Collection in Wide can be questioned about how many elements it has using the `//` Inclusion Intent.
+Every Collection in Wide can be questioned about how many elements it has using the `//` Inclusion Intent by prefixing it with `#`.
 
 ```lua
 numbers:= [10, 20, 30, 40, 50]
 
 "How many elements in 'numbers'?"
-"There are {/numbers/} elements in 'numbers'"
+"There are {} elements in 'numbers'", #/numbers/
 -- There are 5 elements in 'numbers'
 ```
 
@@ -1844,7 +1853,7 @@ And if the Collection has fixed size it works the same way:
 numbers:[5] = [10]
 
 "How many elements in 'numbers'?"
-"There are {/numbers/} elements in 'numbers'"
+"There are {} elements in 'numbers'", #/numbers/
 -- There are 5 elements in 'numbers'
 ```
 
@@ -1853,7 +1862,7 @@ Simple count string characters:
 ```lua
 message:= "Hello, Wide!"
 
-"'message' has {/message/} characters"
+"'message' has {} characters", #/message/
 -- 'message' has 12 characters
 ```
 
@@ -4778,6 +4787,97 @@ And you can even specify the types you wanna to work with:
 }
 ```
 
+## Type Checking
+
+In Wide type checking can be done using the `//` Inclusion Intent.
+
+When reading `//` you can say "when" or "where".
+
+There are 2 basic forms:
+
+```lua
+a:float = 3.14
+b:int = 3
+
+// a float ? "a is float" . "a is not float"
+-- Read: When a is float
+
+// b float ? "b is float" . "b is not float"
+-- Read: When b is float
+```
+
+Output:
+
+```text
+a is float
+b is not float
+```
+
+But you could also obtain the same result like so:
+
+```lua
+/a/ float ? "a is float" . "a is not float"
+-- Read: Where a is float
+
+/b/ float ? "b is float" . "b is not float"
+-- Read: Where b is float
+```
+
+You can construct a negative sentence like so:
+
+```lua
+b:int = 3
+// b ! float ? "b is not float" -- True!!!
+-- /b/ ! float ? "b is not float"
+```
+
+That reads: When/Where b is not equal to float
+
+You can also check if the Entity Type like a instanceof operator:
+
+```lua
+..Animal < />
+
+.Dog .Animal < />
+
+.Robot < />
+
+// Dog Animal ? "Dog is an Animal" . "Dog is not an Animal"
+-- Read: When Dog is Animal
+
+// Robot Animal ? "Robot is an Animal" . "Robot is not an Animal"
+-- Read: When Robog is Animal
+
+robot:= <Robot />
+
+// robot ! Animal ? "Robot is not an Animal" -- True!!
+-- /robot/ ! Animal ? "Robot is not an Animal" -- True!!
+-- When robot is NOT Animal
+```
+
+Output:
+
+```text
+Dog is an Animal
+Robot is not an Animal
+Robot is not an Animal
+```
+
+You can also batch check multiple entities separating by commas:
+
+```lua
+// a, b float -- False, a is int
+// Dog, Robot Animal -- False, Robot is not Animal
+```
+
+For better readability, you can use any pair or brackets to enclose them:
+
+```lua
+// [a, b] float
+// (a, b) float
+// {a, b} float
+```
+
 ## Type Casting
 
 In Wide type casting is very simple, just type the variable when using it:
@@ -4819,3 +4919,23 @@ printSum(a:i32, b:i32) => {
 ```
 
 ⚠️ Type casting expressions must be value-safe. Downcasting is explicit and must obey overflow constraints — otherwise a compile-time or runtime error will occur (depending on safety settings).
+
+Just going creative:
+
+```lua
+printSum(a: int | float, b: int | float) => (a, b) ? {
+  /a/ float => {
+    /b/ float ? "Sum is {}", a + b . "Sum is {}", a + b:i32
+  },
+  /b/ float => "Sum is {}", a:i32 + b
+  . => "Sum is {}", a + b
+}
+
+printSum(a: int | float, b: int | float) => (a, b) ? {
+  // a float => {
+    // b float ? "Sum is {}", a + b . "Sum is {}", a + b:i32
+  },
+  // b float => "Sum is {}", a:i32 + b
+  . => "Sum is {}", a + b
+}
+```
