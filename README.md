@@ -4777,3 +4777,17 @@ And you can even specify the types you wanna to work with:
   +Inf:int = +..,
 }
 ```
+
+## Type Casting
+
+In Wide type casting is very simple, just type the variable when using it:
+
+```lua
+a:i16 = 12
+b:int = 4
+c:float = 3.7
+
+"{}", a:i8 + b:i8 + c:i8
+```
+
+Output will be: 19
