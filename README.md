@@ -4791,3 +4791,31 @@ c:float = 3.7
 ```
 
 Output will be: 19
+
+You can also force final result casting (expression-level):
+
+```lua
+"{}", (a + b + c):f32
+```
+
+You can also use in function calls:
+
+```lua
+sum(a:i32, b:i32) i32 => a + b
+
+printSum(a:i32, b:i32) => {
+  "Sum is {}", a + b
+}
+
+() => {
+  x:i64 = 100
+  y:i64 = 200
+
+  printSum(x:i32, y:i32)
+
+  result := sum(x:i32, y:i32)
+  "Result is {}", result
+}
+```
+
+⚠️ Type casting expressions must be value-safe. Downcasting is explicit and must obey overflow constraints — otherwise a compile-time or runtime error will occur (depending on safety settings).
