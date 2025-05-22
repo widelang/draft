@@ -470,10 +470,21 @@ It's built-in core Type-Values looks like this:
 |:---:|--------|--------|
 | ? | bool (1: true, 0: false ) | true/false, yes/no, on/off |
 | '' | char  | letter 'A', number '1', symbol '$' |
-| " | string  | "hello", "sweet potatoes", "How are you?" |
-| 0 | int | 1, 10, 100, 999 |
+| "" | string  | "hello", "sweet potatoes", "How are you?" |
 | 0.0 | float | 20.5%, -5.6°C, 10.9km |
 | 0.00 | double | Pi(π)3.14159265358979323846, -23.5505200 lat, -46.6333094 lng |
+| 0 | int | -1, 0, 1 |
+| 00 | uint | 1, 2, 3 |
+| 08 | i8 | -128, 0, 127 |
+| 08+ | u8 | 0, 255 |
+| 016 | i16 | -32_768, 0, 32_767 |
+| 016+ | u16 | 0, 65_535 |
+| 032 | i32 | -2_147_483_648, 0, 2_147_483_647 |
+| 032+ | u32 | 0, 4_294_967_295 |
+| 064 | i64 | -9_223_372_036_854_775_808, 0,  9_223_372_036_854_775_807 |
+| 064+ | u64 | 0, 18_446_744_073_709_551_615 |
+| 0128 | i128 | -170_141_183_460_469_231_731_687_303_715_884_105_728, 0, 170_141_183_460_469_231_731_687_303_715_884_105_727 |
+| 0128+ | u128 | 0, 340_282_366_920_938_463_463_374_607_431_768_211_455 |
 | () | fn \| lambda | (add), (subtract), (print), (click)  |
 | <> | obj | Person, Vehicle, Dropdown, Box, Header, Provider |
 
@@ -493,17 +504,45 @@ But that would serve no purpose! It's lost in the vaccumm of nonsense!
 For core Wide **Type-Values** you can give it the type you want it to be:
 
 ```lua
+'':char
 "":string
+0:int
+0+:uint
+08:i8
+08+:u8
+016:i16
+016+:u16
+032:i32
+032+:u32
+064:i64
+064+:u64
+0128:i128
+0128+:u128
+0.0:float
+0.00:double
+<>:obj
+():fn
 ```
 
-⚠️ That's an Aliased Type-Value.
+⚠️ That's Wide's own Aliased Type-Values.
 
-You can also create a type by assigning a type-value with the `=` Assignment Intent to a custom type.
+You can also create custom aliases assigning a type-value with the `=` Assignment Intent to a custom type, so Wide's own type aliases could be done like so.
 
 ```lua
 :char = ''
 :string = ""
 :int = 0
+:uint = 0+
+:i8 = 08
+:u8 = 08+
+:i16 = 016
+:u16 = 016+
+:i32 = 032
+:u32 = 032+
+:i64 = 064
+:u64 = 064+
+:i128 = 0128
+:u128 = 0128+
 :float = 0.0
 :double = 0.00
 :obj = <>
@@ -518,29 +557,29 @@ You can also even alias from an already existing type aliased:
 
 ⚠️ As you'll learn in Objects section, Types are close cousins to Interfaces and they can beautifully implement each other!
 
-You can even go more specialized mixing anything that might represent a type grouping them all together.
+Besides not having keywords in its syntax, some words are impossible to avoid when talking to types, and that would turn Wide impossible to work with. As you can **alias** types, and in order to help newcomers and professionals with parity with other languages, Wide has those built-in aliases for them in plain English.
 
-Besides not having keywords in its syntax, some words are impossible to avoid when talking to types, and as you can **alias** types, and in order to help newcomers and professionals with parity with other languages, Wide has built-in aliases for them in plain English:
+You can also alias type values, but currently just `?` Boolean type has it:
 
 ```lua
 ?:bool {
   0:false
   1:true
 }
-'':char
-"":string
-0:int
-0.0:float
-0.00:double
-():fn
-</>:obj
+
+-- or using assignment
+
+:bool = ? {
+  :false = 0
+  :true = 1
+}
 ```
 
-Those words are not syntax, they are English words the compiler knows by default they were aliased. You can rename at any time just using the core Wide types as of the previous table and examples or from already English aliased types.
+Those words are not syntax, they are plain English words the compiler knows by default they were aliased and performs type lowering at compile-time.
 
-In the case of `?:bool`, it aliased it's possible values because they are also Type-Values. If that's the case, you use `{}` a context for them and follow the same pattern.
+You can rename them at any time just using the core Wide types from the previous table and examples or from already English aliased types.
 
-***Wide is made in Brazil***, so types could be aliased like so:
+For you to better understand, ***Wide is made in Brazil***, so types could be aliased like so:
 
 ```lua
 ?:booleano {
@@ -556,15 +595,33 @@ In the case of `?:bool`, it aliased it's possible values because they are also T
 </>:objeto
 ```
 
-⚠️ Wide is able to understand both English and Portuguese alias in this case.
+Or like so using assignment:
+
+```lua
+:booleano = ? {
+  :falso = 0
+  :verdadeiro = 1
+}
+:caractere = ''
+:texto = ""
+:inteiro = 0
+:flutuante = 0.0
+:real = 0.00
+:funcao = ()
+:objeto = </>
+```
+
+⚠️ Wide is able to understand both English and Portuguese alias in this case because it won't cancel the previous English ones.
 
 ### Rules for Aliasing
 
 When creating aliases you can't create them anywhere.
 
-They must be the first lines of code if there are no imports, or the first lines of code after the imports if there are imports.
+They must be in the first lines of code if there are no imports, or int the first lines of code after the imports if there are imports.
 
-They can't be inside the Entry function nor elsewhere.
+So, they can't be created inside the Entry function nor elsewhere. This is because the Compiler must now before-hand the types were aliased.
+
+You can create a Wide file called `.aliases` and place it in the root of your project as well. Just copy and paste them it, and you are ready to go.
 
 ## Entry function
 
@@ -584,7 +641,7 @@ Whatever you place before it is structural code that you can reuse inside the En
 
 ⚠️❌ From now own, other than very specific, the Entry Function may not be  used for fragment code samples.
 
-Back to custom types. This how you would do that for `:string` cited previously:
+Back to custom types. This is how you would do that for `:string` custom type presented previously:
 
 ```lua
 :string = ""
@@ -1022,7 +1079,7 @@ $words.filter(w => w.length > 4)
 
 ### Shadowing Exchange
 
-You can shadow Entities from Immutable to Immutable. But be carefull because excessive shadowing can be confusing. That's why using $ in Immutables usage is the best whay to go!
+You can shadow Entities from Immutable to Mutable state. But be carefull because excessive shadowing can be confusing. That's why using $ in Immutables usage is the best whay to go!
 
 Without signaling $ state intent:
 
@@ -1167,7 +1224,7 @@ You can't have the same Constants grouped with different names because that woul
 }
 ```
 
-Enums are closely related to Enums, with the main difference that enums enclose their constants with `</>` and can have Generics in their name and Functions to behave on selection.
+Constants are closely related to Enums, with the main difference that enums enclose their constants with `</>` and can have Generics in their name and Functions to behave on selection.
 
 Take a look at Enums section later, but the most comparison that we can make now may be overhead, so just abstract the concepts until you reach Enums.
 
@@ -1345,7 +1402,7 @@ doSomething(/* You can use anywhere */) => {
 
 ## Union Types
 
-If you have a Entity that might have more than one possible type and you want to just force it, you can use Union Types.
+If you have an Entity that might have more than one possible type and you want to just force it, you can use Union Types.
 
 ```lua
 value:= string | number
@@ -1353,7 +1410,7 @@ value:= 123
 value:= "hello"
 ```
 
-But it some cases it only makes sense when used with Mutables because since when Shadowing Immutables the compiler kills the previous Entity and creates a new one with whatever same or new type you shadow it.
+But in some cases it only makes sense when used with Mutables because since when Shadowing Immutables the compiler kills the previous Entity and creates a new one with whatever same or new type you shadow it.
 
 ```lua
 value:= string | number
