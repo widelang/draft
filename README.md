@@ -4939,3 +4939,152 @@ printSum(a: int | float, b: int | float) => (a, b) ? {
   . => "Sum is {}", a + b
 }
 ```
+
+## Exports and Imports
+
+Wide has a very simple system for importing with `..` and exporting with `&`.
+
+### `&` Extern Intent
+
+Whenever you see the Extern Intent `&` (ampersand symbol) you can think:
+
+- it can be shared
+- it can be paired
+- it can be exported
+
+### Exporting
+
+You export prefixing what you want to export using the `&` Extern Intent:
+
+```lua
+-- ./libs/Zoo.wide file
+
+.Zookeeper <
+  (.name:string)
+/>
+
+& zoo:= "Blue forest"
+& .Animal <
+  #animals: []string
+
+  .add(name:string) => {
+    .animals[] = name
+  }
+/>
+& #Status <
+  Open = true
+  Closed = false
+/>
+```
+
+And you import using the `..` Extent Intent passing the path of the file that contains the Entities you just want to import:
+
+```lua
+-- ./main.wide file
+
+..{zoo} ./libs/Zoo
+..{Animal} ./libs/Zoo
+..{Status} ./libs/Zoo
+-- ..{ZooKeeper} ./libs/Zoo ❌ -- Error: Cannot import not exported entity ZooKeeper
+
+() => {
+  zooName:= zoo
+  zooStatus:= #Status..Open
+
+  animal: Animal = </>
+  animal.add("Giraffe")
+  animal.add("Monkey")
+  animal.add("Eagle")
+}
+```
+
+### Grouped Exports and Imports
+
+As many things in Wide you can group exports and imports:
+
+```lua
+-- ./libs/Zoo.wide file
+
+-- ... previous code
+
+&{
+  zoo,
+  Animal,
+  Status
+}
+```
+
+or you could group them:
+
+```lua
+-- ./libs/Zoo.wide file
+
+.Zookeeper </*...*//>
+
+&{
+  zoo:= "Blue forest"
+  .Animal </*...*//>
+  #Status </*...*//>
+}
+```
+
+And you can also name your grouped exports creating a Struct-like export:
+
+```lua
+-- ./libs/Zoo.wide file
+
+.Zookeeper </*...*//>
+
+&Zoo {
+  zoo:= "Blue forest"
+  .Animal </*...*//>
+  #Status </*...*//>
+}
+```
+
+And now you can import each Entity isolated as you already now, or grouped, or named:
+
+```lua
+-- ./main.wide file
+
+..{zoo} ./libs/Zoo
+..{zoo, Animal} ./libs/Zoo
+..{zoo, Animal, Status} ./libs/Zoo
+
+-- named export is imported
+..{Zoo} ./libs/Zoo
+
+-- custom-named import
+Safari..{
+  zoo,
+  Animal,
+  Status
+} ./libs/Zoo
+
+() => {
+  -- using named import
+  Zoo.zooName:= zoo
+  Zoo.zooStatus:= #Status..Open
+
+  Zoo.animal: Animal = </>
+  animal.add("Giraffe")
+  animal.add("Monkey")
+  animal.add("Eagle")
+
+  -- using custom-named import
+  Safari.zooName:= zoo
+  Safari.zooStatus:= #Status..Open
+  Safari.animal: Animal = </>
+
+  -- using normal imports:
+  zooName:= zoo
+  zooStatus:= #Status..Open
+
+  animal: Animal = </>
+  animal.add("Giraffe")
+  animal.add("Monkey")
+  animal.add("Eagle")
+}
+```
+
+⚠️ You can reimport at will, Wide just caches it and ignore what's already imported.
