@@ -637,6 +637,17 @@ intEntity:int = 1
 sum:= boolEntity + intEntity ✅ -- sum value is 2
 ```
 
+But as you'll see later, you can type cast a value by using `:type` attached to the entity when using it:
+
+```lua
+boolEntity:bool = 1
+intEntity:int = 1
+
+sum:= boolEntity:int + intEntity ✅ -- sum value is 2
+```
+
+⚠️ Notice that `boolEntity:int` did the trick here.
+
 ### Rules for Aliasing
 
 When creating aliases you can't create them anywhere.
@@ -808,10 +819,10 @@ Employee {} is {} years old. \
 Occupies the hole of {}. \
 And makes ${}.\
 ",
-  name,
-  age,
-  occupation,
-  salary
+name,
+age,
+occupation,
+salary
 ```
 
 ### Printing Entity Type
