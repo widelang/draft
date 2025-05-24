@@ -643,10 +643,22 @@ But as you'll see later, you can type cast a value by using `:type` attached to 
 boolEntity:bool = 1
 intEntity:int = 1
 
-sum:= boolEntity:int + intEntity ✅ -- sum value is 2
+sum:= boolEntity:int + intEntity ✅ -- sum value is 2 -> 1 + 1
+
+boolEntity:bool = 0
+sum:= boolEntity:int + intEntity ✅ -- sum value is 1 -> 0 + 1
+
 ```
 
 ⚠️ Notice that `boolEntity:int` did the trick here.
+
+You can't turn other type into Boolean however!
+
+```lua
+intEntity:int = 1
+
+intEntity:bool ? "True" . "False" ❌ -- "Error: Cannot cast as boolean
+```
 
 ### Rules for Aliasing
 
