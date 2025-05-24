@@ -2443,6 +2443,40 @@ Output:
 ]
 ```
 
+### Comprehension Flow Binding
+
+You can create generators like this in Wide:
+
+```lua
+countries()~> {
+  ["Brazil", "BR"];
+  ["Canada", "CA"];
+  ["Japan", "JP"];
+}
+```
+
+So you can consume it:
+
+```lua
+codes ~= (entry) {
+  (name, code) := entry
+  codes.name = code
+} <~ countries
+```
+
+Or you could go full fancy-mode:
+
+```lua
+codes ~= (entry) {
+  (name, code) := entry
+  codes.name = code
+} <~> {
+  ["Brazil", "BR"];
+  ["Canada", "CA"];
+  ["Japan", "JP"];
+}
+```
+
 ## `?` Question Intent
 
 Every time you want to question your code for anything you use the `?` Question Intent.
