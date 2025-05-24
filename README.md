@@ -2199,7 +2199,7 @@ They are based on the concept learned for Slices and Iterations.
 
 Some examples:
 
-**Wide one-based style**
+**Wide is one-based**
 
 The following example start all at 1
 
@@ -2239,47 +2239,6 @@ range:= ~(3..10:2)
   "{val}" -- 3 5 7 9
 }
 ```
-
-**Classic Zero-based index**
-
-```lua
-range:= ~([6])
-~(val = range) {
-  "{val}" -- 0 1 2 3 4 5
-}
-
--- no need for temporary entity
-~(val = ([6])) {
-  "{val}" -- 0 1 2 3 4 5
-}
-```
-
-```lua
-range:= ~([3:6])
-~(val = range) {
-  "{val}" -- 3 4 5
-}
-
--- no need for temporary entity
-~(val = ([3:6])) {
-  "{val}" -- 3 4 5
-}
-```
-
-```lua
-range:= ~([3:10:2])
-
-~(val = range) {
-  "{val}" -- 3 5 7 9
-}
-
--- no need for temporary entity
-~(val = ([3:10:2])) {
-   "{val}" -- 3 5 7 9
-}
-```
-
-⚠️ In this documentation Wide syntax will use just One-based indexes.
 
 ## `?` Question Intent
 
@@ -2399,6 +2358,78 @@ That will print:
 ```text
 Welcome, Alice!
 ```
+
+### Checking the Truthness of An Entity
+
+As you saw in the Type-Values section, you can't cast any type into boolean, just numbers into booleans.
+
+But you can check the truthness of an Entity using the `?..` Truthness Intent.
+
+Just prefix the name of any Entity with that in a Question, and you'll get a true of false value for that.
+
+In the following example Mutables will be used to make clear the Intent, because people will mostly check truthness on Entities that might have changed their states, but it will work the same for Immutables, Contants, Functions, Objects, and anything that returns a value.
+
+```lua
+$name:string
+$age:int
+$salary:double
+$isMarried:bool
+
+?..name ? "Has name"
+?..age ? "Has age"
+?..salary ? "Has salary"
+?..isMarried ? "Is Married"
+```
+
+The above will print nothing, because all values ended up to be `falsy` values.
+
+```lua
+-- ... previous code
+
+$name = "Alice"
+$age = 34
+$salary = 19999.00
+$isMarried = true
+
+?..name ? "Has name"
+?..age ? "Has age"
+?..salary ? "Has salary"
+?..isMarried ? "Is Married"
+```
+
+Now it will all print the corresponing questioned text:
+
+```text
+Has name
+Has age
+Has salary
+Is Married
+```
+
+And of course, if you just want to negate, you use the `!` Not Intent:
+
+```lua
+$name:string
+$age:int
+$salary:double
+$isMarried:bool
+
+!?..name ? "Has NOT name"
+!?..age ? "Has NOT age"
+!?..salary ? "Has NOT salary"
+!?..isMarried ? "Is NOT Married"
+```
+
+Not it will output, because you negate the question:
+
+```text
+Has NOT name
+Has NOT age
+Has NOT salary
+Is NOT Married
+```
+
+⚠️ A table with all possibilities will be created, because it's vague yet!
 
 ### Regular Question Expression 🤣
 
@@ -2612,7 +2643,7 @@ To invoke a Function you do like so:
 () -- Does nothing
 ```
 
-⚠️ In Wide ()=> {} alone in a file is the Entry Function.
+⚠️ In Wide ()=> {} alone in a file is the Entry Function used to tell the compiler that file can be used as an Entry point to your program.
 
 Named Function:
 
@@ -2636,8 +2667,8 @@ greet() -- Output: Hello, Wide!
 Function that prints a message based on single parameter:
 
 ```lua
-greet(name:string) => {} -- No return type
-  "Hello, {name}!" -- No return value, will just print to screen
+greet(name:string) => {}
+  "Hello, {name}!" -- Will print a dynamic message on the screen
 
 greet("World") -- Output: Hello, World!
 ```
@@ -2649,7 +2680,33 @@ It's the only place where it's used in Wide.
 
 **Returning Values:**
 
-To return values you use the `;` Return Intent at the end of the line that you want to return the value or resulting value from an expression.
+When you create a function like this:
+
+```lua
+greet() => {
+
+}
+```
+
+It will return an empty tuple `()` by default because there no return type nor a return value defined in the function.
+
+If you want to check if a function doesn't have a type, it means you want to check if it returns an empty tuple:
+
+```lua
+greet() => {}
+
+() == greet() ?  "Function doesn't return a value"
+```
+
+You can also check the truthness of if it:
+
+```lua
+greet() => {}
+
+?..greet() ?  "Function doesn't return a value"
+```
+
+If you need to return value(s) you need use the `;` Return Intent at the end of the line that you want to return the value or resulting value from an expression. This is the only place where `;` is used in Wide — for returning values (which also means yielding as you'll see)
 
 Function that returns a message based single on parameter:
 
@@ -2710,6 +2767,21 @@ times10(number:int) => number * 10
 result:= times10(10)
 
 "{result}" -- 100
+```
+
+Back to the case of default `()` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthness of the returned value:
+
+```lua
+sum(n:int, m:int) => {
+  n + m;
+}
+
+// sum(1, 1) int ? "It's an int type"
+
+sum(1, 1) == 2 ? "It's 2"
+
+?..sum(1, 1) ? "truthy"
+?..sum(0, 0) ? "falsy"
 ```
 
 **Multiple parameters:**
