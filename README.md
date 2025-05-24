@@ -504,6 +504,7 @@ But that would serve no purpose! It's lost in the vaccumm of nonsense!
 For core Wide **Type-Values** you can give it the type you want it to be:
 
 ```lua
+?:bool
 '':char
 "":string
 0:int
@@ -529,6 +530,7 @@ For core Wide **Type-Values** you can give it the type you want it to be:
 You can also create custom aliases assigning a type-value with the `=` Assignment Intent to a custom type, so Wide's own type aliases could be done like so.
 
 ```lua
+:bool = ?
 :char = ''
 :string = ""
 :int = 0
@@ -612,6 +614,28 @@ Or like so using assignment:
 ```
 
 ⚠️ Wide is able to understand both English and Portuguese alias in this case because it won't cancel the previous English ones.
+
+### Notes on Boolean Type
+
+It is important to notice that when you use Bool Type-Values `0` or `1` you are not using Integer Type-Values like `1`, `0`, `-1`, `100`. That's why you must explicity type your Entities of type Bool.
+
+So you can't do Math like so:
+
+```lua
+boolEntity:bool = 1
+intEntity:int = 1
+
+sum:= boolEntity + intEntity ❌ -- Error: Cannot Add bool to Integer
+```
+
+If you remove `:bool` from boolEntity the compiler will infer that is an Integer.
+
+```lua
+boolEntity:= 1
+intEntity:int = 1
+
+sum:= boolEntity + intEntity ✅ -- sum value is 2
+```
 
 ### Rules for Aliasing
 
