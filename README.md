@@ -2986,6 +2986,7 @@ You can go really fancy!
 Whenever you see the Type Intent `@` you can think:
 
 - it has behaviour *(metadata)*
+- it has reflection *(metadata)*
 - it has asynchronous behaviour *(async/await)*
 - it has concurrent behaviour *(processes)*
 - it has reactive hehaviour *(live update, assertion related)*
@@ -4561,35 +4562,29 @@ You can also bind traits to Enums:
 />
 ```
 
-## Attributes in Wide Language
+## Attributes
 
 In Wide, **attributes** are metadata-like constructs that can be applied to functions, meta entities, objects, and more — very much like annotations in other languages. But unlike traditional attributes, they are full-fledged **objects** in Wide, with support for inheritance, traits, macros, and default parameters.
 
 Wide attributes are not just markers — they're living pieces of logic you can reason with.
 
-### Attribute Binding in Wide
+### Attribute Binding
 
 Wide supports annotations (called **attributes**) using a concise and composable syntax.
 
-Attributes are declared using `@{}` Intents and contain one or more calls to functions and/or objects:
+Attributes are declared using `@[]` Intents and contain one or more calls to functions and/or objects:
 
 ```lua
-@{
-  route(path: "/aircraft/{id}")
-}
+@[route(path: "/aircraft/{id}")]
 show(id:int) View => "..."
 ```
 
 ```lua
 .Book<
-  @{
-    belongsTo(localKey:'author_id')
-  }
+  @[belongsTo(localKey:'author_id')]
   .author:Author
 
-  @{
-    belongsTo(localKey:'collection_id')
-  }
+  @[belongsTo(localKey:'collection_id')]
   .collection:BookCollection
 />
 ```
@@ -4600,10 +4595,10 @@ You can chain multiple attributes inside the same block separated by commas:
 
 ```lua
 .Book<
-  @{
+  @[
     belongsTo(localKey: "author_uuid"),
     inverse(inverseKey: "uuid")
-  }
+  ]
   .[author]:Author
 />
 ```
@@ -4622,9 +4617,7 @@ Attributes can inherit from one another using `:` Interfaces or `::` Traits just
 />
 
 .BookController <
-  @{
-    <GetRoute path:"/books" />
-  }
+  @[<GetRoute path:"/books" />]
   .listBooks() => {
     -- list books...
   }
@@ -4643,14 +4636,10 @@ Attributes support **default parameter values**, making them easier to use:
   .roles:= ["user"]
 />
 
-@{
-  <Logged />
-}
+@[<Logged />]
 viewDashboard()
 
-@{
-  <Logged required=false, roles=["guest"] />
-}
+@[<Logged required=false, roles=["guest"] />]
 previewDashboard()
 ```
 
@@ -4667,9 +4656,7 @@ Since attributes are objects, they can **implement traits** or even **use other 
   .logLevel:= "INFO"
 />
 
-@{
-  <AuditAttribute logLevel="DEBUG" />
-}
+@[<AuditAttribute logLevel="DEBUG" />]
 deleteItem()
 ```
 
@@ -4680,9 +4667,7 @@ This enables **modular attribute logic** through traits.
 Attributes can pair with **compile-time macros**, injecting logic or altering behavior at compile time:
 
 ```lua
-@{
-  <AutoToString />
-}
+@[<AutoToString />]
 <Person />
 ```
 
@@ -4691,6 +4676,168 @@ Use cases include:
 - Auto-generating methods (e.g., `toString()`)
 - Validations (e.g., required fields)
 - Dependency injection markers
+
+## Reflection and Introspection
+
+Wide has a very simple reflective and introspective mechanism using the `@` Event Intent.
+
+You just postfix the name of your Entity with `@..` and you can now get comment tags using `*` and the attributes just using their names.
+
+For example:
+
+```lua
+/**
+ * @author "Somebody"
+ *
+ * @param string arg1 The first argument
+ * @param string arg2 The second argument
+ * @param string arg3 The third argument
+
+ * @returns string
+ */
+@[attrFunc(value1: "value 01", value2: "value 02", value3: "value 03")]
+yourFunc(arg1:string, arg2:string, arg3:string = "arg 03") string => ""
+```
+
+Using instropection and reflection at the same time is indistinguishable:
+
+```lua
+yourFunc@..*.author.1    -- Output ["Somebody"]
+```
+
+```lua
+yourFunc@..*.param.1
+yourFunc@..*.param.2
+yourFunc@..*.param.3
+```
+
+Output:
+
+```text
+["string", "arg1", "The first Argument"]
+["string", "arg2", "The first Argument"]
+["string", "arg3", "The first Argument"]
+```
+
+```lua
+yourFunc@..*.returns
+```
+
+Output:
+
+```text
+["string"]
+```
+
+```lua
+yourFunc@..*.param
+```
+
+Output:
+
+```text
+[
+  ["string", "arg1", "The first Argument"]
+  ["string", "arg2", "The first Argument"]
+  ["string", "arg3", "The first Argument"]
+]
+```
+
+```lua
+yourFunc@..*
+```
+
+Output :
+
+```text
+{
+  param: [
+    ["string", "arg1", "The first Argument"]
+    ["string", "arg2", "The first Argument"]
+    ["string", "arg3", "The first Argument"]
+  ],
+  returns: [ "string" ]
+}
+```
+
+```lua
+yourFunc@..attrFunc.1
+yourFunc@..attrFunc.2
+yourFunc@..attrFunc.3
+```
+
+Output:
+
+```text
+["value1", "string",  "value 01"]
+["value2", "string",  "value 02"]
+["value3", "string",  "value 03"]
+```
+
+```lua
+yourFunc@..attrFunc
+```
+
+Output:
+
+```text
+{
+  value1: ["value1", "string",  "value 01"],
+  value1: ["value2", "string",  "value 02"],
+  value1: ["value3", "string",  "value 03"],
+}
+```
+
+```lua
+yourFunc@..
+```
+
+Output:
+
+```text
+{
+  * : {
+    param: [
+      ["string", "arg1", "The first Argument"],
+      ["string", "arg2", "The first Argument"],
+      ["string", "arg3", "The first Argument"]
+    ],
+    returns: [ "string" ]
+  },
+  attrFunc: {
+    value1: ["value1", "string",  "value 01"],
+    value1: ["value2", "string",  "value 02"],
+    value1: ["value3", "string",  "value 03"]
+  }
+}
+```
+
+⚠️ If reflected is a Function or Object, you can call or instanciate them.
+
+```lua
+.Callback <
+  () => {
+    "I'm Callback Object"
+  }
+/>
+anotherCallback() => {
+  "I'm another callback Function"
+}
+
+callback(anotherCallback:fn) => {
+  "I'm callback Function"
+}
+
+@[callback, Callback]
+myFunc() => {}
+
+
+myFunc@..callback() -- Output: "I'm callback Function"
+myFunc@..callback.anotherCallback() -- "I'm another callback Function"
+myFunc@..Callback..() -- Output: "I'm Callback Object"
+```
+
+⚠️ In the previous as `myFunc@..Callback..()` is called before `myFunc()..` you are calling the static Lambda Constructor and not the default Slot. The default slot `Callback..()` can only be called when inside an HTML like structure.
 
 ### Pipe Intent
 
