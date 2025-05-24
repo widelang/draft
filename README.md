@@ -1847,6 +1847,138 @@ numbers:[2] -- Same as: [2]
 numbers:[2] = [] -- Same as: [0, 0]
 ```
 
+#### Multidimensional Collections
+
+You can have multidimensional collections:
+
+```lua
+numbers:[3][3][3] = []
+```
+
+That will create an Array-like:
+
+```text
+[
+  [
+    [0, 0, 0], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [0, 0, 0], [0, 0, 0]
+  ],
+]
+```
+
+But if you want to set just individual members of the structure.
+
+Per member:
+
+```lua
+numbers:[3][3][3] = []
+
+numbers.1.1.1 = 1
+numbers.2.2.2 = 2
+numbers.3.3.3 = 3
+```
+
+Output will be:
+
+```text
+[
+  [
+    [1, 0, 0], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [0, 2, 0], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [0, 0, 0], [0, 0, 3]
+  ],
+]
+```
+
+Per chunck:
+
+```lua
+numbers:[3][3][3] = []
+
+numbers.1.1 = [1]..
+numbers.2.2 = [2]..
+numbers.3.3 = [3]..
+```
+
+⚠️ Notice the `..` is after [].
+
+Output will be:
+
+```text
+[
+  [
+    [1, 1, 1], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [2, 2, 2], [0, 0, 0]
+  ],
+  [
+    [0, 0, 0], [0, 0, 0], [3, 3, 3]
+  ],
+]
+```
+
+Per row:
+
+```lua
+numbers:[3][3][3] = []
+
+numbers.1 = [1]..
+numbers.2 = [2]..
+numbers.3 = [3]..
+```
+
+Output will be:
+
+```text
+[
+  [
+    [1, 1, 1], [1, 1, 1], [1, 1, 1]
+  ],
+  [
+    [2, 2, 2], [2, 2, 2], [2, 2, 2]
+  ],
+  [
+    [3, 3, 3], [3, 3, 3], [3, 3, 3]
+  ],
+]
+```
+
+Per column:
+
+```lua
+numbers:[3][3][3] = []
+
+numbers[1][1][1] = ..[9]
+```
+
+⚠️ Notice the `..` is before [].
+
+Output will be:
+
+```text
+[
+  [
+    [9, 9, 9], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [9, 9, 9], [0, 0, 0], [0, 0, 0]
+  ],
+  [
+    [9, 9, 9], [0, 0, 0], [0, 0, 0]
+  ],
+]
+```
+
 ### Typed Collections
 
 All Collections in Wide can have an explicit type:
@@ -1987,6 +2119,8 @@ list ~ (item) {
 }
 ```
 
+⚠️ Notice that `~` here assumes a Foreach-like meaning.
+
 Enumeration is also implicit:
 
 ```lua
@@ -1994,8 +2128,6 @@ list = [1, 2, 3, 4, 5, 6]
 list ~ (item) {
   "Item at {item.} is {item}"
   -- Item at 1 is 1
-  "Item at {item[]} is {item}"
-  -- Item at 0 is 1
 }
 ```
 
@@ -2045,7 +2177,7 @@ uniqueColors:= {"red":'R', "green":'G', "blue":'B'}
 
 ~({key, value} = uniqueColors) {
   "{key.(capitalize)} is represented by the letter: {value}"
-  }
+}
 
 ~(color = uniqueColors) {
   "Color is {color}"
@@ -2240,6 +2372,77 @@ range:= ~(3..10:2)
 }
 ```
 
+## Comprehension Assignment
+
+In Wide, you can construct and populate an entity using a single expression via Comprehension Assignment, using the Meta Intent `~=`.
+
+This combines:
+
+- ~ Iteration
+- = Assignment
+
+into a single constructive flow:
+
+```lua
+range = 1..10
+
+squares ~= (i) {
+  squares.i = i * i
+}
+```
+
+The i is taken from range (which yields numbers 1 to 10).
+Wide automatically connects the nearest iterable to the comprehension loop.
+
+```text
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+
+```lua
+countries = () ~> {
+  ["Brazil", "BR"];
+  ["Canada", "CA"];
+  ["Japan", "JP"];
+}
+
+codes ~= (entry) {
+  (name, code) := entry
+  codes.name = code
+}
+```
+
+Here entry is each sublist from countries, destructured into name and code.
+
+Output:
+
+```lua
+{
+  "Brazil": "BR",
+  "Canada": "CA",
+  "Japan": "JP"
+}
+```
+
+```lua
+range:= ~(1..3)
+
+grid ~= (x, y) {
+  grid.x.y = "{x},{y}"
+}
+```
+
+The comprehension is nested: range is implicitly used for both x and y.
+
+Output:
+
+```text
+[
+  ["1,1", "1,2", "1,3"],
+  ["2,1", "2,2", "2,3"],
+  ["3,1", "3,2", "3,3"]
+]
+```
+
 ## `?` Question Intent
 
 Every time you want to question your code for anything you use the `?` Question Intent.
@@ -2427,6 +2630,31 @@ Has NOT name
 Has NOT age
 Has NOT salary
 Is NOT Married
+```
+
+But you can get more fancy, and do just like so:
+
+```lua
+name?.. "Has name" . "Has NOT name"
+age?.. "Has age" . "Has NOT age"
+salary?.. "Has salary" . "Has NOT salary"
+isMarried?.. "Is Married" . "Is NOT married"
+```
+
+Now, look how cool it gets with objects:
+
+```lua
+.User <
+  .name:string
+/>
+
+$user:User </>
+
+user?.. "Hello, {user.name}" . "Who are you really?"
+
+$user:= <User name="Alice"/>
+
+user?.. "Hello, {user}" . "Who are you really?"
 ```
 
 ⚠️ A table with all possibilities will be created, because it's vague yet!
@@ -3442,13 +3670,28 @@ You create a concrete object by prefixing its name with `.`:
 
 ```lua
 .Thing </>
+```
 
+And resolve it like this:
+
+```lua
 thing:Thing = </>
+```
 
--- or
+or like this:
 
+```lua
 thing: = <Thing/>
 ```
+
+You can also use an alternative syntax mostly like if it were a constructor function, but not, calling the Object Lambda Constructor:
+
+```lua
+thing:Thing = .()
+thing:= Thing.()
+```
+
+You might be questioning why not `Thing()`? That's because functions are called like so. And using `.()` makes it clear it is an object not a function.
 
 **Adding Functions to Objects**
 
@@ -3519,7 +3762,7 @@ Objects can also be self-aliased like so:
   .doSomething() => {
     Self.do ? "Do something!"
   }
-/{Self}>
+/Self>
 ```
 
 ⚠️ That's not a keyword, you can name it whatever you want. Very likely `Self` will become standard convention mostly because like in Python and Rust.
@@ -3530,7 +3773,7 @@ Objects can also be self-aliased like so:
   .doSomething() => {
     this.do ? "Do something!"
   }
-/{this}>
+/this>
 ```
 
 And now things can get weird for some and amazing for others:
@@ -3577,23 +3820,23 @@ Objects can have static scope internally themselves just removing the (.) access
 />
 ```
 
-The `.` Resolution Intent were removed from Entity and Function Object, what now when used outside?
+The `.` Resolution Intent were removed from Entity and Function Object, what now what to do when resolving outside?
 
-Angry Birds mode! Outside in any case you can use the `..` Extent Intent, but when you are using the Object name itself, you can just use a single `.`, this is possible because there's no way for an Object name being redefined.
+Outside in any case of static resolution you can use the `..` Extent Intent itself, and that's prefered, but when you are using the Object name itself, you can just use a single `.`, this is possible because there's no way for an Object name being redefined.
 
 ```lua
 Thing..do
 Thing..doSomething()
 ```
 
-But in that case, as you directly using the Object name, you can just use just one dot.:
+But in that case, as you are directly using the Object name, you can just use just one dot.:
 
 ```lua
 Thing.do
 Thing.doSomething()
 ```
 
-But that's by design because other language that use `.` may not make the distinction between static. Other languages use `::`, but in Wide it has other purpose, it's used with Traits!
+Other languages use `::`, but in Wide it has other purpose, it's used with Traits.
 
 Some examples using static:
 
@@ -3835,7 +4078,7 @@ The Enumeration MUST be created using Generics and itself has `</>` body.
 
 Objects can have constructors that behaves as an Object Lambda.
 
-The concept of **Constructor/Lambda Promotion** can be used, and when done the Entities you created inside the Object Lambda become Meta Entitities of the enclosing Object.
+The concept of **Constructor/Lambda Promotion** is best used here, and when used the Entities you created inside the Object Lambda become Meta Entitities of the enclosing Object.
 
 You must pass the Accessor to mean you want to promote.
 
@@ -3847,10 +4090,8 @@ The most basic Object Lambda Looks like so:
 .Thing <()/>
 
 thing:Thing = <()/>
-
--- or
-
 thing:= <Thing () />
+thing:= Thing.()
 ```
 
 Promoting Meta Entities from Constructor Lambda
@@ -3864,33 +4105,40 @@ Promoting Meta Entities from Constructor Lambda
     nothing: false, -- Has NOT, is NOT promoted
   ) => nothing ? "Doing nothing"
 
-  .(doSomething) => {
+  .doSomething() => {
     .do ? "{.what} will be done {.where}"
   }
 />
 
-thing: <Thing (do: true, what: "Something", nothing: true )/> -- Doing nothing
-thing.(doSomething) -- Something will be done Never!
+thing: <Thing (do: true, what: "Something", nothing: true )/>
+thing.doSomething()
 
 thing: <Thing (do: true, what: "Something")/>
-thing.(doSomething) -- Something will be done Never!
+thing.doSomething()
 
 thing: <Thing (do: true, what: "Nothing", when: "Always!")/>
-thing.(doSomething) -- Nothing will be done Always!
+thing.doSomething()
+```
+
+You can use the Lambda Resolution as well:
+
+```lua
+thing:= Thing.(do: true, what: "Nothing", when: "Always!")
+thing.doSomething()
 ```
 
 But you can make explict you intentions and separate constructor promoted entities line by line:
 
 ```lua
 .Thing <
-    #(when:string = "Never!")
-    .(do:bool)
-    ..(what:string)
+  #(when:string = "Never!")
+  .(do:bool)
+  ..(what:string)
 
-    -- Object Function
-    .(doSomething) => {
-        .do ? "{.what} will be done {.where}"
-    }
+  -- Object Function
+  .doSomething() => {
+    .do ? "{.what} will be done {.where}"
+  }
 />
 ```
 
@@ -3928,7 +4176,7 @@ When NOT promoted parameters are used you can also segment it like unnamed param
 .Thing <
   (..params:int ) => {
     ~(param = params) {
-      "{param}"
+      "{param}\n"
     }
   }
 />
@@ -3938,6 +4186,15 @@ thing: Thing = <(1, 2, 3, 4)/>
 -- or
 
 thing:= <Thing (1, 2, 3, 4)/>
+```
+
+Both cases the output will be:
+
+```text
+1
+2
+3
+4
 ```
 
 ### Abstract Extent Objects
@@ -3990,7 +4247,7 @@ This is how Something will look after abstracting an Extent:
     -- not abstract Function can be modified
     .name ?. "How is it possible for me not having a name?";
   }
-/{Self}>
+/Self>
 ```
 
 ### Slot Objects
