@@ -1954,7 +1954,7 @@ list ~ (item) {
 
 ### Destructive Iterations
 
-You can get the index of the current iteration using `.` or `[]` after the name of the collection Entity.
+You can get the index of the current iteration using `.` after the name of the collection Entity.
 
 ```lua
 numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -1962,8 +1962,6 @@ numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ~(number = numbers) {
   "Number at #{numbers.} is {number}"
   -- Number at #1 is 1
-  -- "Number at #{numbers[]} is {number}"
-  -- Number at #0 is 1
 }
 
 /*
@@ -3177,7 +3175,40 @@ When you prefix a list with `@[]` you can create a concurrent Context:
 ]
 ```
 
+⚠️ You can place it inside a function call like so:
+
+```lua
+@[
+  processOne(),
+  processTwo(),
+  processThree(),
+  {
+    "do something in block"
+    "that may be useful
+  }
+]
+myFunc() ❌ -- It would be a bunch of Attributes decorating the function.
+```
+
+Just separate by an empty line:
+
+```lua
+@[
+  processOne(),
+  processTwo(),
+  processThree(),
+  {
+    "do something in block"
+    "that may be useful
+  }
+]
+✅ -- You are ready to go concurrent now!
+myFunc()
+```
+
 ## Function Special Return Cases
+
+Wide has some special return cases that makes it an HTML-first language.
 
 ### HTML Fragment Return `<></>`
 
