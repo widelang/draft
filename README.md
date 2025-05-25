@@ -2658,6 +2658,8 @@ verifyNumber(4)
 -- Output: "Less than 10"
 ```
 
+⚠️ There's more to be added match expression cases. Those are just the bare basics!
+
 ## Functions
 
 In its nature Functions are related to Lambdas in Wide, and they are reusable blocks of code that perform specific tasks like most programming languages do.
