@@ -759,6 +759,23 @@ $salary = 20000.00
 "{name} is {age} old. Salary: {$salary}"
 ```
 
+#### Note
+
+In Wide, the core assignment system uses only two forms:
+
+| Symbol | Intent     | Meaning                                    |
+| ------ | ---------- | ------------------------------------------ |
+| `:=`   | **Birth**  | Infer Intent: defines, redefines, or shadows |
+| `=`    | **Growth** | State Intent: reassigns an existing entity |
+
+Wide uses `=` for any assignment after birth.
+
+Whether the entity is mutable or just not yet initialized — you are saying: "Now you are ready to take a value."
+
+This simplicity eliminates the need for declaration keywords. Your code stays clean, and your intention stays loud.
+
+Your job is simply to flex mutability in or out — just by prefixing an Entity with `$` when you want to mutate.
+
 ### Grouped Entities
 
 Whenever you want to define multiple Entities, you can just group them.
