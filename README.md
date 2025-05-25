@@ -4769,11 +4769,13 @@ You can create Constant-like Enums:
 />
 ```
 
-Could be just:
+Could be just the Union of `Success`, `Failure`, and `Uncertainty` constants:
 
 ```lua
 # Result = Success{u8} | Failure{u16, char} | Uncertainty
 ```
+
+😮 That proves WHY enums are just constants grouped in Wide.
 
 So you can use in both cases like so:
 
