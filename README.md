@@ -4759,7 +4759,7 @@ You can also bind traits to Enums:
 />
 ```
 
-You can create Constant-like Enums:
+### Constant-like Enums
 
 ```lua
 # Result <
