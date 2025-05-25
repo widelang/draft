@@ -4619,13 +4619,13 @@ printItem(doc)
 
 ### Enums
 
-Enums are very close to Constants, but you can have behaviour and create it with Generics Type.
+Enums are very close to Constants, but you can have behaviour and create it with Generics Type, or compose it with Union.
 
-They are created using `#` prefixed to its name.
+They are created using `#` prefixed to its name like constants.
 
-They're constants are accessed using the Static context with `..`.
+They're constants are accessed using the Static context with `..` preferably, but you can access it with a single `.`.
 
-⚠️ You don't use `#` when defining the Type, but when assigning values with them it makes it more explicit you are using enums, so in this examples they will be used.
+⚠️ You don't use `#` when defining the Type, but when assigning values with them it can make it more explicit you are using enums, so in this examples they will be used.
 
 ```lua
 -- Numeric enum
@@ -4757,6 +4757,34 @@ You can also bind traits to Enums:
   Binary(Vec{int}),
   Control(Command),
 />
+```
+
+You can create Constant-like Enums:
+
+```lua
+# Result <
+  Success(u8)
+  Failure(u16, char)
+  Uncertainty
+/>
+```
+
+Could be just:
+
+```lua
+# Result = Success{u8} | Failure{u16, char} | Uncertainty
+```
+
+So you can use in both cases like so:
+
+```lua
+outcome:Result = #Failure(20, 'X');
+
+outcome ? {
+    Success {n} => "Success with value: {}", n
+    Failure {code, why} => "Fail: {} - {}", code, why
+    Uncertainty => "Still waiting..."
+}
 ```
 
 ## Attributes
