@@ -485,7 +485,7 @@ It's built-in core Type-Values looks like this:
 | 064+ | u64 | 0, 18_446_744_073_709_551_615 |
 | 0128 | i128 | -170_141_183_460_469_231_731_687_303_715_884_105_728, 0, 170_141_183_460_469_231_731_687_303_715_884_105_727 |
 | 0128+ | u128 | 0, 340_282_366_920_938_463_463_374_607_431_768_211_455 |
-| () | fn \| lambda | (add), (subtract), (print), (click)  |
+| () | fn \| lambda | add(), subtract(), print(), click()  |
 | <> | obj | Person, Vehicle, Dropdown, Box, Header, Provider |
 
 Their Intent is both the type and the value they default to,
@@ -1618,6 +1618,8 @@ There are two ways to print the members of a collection in Wide.
 ```
 
 Wide is able to make the translation because that's just syntatic-sugar ready for you to use!
+
+⚠️ But from now own only One-based index will be used.
 
 **Last Item `..`**
 
@@ -3696,6 +3698,26 @@ $person.name = "Alice"
 $person.age = 34
 ```
 
+When aliasing anonymous objects, you are indeed just creating a new variable that can be self referenced. In the case of Anonymous Objects, they can just be used a local variable, so you MUST enclose the name inside `{}`.
+
+```lua
+<
+  name: string,
+  age: int
+
+  .printInfo() => {
+    "{}, "",
+    $person.name,
+    $person.age
+  }
+/{$person}>
+
+$person.name = "Alice"
+$person.age = 34
+
+$person.printInfo()
+```
+
 ### Resolution Objects
 
 They are objects that you use to create concrete Object Entities and you can resolve them.
@@ -3971,7 +3993,7 @@ When you have multiple Meta Entities you can just group them using the `[]` Meta
     entitySix: bool
   ]
 
-  #[ -- private
+  ...[ -- private
     entitySeven:bool,
     entityEight:bool,
     entityNine: bool
@@ -4007,7 +4029,7 @@ Every object can have 4 ways for you to access them called:
 - static *(in Isolation Intent - has no symbol - and doesn't preserve scope characteristics)*
 - public *(using `.` preserves scope characteristics)*
 - protected *(using `..` preserves scope characteristics)*
-- private *(using `#` - local to object)*
+- private *(using `...` - local to object)*
 
 ⚠️ In this documentation it made sense keep the OOP jargons, but for Wide core it has other names:
 
@@ -4018,6 +4040,15 @@ Every object can have 4 ways for you to access them called:
 
 They mean the same thing as in every OOPL.
 
+Visibility is just how many dots you use:
+
+| Symbol | Level | Meaning             | Phrase                            |
+|--------|--------|---------------------|------------------------------------|
+| *(none)* | 0      | Static              | **no dot means static**            |
+| `.`      | 1      | Public              | **one dot shares it**              |
+| `..`     | 2      | Protected           | **two dots guards it**             |
+| `...`    | 3      | Private (Self-only) | **three dots hides it**            |
+
 Example of extending an Object:
 
 ```lua
@@ -4026,12 +4057,12 @@ Example of extending an Object:
   .name:string -- public
   ..value:obj -- protected
 
-  #instance:Thing -- private
+  ...instance:Thing -- private
 
   count() int => count -- static
   .name() string => .name -- public
-  ..(value) obj => .value -- protected
-  #(instance) Thing => .instance ?. <Thing /> -- private
+  ..value() obj => .value -- protected
+  ...instance() Thing => .instance ?. <Thing /> -- private
 />
 
 -- Thing is extended by Something
@@ -4045,16 +4076,16 @@ In the above example Something becomes:
   count:int
   .name:string
   ..value:obj
-  `#instance:Thing` -- not extended
+  `...instance:Thing` -- not extended
 
   count() int: count
   .name() string: .name
   ..value() obj: .value
-  `#instance():Thing` -- not extended
+  `...instance():Thing` -- not extended
 />
 ```
 
-As you can see only the `#instance` Entity and `#intance()` weren't extended.
+As you can see only the `...instance` Entity and `...intance()` weren't extended.
 
 Somethings to notice:
 
@@ -4062,7 +4093,7 @@ Somethings to notice:
 Static Entities or Functions are accessed without `.` Intent but with `..`.
 
 **#2**
-Non-static Entities or Functions are accessed with only one `.` Intent independent of their characteristic (`.`,`..`,`#`).
+Non-static Entities or Functions are accessed with only one `.` Intent independent of their characteristic (`.`,`..`,`...`).
 
 **#2**
 When used inside an Object `.` Intent means both *Self* but never *static*.
@@ -4070,30 +4101,20 @@ When used inside an Object `.` Intent means both *Self* but never *static*.
 **3**
 Entities and Function can have the same name because `()` makes their distinction.
 
-Special notice is due to the `#` private symbol. In Wide you can define constants and Enums using them. But how could you create constants inside Objects? At the end all you need is an Immutable Meta Entity or Immutable Static Entity to reproduce constants. But what about Enums? Yes! You can create them both, and the syntax gets clear enough for you that they are not a private members.
+What about Enums and Constants? You can create them both, just prefix them with the visibility you want
 
 Look:
 
 ```lua
-.Network {
-  -- Constant
-  #INITIAL_STATUS{int} = 0
+.Network <
+  .#INITIAL_STATUS{int} = 0
 
-  -- Enum
-  #Status{int} <
+  .#Status{int} <
     Disconnected = #INITIAL_STATUS
     Connected
     Error
-  >
-
-  -- cannot be used outside
-  #privateMember:= true
-  #anotherPrivate: string = "ok"
-  #[
-    groupedPrivateMember1:int = 1
-    groupedPrivateMember2:int = 2
-  ]
-}
+  />
+/>
 
 $status:Network.Status = Network.#Status..Disconnect
 
@@ -4101,12 +4122,6 @@ $status == #INITIAL_STATUS ? {
   $status = Network.#Status..Connected
 }
 ```
-
-⚠️ It's clear that `#INITIAL_STATUS` constant and `#Status` Enum are not a Private Entities.
-
-The constant MUST be create using Generics and you can only use `=` Assignment Intent.
-
-The Enumeration MUST be created using Generics and itself has `</>` body.
 
 ### Constructor Object Lambdas
 
@@ -4135,7 +4150,7 @@ Promoting Meta Entities from Constructor Lambda
   (
     .do:bool, -- Has Acessor, is promoted to Meta Entity
     ..what:string, -- Has Acessor, is promoted to Meta Entity
-    #when:string = "Never!", -- Has Acessor, is promoted to Meta
+    ...when:string = "Never!", -- Has Acessor, is promoted to Meta
     nothing: false, -- Has NOT, is NOT promoted
   ) => nothing ? "Doing nothing"
 
@@ -4165,9 +4180,9 @@ But you can make explict you intentions and separate constructor promoted entiti
 
 ```lua
 .Thing <
-  #(when:string = "Never!")
   .(do:bool)
   ..(what:string)
+  ...(when:string = "Never!")
 
   -- Object Function
   .doSomething() => {
@@ -4256,7 +4271,7 @@ Protected, Public, Static Entities and Functions can't be abstracted and just us
   !instance() Thing -- abstract Function doesnt have body
 
   .name() string => {
-    .name ?. (thingName); -- resolvable Function can have body
+    .name ?. thingName(); -- resolvable Function can have body
   }
 />
 ```
@@ -4483,18 +4498,18 @@ To use in objects just compose and implement Interface's Functions:
 ```lua
 .Person :Speaker <
 
-  .(speak) => {
+  .speak() => {
     "Shit!"
   }
 />
 
 .Robot :Speaker, Mover <
 
-  .(speak) => {
+  .speak() => {
     "Bits and Shits!"
   }
 
-  .(move) => {
+  .move() => {
     "Shifting bits >>>>>"
   }
 />
@@ -4503,11 +4518,11 @@ To use in objects just compose and implement Interface's Functions:
 
   .name:string = "Talking Car"
 
-  .(speak) => {
+  .speak() => {
     "Beep beep!"
   }
 
-  .(move) => {
+  .move() => {
     "Rolling tyres..."
   }
 />
@@ -4527,13 +4542,13 @@ You create traits using `::` symbols.
 
 ```lua
 ::Hello <
-  .(sayHello) => {
+  .sayHello() => {
     "Hello "
   }
 />
 
 ::Wide <
-  .(sayWide) => {
+  .sayWide() => {
     "Wide!"
   }
 />
@@ -4563,31 +4578,31 @@ obj.exclamation()
 
 ```lua
 ::A <
-  .(smallTalk) => {
+  .smallTalk() => {
     "a"
   }
 
-  .(bigTalk) => {
+  .bigTalk() => {
     "A"
   }
 />
 
 ::B <
-  .(smallTalk) => {
+  .smallTalk() => {
     "b"
   }
 
-  .(bigTalk) => {
+  .bigTalk() => {
     "B"
   }
 />
 
 .Talker <
   ::(A, B) {
-    B.smallTalk(): A, -- uses A.smallTalk()
-    A.bigTalk(): B -- uses B.bigTalk()
+    B.smallTalk(): A, -- uses A<.smallTalk()/>
+    A.bigTalk(): B -- uses B<.bigTalk()/>
     -- aliasing
-    B.bigTalk(): talk -- becomes B.talk()
+    B.bigTalk(): talk -- becomes B<.talk()/>
   }
 />
 ```
@@ -4598,7 +4613,7 @@ You can change Trait's visibility:
 .Talker <
   ::(A, B) {
     B.smallTalk(): B.., -- just change the Accessor
-    A.bigTalk(): A# -- just change the Accessor
+    A.bigTalk(): A... -- just change the Accessor
   }
 />
 ```
@@ -4608,9 +4623,9 @@ You can mix conflict resolution and aliasing
 ```lua
 .Talker <
   ::(A, B) {
-    B.(smallTalk): A.., -- Like if A..smallTalk()
-    A.(bigTalk): B# -- Like if B#bigTalk()
-    B.(bigTalk): #talk -- like if B#talk()
+    B.smallTalk(): A.., -- Like if A<..smallTalk()/>
+    A.bigTalk(): B... -- Like if B<...bigTalk()/>
+    B.bigTalk(): ...talk -- like if B<...talk()/>
   }
 />
 ```
@@ -4713,7 +4728,7 @@ Example using Object
 
 ```lua
 .Calculate{T} <
-  .average( a:T b:T) T => (a + b) / 2
+  .average(a:T b:T) T => (a + b) / 2
 />
 ```
 
@@ -4761,7 +4776,7 @@ Another example:
 
 ```lua
 .Stack{T} <
-  #stack: []T
+  ...stack: []T
 
   .push(item: T) => {
     Self.stack.(push item)
@@ -4793,7 +4808,7 @@ stringStack.push(aNumber)
 Multiple type parameters can be defined within the angle brackets {} when declaring a generic function, interface, trait, enum, struct or object. Each type parameter represents a distinct type that can be specified when the generic is used.
 
 ```lua
-processData({T, U} input1: T, input2: U) T, U => {
+processData{T, U}(input1: T, input2: U) T, U => {
   [input1, input2];
 }
 
@@ -4992,7 +5007,7 @@ process_message{T}(msg: Message{T}) => msg ? {
 You can also bind traits to Enums:
 
 ```lua
-#Serialize <
+::Serialize <
   -- Somewhere in code...
 />
 
@@ -5553,7 +5568,7 @@ You export prefixing what you want to export using the `&` Extern Intent:
 
 & zoo:= "Blue forest"
 & .Animal <
-  #animals: []string
+  ...animals: []string
 
   .add(name:string) => {
     .animals[] = name
