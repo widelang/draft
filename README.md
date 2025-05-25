@@ -4087,21 +4087,7 @@ In the above example Something becomes:
 
 As you can see only the `...instance` Entity and `...intance()` weren't extended.
 
-Somethings to notice:
-
-**#1**
-Static Entities or Functions are accessed without `.` Intent but with `..`.
-
-**#2**
-Non-static Entities or Functions are accessed with only one `.` Intent independent of their characteristic (`.`,`..`,`...`).
-
-**#2**
-When used inside an Object `.` Intent means both *Self* but never *static*.
-
-**3**
-Entities and Function can have the same name because `()` makes their distinction.
-
-What about Enums and Constants? You can create them both, just prefix them with the visibility you want
+What about Enums and Constants that use the `#` symbol? You can create them both, just prefix them with the visibility you want
 
 Look:
 
