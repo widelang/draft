@@ -1867,6 +1867,364 @@ tuple:= ('a', 'b', 'c', 'd', 'e')
 
 There's more to slices, but that's just a taste for you to meat Ranges after Iterations.
 
+## Positionals
+
+You can change Collections in Wide using Positional. Positionals are like Slices that can change the Collections.
+
+In all examples will be using this list:
+
+```lua
+$list := [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+At Birth list is:
+
+```text
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+You can **prepend** to `list`:
+
+```lua
+list ..= 0
+```
+
+`list` now is:
+
+```text
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+You can **append** to `list`:
+
+```lua
+list =.. 10
+```
+
+`list` now is:
+
+```text
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+You can `batch-prepend` or `batch-append`:
+
+```lua
+list ..= [-2, -1]
+list =.. [11, 12]
+```
+
+`list` now is:
+
+```text
+[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+```
+
+That's very close to Infinity Syntax of Wide:
+
+```lua
+negativeInfinity:= -..
+justInfinity:= ...
+positiveInfinity:= ..+
+```
+
+So when you do `..=` or `=..` you are just giving Limits to a Finite Collection.
+
+Hope that makes sense!
+
+### Positional Slices
+
+You can use slices to insert at, between or after.
+
+#### At Position
+
+Single dotted assignment:
+
+```lua
+list 2.= -10
+list =.2 110
+```
+
+`list` now is:
+
+```text
+[-2, -10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 110, 12]
+```
+
+You could use Slice syntax:
+
+```lua
+list:2.= -10
+list:=.2 110
+```
+
+But that could confuse some people, so choose what better fits to your eyes.
+
+#### After Position
+
+Double dotted assignment:
+
+```lua
+list 2..= -9
+list =..2 109
+```
+
+`list` now is:
+
+```text
+[-2, -10, -9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 109, 110, 12]
+```
+
+You could use Slice syntax:
+
+```lua
+list:2..= -10
+list:=..2 110
+```
+
+But, again, that could confuse some people, so choose what better fits to your eyes.
+
+### Between Positions
+
+```lua
+list 1..3= [-3, -2, -1]
+list =1..3 [11, 12, 13]
+```
+
+`list` now is:
+
+```text
+[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+```
+
+You could use Slice syntax:
+
+```lua
+list:1..3= [-3, -2, -1]
+list:=1..3 [11, 12, 13]
+```
+
+But, again, that could confuse some people, so choose what better fits to your eyes.
+
+If want to use steps you pass them to the slice:
+
+```lua
+$listToSlice := [1, 3, 5, 7, 9]
+
+listToSlice 1..:2 = [2, 4, 6, 8,]
+```
+
+`list` now is:
+
+```text
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+⚠️ Just be creative and you can do amazing things!
+
+### Positional Maths
+
+You can perform some Mathematics with Positionals:
+
+```lua
+$list := []
+
+list 2*= 3
+```
+
+List is [3, 3]
+
+```lua
+list += 3
+```
+
+List is [3, 3, 3]
+
+```lua
+2 *= list
+```
+
+List is [3, 3, 3, 3, 3, 3]
+
+```lua
+2 /= list
+```
+
+List is [3, 3, 3]
+
+```lua
+2 %= list
+```
+
+List is [3]
+
+In all cases about you can spread the operations and create new Collections besides the current in use:
+
+```lua
+$current := []
+{before, after} = current 2*= 3
+```
+
+`before` is []
+
+`after` is [3, 3]
+
+`current` is [3, 3]
+
+```lua
+{before, after} = current += 3
+```
+
+`before` is [3, 3]
+
+`after` is [3, 3, 3]
+
+`current` is [3, 3, 3]
+
+```lua
+{before, after} = 2 *= current
+```
+
+`before` is [3, 3, 3]
+
+`after` is [3, 3, 3, 3, 3, 3]
+
+`current` is [3, 3, 3, 3, 3, 3]
+
+```lua
+{before, after} = 2 /= current
+```
+
+`before` is [3, 3, 3, 3, 3, 3]
+
+`after` is [3, 3, 3]
+
+`current` is [3, 3, 3]
+
+```lua
+{before, after} = 2 %= current
+```
+
+`before` is [3, 3, 3]
+
+`after` is [3]
+
+`current` is [3]
+
+In all cases you can pass multiple elements:
+
+```lua
+$current := []
+current 2*= [1, 2, 3]
+```
+
+`current` is [1, 2, 3, 1, 2, 3]
+
+Or use spread:
+
+```lua
+$current := []
+{before, after} = current 2*= [1, 2, 3]
+```
+
+`before` is []
+
+`after` is [1, 2, 3]
+
+`current` is [1, 2, 3]
+
+### Removing Positions
+
+You can use the same approach for At, After, and Between Positions, but the syntax will resemble an isolated Match Expression arm:
+
+Considering the yet previous `$list` Entity that must be like this as of now:
+
+```text
+[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+```
+
+You can remove the first and last items:
+
+```lua
+-.=list
+-=.list
+```
+
+`list` now is:
+
+```text
+[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+```
+
+You can remove at position:
+
+```lua
+-2.=list
+-2=.list
+```
+
+`list` now is:
+
+```text
+[-2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
+```
+
+You can remove between positions:
+
+```lua
+-1..2.=list
+-1..2=.list
+```
+
+`list` now is:
+
+```text
+[4, 5, 6]
+```
+
+There is this case where you might want to use negative indexes from the end. In this case you can use parentheses.
+
+So let's create a new list
+
+```lua
+$list = [1, 2, 3, 4, 5, 6]
+-(-4..2)=.list
+```
+
+`list` now is:
+
+```text
+[1, 2]
+```
+
+If you destructure you can understand:
+
+```lua
+$list = [1, 2, 3, 4, 5, 6]
+{removed, before, after} = -(-4..2)=.list
+```
+
+`removed` is [3, 4, 5, 6]
+
+`before` is [1, 2, 3, 4, 5, 6]
+
+`after` is [1, 2]
+
+Got it? That's why! You should you parentheses.
+
+But that's Math, right?
+
+```lua
+$list = [1, 2, 3, 4, 5, 6]
+{removed, before, after} = +4..2=.list
+```
+
+Now the compiler nows you are performing a deletion as well because there's no case where + is used in Positionals.
+
+In all cases, when you destructure a removed Positional, you can have 3 possible Entities at your desposal like in the example above.
+
+⚠️ All Positionals can be revisited in the future. But as for now, they are just sugary over core libraries that perform them. So when STL is available, it will al be documented here.
+
 ## Iterations
 
 Wide has a revamped approach to iterating over Collections data.
