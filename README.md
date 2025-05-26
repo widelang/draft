@@ -1869,7 +1869,7 @@ There's more to slices, but that's just a taste for you to meat Ranges after Ite
 
 ## Positionals
 
-You can change Collections in Wide using Positional. Positionals are like Slices that can change the Collections.
+You can change Collections in Wide using Positionals. They are like Slices alike that can change the Collections.
 
 In all examples will be using this list:
 
