@@ -5011,7 +5011,8 @@ Wide allows you to resolve these conflicts using an explicit resolution block, b
 
 This design ensures that Entity Extensions are purely public-facing compositions, safe and visible to users, and free from encapsulation complexity.
 
-You resolve conflicts using an aliasing block just before `:` Type Intent :
+You resolve conflicts using an aliasing block between `:=` Infer Intent.
+After `:` Type Intent and before `=` Assignment Intent:
 
 ```lua
 entity
