@@ -4727,7 +4727,7 @@ obj.exclamation()
 .Talker <
   ::(A, B) {
     B.smallTalk(): A, -- uses A<.smallTalk()/>
-    A.bigTalk(): B -- uses B<.bigTalk()/>
+    A.bigTalk(): B, -- uses B<.bigTalk()/>
     -- aliasing
     B.bigTalk(): talk -- becomes B<.talk()/>
   }
@@ -4751,7 +4751,7 @@ You can mix conflict resolution and aliasing
 .Talker <
   ::(A, B) {
     B.smallTalk(): A.., -- Like if A<..smallTalk()/>
-    A.bigTalk(): B... -- Like if B<...bigTalk()/>
+    A.bigTalk(): B..., -- Like if B<...bigTalk()/>
     B.bigTalk(): ...talk -- like if B<...talk()/>
   }
 />
@@ -4999,6 +4999,30 @@ In all case, there are some things to be noticed:
 - the symbol that identifies the extension (`.`, `#`, `:`, `::`) must come in the start of the `()`
 - Structs must use `.()` like objects because it doesn't have a special symbol
 - you can use Generics
+
+### Conflict Resolution on Entity Extension
+
+When extending Entities using inline Entity Extension Definition, naming conflicts can occur if multiple traits, interfaces, or objects provide members with the same name.
+
+Wide allows you to resolve these conflicts using an explicit resolution block, but with a key restriction:
+
+- Only public members `.` can be inherited or resolved.
+- Protected `..` and private `...` members are not allowed in this context.
+
+This design ensures that Entity Extensions are purely public-facing compositions, safe and visible to users, and free from encapsulation complexity.
+
+You resolve conflicts using an aliasing block just before `:` Type Intent :
+
+```lua
+entity
+  .(ObjectA)
+  ::(TraitA, TraitB)
+  :{
+    ObjectA.name: .objectAName,   -- resolves TraitA.name as .objectAName()
+    TraitA.name(): .traitAName,   -- resolves TraitA.name as .traitAName()
+    TraitB.name(): .traitBName    -- resolves TraitB.name as .traitBName()
+  } = </>
+```
 
 ## Generics
 
