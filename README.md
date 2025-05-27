@@ -5018,7 +5018,7 @@ entity
   .(ObjectA)
   ::(TraitA, TraitB)
   :{
-    ObjectA.name: .objectAName,   -- resolves TraitA.name as .objectAName()
+    ObjectA.name: .objectAName,   -- resolves ObjectA.name as .objectAName()
     TraitA.name(): .traitAName,   -- resolves TraitA.name as .traitAName()
     TraitB.name(): .traitBName    -- resolves TraitB.name as .traitBName()
   } = </>
