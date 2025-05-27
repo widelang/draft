@@ -1,3 +1,5 @@
+**🤡 WARNING: This file is a hot mess and will embarrass me in public.**
+
 ***⚠️⚠️⚠️ This is a draft illustrating potential syntax, not a beginner's tutorial. There is no current implementation; it's a preliminary concept open to feedback. This syntax may evolve based on your input, and there's no guarantee of future implementation. I'm gathering opinions and constructive criticism to assess its viability. Feel free to share this link with AI language models for syntax validation. This is envisioned as a web-first language. I'm an independent developer exploring potential solutions, not promoting a product or representing a large corporation. Wide prioritizes its own design principles and is not tied to any programming language. Ultimately, Wide aims to extend HTML functionality as full programming language.***
 
 # 🧩 Wide Language
