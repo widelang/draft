@@ -27,9 +27,9 @@
 </html>
 ```
 
-Welcome to a Web-first **Intent-Oriented Programming**.
+Welcome to **Intent-Oriented Programming**.
 
-Wide is a symbol-based, declarative, paradigm-unifying programming language designed to feel natural, composable, and deeply readable.
+Wide is a symbol-based, declarative, paradigm-unifying programming language designed to feel natural, composable, and deeply readable just using symbols you already know.
 
 It doesn't have keywords (at least not for aliased types).
 
@@ -256,7 +256,7 @@ In wide you can create a **Custom Type** opening a context or not and where to p
 
 But that would serve no purpose! It's lost in the vaccumm of nonsense!
 
-For core Wide **Type-Values** you can give it the type you want it to be:
+For core Wide **Type-Values** you can give it the aliasesname you want them to be:
 
 ```lua
 ?:bool
@@ -370,6 +370,9 @@ Or like so using assignment:
 
 ⚠️ Wide is able to understand both English and Portuguese alias in this case because it won't cancel the previous English ones.
 
+⚠️ Just remember that you don't need to give aliases to the core Wide Type-Values presented before.
+The compiler was provided with them for you convenience.
+
 ### Notes on Boolean Type
 
 It is important to notice that when you use Bool Type-Values `0` or `1` you are not using Integer Type-Values like `1`, `0`, `-1`, `100`. That's why you must explicity type your Entities of type Bool.
@@ -421,9 +424,9 @@ When creating aliases you can't create them anywhere.
 
 They must be in the first lines of code if there are no imports, or int the first lines of code after the imports if there are imports.
 
-So, they can't be created inside the Entry function nor elsewhere. This is because the Compiler must now before-hand the types were aliased.
+So, they can't be created inside the Entry function nor elsewhere. This is because the Compiler must know before-hand the types were aliased.
 
-You can create a Wide file called `.aliases` and place it in the root of your project as well. Just copy and paste them it, and you are ready to go.
+You can create a Wide file called `.aliases` and place it in the root of your project as well. Just copy and paste them inside it, and you are ready to go.
 
 ## Entry function
 
@@ -441,13 +444,14 @@ Whatever you place before it is structural code that you can reuse inside the En
 
 ⚠️ When you see `{}` anywhere its very Intent is to bind itself as a **context** for anything. It's called **Context Intent**. A context can be used to create different things, but you don't need to memorize them all as you learn, they'll get so implicit into your head that you will understand them as you go.
 
-⚠️❌ From now own, other than very specific, the Entry Function may not be  used for fragment code samples.
+⚠️❌ From now own, other than very specific, the Entry Function may not be used for fragment code samples.
 
-Back to custom types. This is how you would do that for `:string` custom type presented previously:
+This is how you would do that for `:string` custom type presented previously:
 
 ```lua
-:string = ""
+:myString = ""
 :Text = string
+:MyText = myText
 
 () => {
   name:string = "Alice"
@@ -641,9 +645,13 @@ Wheneven you wanna know the name of an Entity:
 
 ## Immutable, Mutable, and Constant Entities
 
-In wide you everything you name is an Entity, Functions and Objects inclusive.
+In wide everything you name is an Entity. That includes Functions, Objects, Interfaces, Traits, Enums, Structs, Attributes, etc.
 
-When talking about Entities you might read just Immutable, Mutable or Constant not having the need to write down nor say "Entity". In this guide, there will be cases when the word Entity will be ommited on purpose.
+When talking about Entities you might read just Immutable, Mutable or Constant not having the need to write down nor say "Entity".
+
+There will be cases when the word Entity will be ommited on purpose.
+
+When you create an Entity you can say it's at **Birth** state.
 
 ### Notes on "Variables"
 
@@ -651,13 +659,15 @@ Some people say that there's not such a thing like Immutables and Mutables, that
 
 Yes, at the end - in Assembly that's true.
 
-But wide is not Assembly!
+But wide is not Assembly, right?
+
+Wide is a high-level programming language that has Mutables that behave like variables and you can change them, so they are like variables.
+
+So you can't say that Entities are themselves variables.
 
 ### Immutable Entities
 
-As talked previously, Wide has **Entities** that work like variables or contants in other programming languages.
-
-By default Entities are immutable:
+By default Entities are immutable unless you sign it with `$` State Intent.
 
 ```lua
 name:= "John"
@@ -685,21 +695,25 @@ age: float
 salary: double
 ```
 
-Yes, but it makes no sense if you never assign them a value and just use the default provided by the type system! If you try to do so you'll get a compiler warning and this code will be removed when compiled if not used. So don't waste yours nor yours computer energy doing that!
+Yes, but it makes no sense if you never assign them a value and just use the default provided by the type system! If you try to do so, you'll get a compiler warning and this code will be removed by the compiler if not used.
 
-You can create a new Entity with the same name by **Shadowing** it, but as you already know, the previous will cease to exist in order for the new to live. Besides that you can also change the initial type when shadowing:
+You can create a new Entity with the same name by **Shadowing** it, but the previous one will cease to exist in order for the new to live.
+
+Besides that you can also change the initial type when shadowing:
+
+```lua
+value:= 123   -- integer
+value:= "Alice" -- string
+```
+
+But remember, you can't reassign Immutables:
 
 ```lua
 value:= 123
-value:= "Alice"
+value = "Alice" ❌ -- Error: Entity value cannot be reassigned
 ```
 
-But remember, you can reassign Immutables:
-
-```lua
-value:= 123
-value= "Alice" ❌ -- Error: Entity value cannot be reassigned
-```
+Once born an Immutable Entity won't ever change even when you shadow it. What happens it that you say the compiler to dispose that Entity from that point and use the same name for a new one. No memory address is shared!
 
 ### `$` State Intent
 
@@ -707,18 +721,17 @@ When you see it the State Intent `$` (dolar symbol) you may say:
 
 - it can mutate
 - it can change *(something)*
+- it has state *(value)*
 
-⚠️ *You have already been presented to the `$` State Intent when learned about Mutable Entities, as it is a more complex intent, placing this section there would make things unnecessarily overheaded.*
+Wide has no concept of `null`, `nullptr`, `nil`, `void`, `None` nor `Option` exposed to you because it is implicit when you want to change anything in Wide.
 
-Wide has no concept of `null`, `nullptr`, `nil`, `void`, `None` nor `Option` exposed to you because is implicit when you want to change anything in Wide.
+It's possible because every entity in Wide has sorta default state — which makes it always valid, but not necessarily assigned to a value.
 
-It's possible because every entity in Wide has a default state — which makes it always valid, but not necessarily populated.
-
-As you'll see later, you just need to check agains that!
+As you'll see later, you just need to check against that!
 
 ### Mutable Entities
 
-If you want to be able to change an Entity's state, you can create it as a **Mutable Entity** by  prefixing its name with the `$` State Intent. Yes, it's intent is to say to you that you'll pay a price for that! Convenient?
+If you want to be able to change an Entity's state, you can create it as a **Mutable Entity** by  prefixing its name with the `$` State Intent.
 
 ```lua
 $name:= "John"
@@ -731,7 +744,7 @@ The same rules of assignment for Immutable Entities also apply here:
 - You can't create entities without types and values
 - You shoudln't create entities that won't be used
 
-But you can change their values!
+But the main obvious difference is taht you can change their values!
 
 ```lua
 $name:= "John"
@@ -743,13 +756,9 @@ $age = 58
 $salary = 20000.00
 ```
 
-Did you notice that you don't use the `:` Intent here just the `=` Assignment Intent?
+Did you notice that you don't use the `:` Intent to assign a new value, just the `=` Assignment Intent? That's how you assign or reassign values on Mutables.
 
-And what would happen if the entity doesn't exist and I don't use the `:` Intent? You got it right! A reassignment!
-
-That's because you can only shadow Immutables, Mutables you reassign.
-
-To print them, you don't need to pass the `$` symbol, but you can if you wish.
+To print them, you don't need to pass the `$` symbol, but you can if you want to enforce that that's a Mutable.
 
 ```lua
 $name = "Mary"
@@ -768,19 +777,15 @@ In Wide, the core assignment system uses only two forms:
 | `:=`   | **Birth**  | Infer Intent: defines, redefines, or shadows |
 | `=`    | **Growth** | State Intent: reassigns an existing entity |
 
-Wide uses `=` for any assignment after birth.
+Wide uses `=` for any assignment after Entity Birth.
 
 Whether the entity is mutable or just not yet initialized — you are saying: "Now you are ready to take a value."
 
-This simplicity eliminates the need for declaration keywords. Your code stays clean, and your intention stays loud.
-
-Your job is simply to flex mutability in or out — just by prefixing an Entity with `$` when you want to mutate.
-
 ### Grouped Entities
 
-Whenever you want to define multiple Entities, you can just group them.
+Whenever you want to define multiple Entities, you can just group them altogether.
 
-Doing so will cause to create a Homogeneous Record.
+Doing so will also create a Homogeneous Record as you'll see.
 
 ```lua
 n1:int
@@ -860,7 +865,7 @@ $name..first
 $name..last
 ```
 
-Or go indexed (you'll see indexing very soon)
+Or go indexed (you'll see indexing very soon - Wide uses one-base index)
 
 ```lua
 $data..1
@@ -879,7 +884,7 @@ Or even iterate over them (you'll see iteration very soon):
 }
 ```
 
-Wide automatically binds utility methods to Entity Groups based on type.
+Wide automatically binds utility methods (if any) to Entity Groups based on the type used:
 
 ```lua
 $nums{ a = 1, b = 2, c = 3 }:int
@@ -894,13 +899,13 @@ $stats.map(n => n * 2)
 $words.filter(w => w.length > 4)
 ```
 
-⚠️ Noticed that when using methods you just used one dot? That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
+⚠️ When using utility methods you just used one. That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
 
 ### Shadowing Exchange
 
-You can shadow Entities from Immutable to Mutable state. But be carefull because excessive shadowing can be confusing. That's why using $ in Immutables usage is the best whay to go!
+You can shadow Entities from Immutable to Mutable state and vice-versa. But be carefull because excessive shadowing can be confusing. That's why explicitly using `$` in Mutables usage is the best way to go!
 
-Without signaling $ state intent:
+Without signaling `$` State Intent on usage:
 
 ```lua
 n:= 1
@@ -908,14 +913,15 @@ n:= 2
 
 $n:= 3
 
--- after lines of code
+-- ... after 1000 lines of code
+
 n = 4
 
 n:= 5 -- not clear if is Mutable or Immutable
 n = 6 ❌ -- Error: cannot assign twice to immutable
 ```
 
-Signalling $ state intent:
+Signalling `$` State Intent on usage:
 
 ```lua
 n:= 1
@@ -923,14 +929,15 @@ n:= 2
 
 $n:= 3
 
--- after lines of code
+-- ... after 1000 lines of code
+
 $n = 4 -- clear that is Mutable
 
 n:= 5
 n = 6 ❌ -- Error: cannot assign twice to immutable
 ```
 
-See? Always using $ Change state makes it clearer when multiple shadowing.
+See? Always using `$` Change Intent makes it clearer when exchanging shadowing.
 
 ## `#` Enumerable Intent
 
@@ -2219,7 +2226,7 @@ $list = [1, 2, 3, 4, 5, 6]
 {removed, before, after} = +4..2=.list
 ```
 
-Now the compiler nows you are performing a deletion as well because there's no case where + is used in Positionals.
+Now the compiler knows you are performing a deletion as well because there's no case where + is used in Positionals.
 
 In all cases, when you destructure a removed Positional, you can have 3 possible Entities at your desposal like in the example above.
 
@@ -2766,7 +2773,7 @@ $isMarried = true
 ?..isMarried ? "Is Married"
 ```
 
-Now it will all print the corresponing questioned text:
+Now it all will print the corresponing questioned text:
 
 ```text
 Has name
@@ -3953,7 +3960,7 @@ Objects can also be self-aliased like so:
 /Self>
 ```
 
-⚠️ That's not a keyword, you can name it whatever you want. Very likely `Self` will become standard convention mostly because like in Python and Rust.
+⚠️ That's not a keyword, you can name it whatever you want, but in this doc it will be called Self.
 
 ```lua
 .Thing <
@@ -3977,7 +3984,7 @@ And now things can get weird for some and amazing for others:
 />
 ```
 
-When mutable, you now can pass it in the object creation as HTML properties and mutate it at will, since it's Mutable, and when accessing there's no need to use `$`.
+When mutable, you can now pass it in the object creation as HTML properties and mutate it at will, since it's Mutable, and when accessing there's no need to use `$`.
 
 ```lua
 thing:= <Thing do=false />
@@ -4008,7 +4015,7 @@ Objects can have static scope internally themselves just removing the (.) access
 />
 ```
 
-The `.` Resolution Intent were removed from Entity and Function Object, what now what to do when resolving outside?
+The `.` Resolution Intent were removed from Entity and Function Object, and now what to do when resolving outside?
 
 Outside in any case of static resolution you can use the `..` Extent Intent itself, and that's prefered, but when you are using the Object name itself, you can just use a single `.`, this is possible because there's no way for an Object name being redefined.
 
@@ -4044,18 +4051,20 @@ Some examples using static:
 />
 
 
-thing:= Thing..newLambdaEntity -- not a function nor meta entity
-thing:= Thing.newLambdaEntity -- not a function nor meta entity
-thing.do ? thing.doSomething()
+thing:= Thing..newLambdaEntity -- Directly to Entity name, can use 2 dots -- preferred!
+thing:= Thing.newLambdaEntity -- Directly to Entity name, can also use one
+thing.do ? thing.doSomething() -- instance level, MUST use just one dot
 
-thing:= Thing..newStaticFunction() -- not a meta entity
-thing:= Thing.newStaticFunction() -- not a meta entity
-thing.do ? thing.doSomething()
+thing:= Thing..newStaticFunction() -- Directly to Entity name, can use 2 dots -- preferred!
+thing:= Thing.newStaticFunction() -- Directly to Entity name, can also use one
+thing.do ? thing.doSomething() -- instance level, MUST use just one dot
 ```
 
-### Keyword-less `new`
+### Notes on Keyword-less `new`
 
-Wide does not require or support the `new` keyword, because objects are instantiated using `</>`. Instead, object instantiation can be expressed through a conventional `new()` method or factory-style functions.
+Wide does not require or support the `new` keyword, because objects are instantiated using `</>`.
+
+But object instantiation can be expressed through a conventional `new()` method or factory-style functions.
 
 The `new()` method is:
 
@@ -4064,7 +4073,7 @@ The `new()` method is:
 - Often returns a self-like or related object
 - May accept parameters for initialization
 
-#### Example
+Example:
 
 ```lua
 .Dog <
@@ -4287,7 +4296,7 @@ thing: <Thing (do: true, what: "Nothing", when: "Always!")/>
 thing.doSomething()
 ```
 
-You can use the Lambda Resolution as well:
+You can use the Lambda Constructor as well, and how that's bound to the Object instance, it says Wide that you want to create a new Object from that Entity's name:
 
 ```lua
 thing:= Thing.(do: true, what: "Nothing", when: "Always!")
@@ -4309,7 +4318,7 @@ But you can make explict you intentions and separate constructor promoted entiti
 />
 ```
 
-**NOT promoted Entities**
+### Notes on NOT promoted Entities
 
 With NOT promoted Entities you enclose them between parentheses normally and access them like static Entities internally, and you must always have a body when using one or more NOT promoted Entities.
 
@@ -4817,6 +4826,179 @@ rectangle:= Rectangle{
   Point {100, 100}
 }
 ```
+
+### Entity Extension Definition
+
+You can extend Objects at Entity definition and not just at Object structural level.
+
+As you'll you are not restrict to use just Object, but other types of extensions like Interfaces, Traits, Enums and Structs are allowed.
+
+For example. Suppose you you want to create a new Object entity anonymously and/or use an already existing named structured Object Entity.
+
+The syntax for Entity Extension Definition is like this:
+
+```lua
+entityName.(ExtentObject):= </>
+entityName.(ExtentObject):= <ResolutionObject/>
+```
+
+That's the same as:
+
+```lua
+entityName.ExtentObject:= </>
+entityName.ExtentObject:= <ResolutionObject/>
+```
+
+But as you can add more that just one, that would be better to just use `.()`:
+
+```lua
+entityName.(ExtentObject, AnotherObject):= </>
+entityName.(ExtentObject, AnotherObject):= <ResolutionObject/>
+```
+
+You can break lines when having too many:
+
+```lua
+entityName.(
+  ExtentObject,
+  AnotherObject,
+  YetAnotherObject,
+  AndYetAnotherObject
+):= </> -- or <ResolutionObject/>
+```
+
+When you use other type of Extension you must change the type symbol that it represents.
+
+In this section let's use this 3 named Objects structures:
+
+```lua
+.Talker <
+  .name:string = "Stranger"
+  .talk()=> "{} is talking...", Self.name
+/Self>
+
+.Eater <
+  .name:string = "Stranger"
+  .eat()=> "{} is eating...", Self.name
+/Self>
+
+.Person <.[
+  name:string
+  age:int
+]/>
+```
+
+You can go bare bones anonymously:
+
+```lua
+stranger.Talker:= </>
+
+"{}", stranger.talk() -- Output: Stranger is talking
+
+anotherStranger.(Talker, Eater):= </>
+
+"{}", anotherStranger.talk() -- Output: Stranger is talking
+"{}", anotherStranger.eat() -- Output: Stranger is eating
+```
+
+But imagine you want to create an anonymous Object that reflects to a person with a given structure like:
+
+```lua
+person:= <
+  name:string
+  age:int
+/>
+```
+
+And say you want it to extend from `Talk` and/or `Eater`?
+
+```lua
+person.(Talker, Eater):= <
+  name:string
+  age:int
+/>
+
+person.name = "Alice"
+person.age = 34
+
+"{}", person.talk() -- Output: "Alice is talking..."
+"{}", person.eat() -- Output: "Alice is eating..."
+```
+
+The same is true for named Objects that has an implemented structure, but that don't extend from Talker nor Eater at structural level and you just want to extend at Entity definition:
+
+```lua
+person.(Talker, Eater):= <Person
+  name="Alice"
+  age=34
+/>
+
+"{}", person.talk() -- Output: "Alice is talking..."
+"{}", person.eat() -- Output: "Alice is eating..."
+```
+
+That gives you a lot of flexibility and power because you don't need to tie your Objects to an implementation immediately when you create them for later use.
+
+All that is true for Iterfaces, Traits, Enums and Structs as well.
+
+In order to keep this section short, no real world examples will be provided, but just a nonsense bunch of possibilities.
+
+```lua
+.Object </>
+:Interface </>
+::Trait </>
+#Enum </>
+Struct {}
+
+entityName.(Object):= </>
+
+entityName:(Interface):= </>
+entityName.(Object):(Interface):= </>
+
+entityName::(Trait):= </>
+
+entityName.(Object):(Interface)::(Trait):= </>
+
+entityName#(Enum):= </>
+entityName.(Object)#(Enum):(Interface)::(Trait):= </>
+
+entityName.(Struct):= </>
+entityName.(Object).(Struct)#(Enum):(Interface)::(Trait):= </>
+```
+
+When you have multiple types of extensions you can separate them all by lines:
+
+```lua
+
+entityName
+  .(Object)
+  :(Interface):= </>
+
+entityName
+  .(Object)
+  :(Interface)
+  ::(Trait):= </>
+
+entityName
+  .(Object)
+  #(Enum)
+  :(Interface)
+  ::(Trait):= </>
+
+entityName
+  .(Object)
+  .(Struct)
+  #(Enum)
+  :(Interface)
+  ::(Trait):= </>
+```
+
+In all case, there are some things to be noticed:
+
+- just 1 extension type was used inside `()`, but you can use multiple separated by commas
+- the symbol that identifies the extension (`.`, `#`, `:`, `::`) must come in the start of the `()`
+- Structs must use `.()` like objects because it doesn't have a special symbol
+- you can use Generics
 
 ## Generics
 
@@ -5793,7 +5975,7 @@ And you can also name your grouped exports creating a Struct-like export:
 }
 ```
 
-And now you can import each Entity isolated as you already now, or grouped, or named:
+And now you can import each Entity isolated as you already know, or grouped, or named:
 
 ```lua
 -- ./main.wide file
