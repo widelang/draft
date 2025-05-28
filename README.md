@@ -1361,7 +1361,9 @@ For all Data Structures:
 
 ### List
 
-A List is created using `[]` symbols.
+A List is created using `[]` symbols and separating values by commas.
+
+List can be homogeneous or heterogeneous.
 
 Some examples:
 
@@ -1376,6 +1378,21 @@ columnAges:= [30, 25, 40]
 employee:= ["John", 45, 9999.00, "Developer"]
 availableOptions:= ["Option A", "Option B", "Option C"]
 allowedPermissions:= ["read", "write", "execute"]
+```
+
+In both case the compiler can infer the types, but if you want to be explicit you can use 2 notations: **Union** for multiple types or **Spread** for the repetion.
+
+```lua
+temperatures:float|int = [22.5, 23.1, 21.8, 24.0, 12, 34, 45]
+sensorReadings:int.. = [10, 12, 9, 11,, 13]
+playlist:string.. = ["Song A", "Song B", "Song C"]
+tasksQueue:string.. = ["Login", "Process Data", "Logout"]
+row1:string | int = ["Alice", 30, "Engineer"]
+row2:string | int = ["Bob", 25, "Designer"]
+columnAges:int.. = [30, 25, 40]
+employee:string | int | float = ["John", 45, 9999.00, "Developer"]
+availableOptions:string.. = ["Option A", "Option B", "Option C"]
+allowedPermissions:string.. = ["read", "write", "execute"]
 ```
 
 There are two ways to print the members of a collection in Wide.
@@ -1408,11 +1425,11 @@ You can just get the last item like so:
 
 ```lua
 "The song I listen to least is:"
-"- {playlist..}"
+"- {}", playlist..
 
 languages: ["PHP", "Python", "JavaScript", "Rust", "Go", "C++", "Wide"]
-"The first language I learned was {languages.1}"
-"The last will be {language..}"
+"The first language I learned was {}", languages.1
+"The last will be {}", language..
 ```
 
 The symbols `..` are called Extent Intent, and you will see it very soon.
@@ -1423,7 +1440,9 @@ After presenting the core Data Structures you'll be presented to Destructuring, 
 
 ### Tuple
 
-A Tuple is created using `()` symbols.
+A Tuple is created using `()` symbols and separating values by commas.
+
+They can be homogeneous or heterogeneous.
 
 Some examples:
 
@@ -1438,36 +1457,60 @@ serverConfig:= ("localhost", 8080, "http")
 today:= (2025, 5, 6)
 gravity:= (0, -9.81, 0)
 
-"Coordinates: {coodinates.1}, {coordinates.2}"
-"Red: R({red.1}), G({red.2}), B({red.3})"
+"Coordinates: {}, {}", coodinates.1, coordinates.2
+"Red: R({}), G({}), B({})", red.1, red.2, red.3
+```
+
+In both case the compiler can infer the types, but if you want to be explicit you can use 2 notations: **Union** for multiple types or **Spread** for the repetion.
+
+```lua
+coordinates:int.. = (10, 20)
+location:float.. = (-33.8688, 151.2093)
+red:int.. = (255, 0, 0)
+paleBlue:int.. = (173, 216, 230)
+user:string | int = ("john_doe", 30, "john.doe@example.com")
+product:string | float = ("Laptop", 1200.50, 5)
+serverConfig:string | int = ("localhost", 8080, "http")
+today:int.. = (2025, 5, 6)
+gravity:float.. = (0, -9.81, 0)
 ```
 
 ### Set
 
-A Set is created using `{}` symbols.
+A Set is created using `{}` symbols and separating values by commas.
+
+They can be homogeneous or heterogeneous.
 
 Some examples:
 
 ```lua
-roles:= {"admin", "editor", "viewer"}
-productSkus:= {"A123", "B456", "C789"}
-visitedUrls:= {"https://example.com", "https://openai.com", "https://github.com"}
+evenNumbers:= {2, 4, 6, 8, 10}
+dataSet:= {"Alice", 42, true, 3.14}
+configValues:= {"enabled", 1, 0.0, false, "42", 42}
 daysOff:= {"Saturday", "Sunday"}
-enabledFeatures:= {"dark_mode", "notifications", "auto_save"}
-bannedUsers:= {"troll123", "spammer99", "bad_actor"}
-tags:= {"python", "webdev", "tutorial"}
 fruits:= {"apple", "banana", "mango"}
-registeredIps:= {"192.168.1.10", "192.168.1.11", "10.0.0.2"}
 
 -- Random results for sets
 
-"This week you'll be off on {days_off.1}"
-"I may take a {fruits.2} to eat now"
+"This week you'll be off on {}", days_off.1
+"I may take a {} to eat now", fruits.2
+```
+
+In both case the compiler can infer the types, but if you want to be explicit you can use 2 notations: **Union** for multiple types or **Spread** for the repetion.
+
+```lua
+evenNumbers:int.. = {2, 4, 6, 8, 10}
+dataSet:string | int | bool | float = {"Alice", 42, true, 3.14}
+configValues:string | int | float = {"enabled", 1, 0.0, false, "42", 42}
+daysOff:string.. = {"Saturday", "Sunday"}
+fruits:string.. = {"apple", "banana", "mango"}
 ```
 
 ### Dictionary
 
-A Dictionary is created using `{:}` symbols structure.
+A Dictionary is created using pairs of `key:value` inside `{:}` symbols structure and separating its pair by commas.
+
+They can be homogeneous or heterogeneous.
 
 Some examples:
 
@@ -1480,7 +1523,14 @@ user:= {
   "isActive": True
 }
 
-"{user.name} is {user.age}"
+"{} is {}", user.name, user.age
+
+myDict:= {
+  "name": "Alice",
+  42: "int key",
+  true: "bool key",
+  (1,2): "tuple key"
+}
 
 -- Nested data for a blog post
 post:= {
@@ -1493,19 +1543,61 @@ post:= {
   "published": true
 }
 
-"{post.title} by {post.author.name}"
-"Tags: {post.tags.1}, {post.tags.2}, {post.tags.3}
+"{} by {}", post.title, post.author.name
+"Tags: {}, {}, {}", post.tags.1, post.tags.2, post.tags.3
+```
+
+In both case the compiler can infer the types, but if you want to be explicit you can use 2 notations: **Union** for multiple types or **Spread** for the repetion for values, and use Generics for keys.
+
+```lua
+-- User profile data
+user{string}: string|int|bool = {
+  "name": "Alice",
+  "age": 30,
+  "email": "<alice@example.com>",
+  "isActive": true
+}
+
+"{} is {}", user.name, user.age
+
+myDict{string|int|bool|tuple}:string = {
+  "name": "Alice",
+  42: "int key",
+  true: "bool key",
+  (1,2): "tuple key"
+}
 ```
 
 ### String
 
 A String is created using `""` symbols structure.
 
+String is an Immutable Collection of characters (`char`) that can be accessed like Lists.
+
 Some examples:
 
 ```lua
 message:= "Hello, Wide!"
 name:= "Mary Alice"
+```
+
+Accessing parts of string:
+
+```lua
+name:= "Mary Alice"
+words:= name.split(" ")
+
+initials:= "{}{}", words.1.1, words.2.1
+-- initials = "MA"
+
+name:= "Mary Alice Smith"
+-- Advanced!
+-- Here's the dynamic version using Comprehension Assignment
+-- Create list ["M", "A"]
+initials ~= (word.1) <~ name.split(" ")
+
+"{}", initials.join("")
+-- Output: "MAS"
 ```
 
 ## Destructuring
@@ -2586,7 +2678,9 @@ Output:
 
 ### Comprehension Flow Binding
 
-You can create generators like this in Wide:
+The marriage of a generator flow with semantic comprehension, using a minimal yet powerful syntax.
+
+Remember that you can create generators like this in Wide:
 
 ```lua
 countries()~> {
@@ -2596,7 +2690,7 @@ countries()~> {
 }
 ```
 
-So you can consume it:
+So you can consume it like this:
 
 ```lua
 codes ~= (entry) {
@@ -2605,13 +2699,26 @@ codes ~= (entry) {
 } <~ countries
 ```
 
-Or you could go full fancy-mode:
+Now here you can marry them and go full fancy-mode:
 
 ```lua
 codes ~= (entry) {
   (name, code) := entry
   codes.name = code
 } <~> {
+  ["Brazil", "BR"];
+  ["Canada", "CA"];
+  ["Japan", "JP"];
+}
+```
+
+Notice that `<~>` is both `<~` and `~>`, so that like could be this:
+
+```lua
+codes ~= (entry) {
+  (name, code) := entry
+  codes.name = code
+} <~(code)~> {
   ["Brazil", "BR"];
   ["Canada", "CA"];
   ["Japan", "JP"];
