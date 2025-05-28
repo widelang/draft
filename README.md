@@ -1549,6 +1549,12 @@ post:= {
 
 In both case the compiler can infer the types, but if you want to be explicit you can use 2 notations: **Union** for multiple types or **Spread** for the repetion for values, and use Generics for keys.
 
+Somewhat like this:
+
+```lua
+entityName{KeyType}:ValueType = { ... }`
+```
+
 ```lua
 -- User profile data
 user{string}: string|int|bool = {
@@ -1565,6 +1571,15 @@ myDict{string|int|bool|tuple}:string = {
   42: "int key",
   true: "bool key",
   (1,2): "tuple key"
+}
+```
+
+If you use just tuples as keys:
+
+```lua
+routes{string..}:string = {
+  ("GET", "/users"): "getUsers",
+  ("POST", "/login"): "loginUser"
 }
 ```
 
