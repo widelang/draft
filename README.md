@@ -4509,25 +4509,24 @@ Protected, Public, Static Entities and Functions can't be abstracted and just us
   -- static Entity cannot be abstracted but used in context
   thingName: "Thing"
 
-  -- Notice that "." turned "!"
-  !name:string
+  .!name:string
 
-  -- Notice that "." turned "!"
-  !instance:obj
+  .!instance:obj
 
   -- static Function cannot be abstracted but used in context
   thingName() => thingName
 
   -- Notice that "." turned "!"
-  !instance() Thing -- abstract Function doesnt have body
+  .!instance() Thing -- abstract Function doesnt have body
 
+  -- NOT abstract member
   .name() string => {
     .name ?. thingName(); -- resolvable Function can have body
   }
 />
 ```
 
-❌ If you don't provide implementation for everything marked as `!` Wide will break with an error.
+❌ If you don't provide implementation for everything marked as `.!` Wide will break with an error.
 
 This is how Something will look after abstracting an Extent:
 
@@ -6170,3 +6169,73 @@ Safari..{
 ```
 
 ⚠️ You can reimport at will, Wide just caches it and ignore what's already imported.
+
+## Operators Overloading
+
+Wide can overload most of its operators when working with Object Entities.
+
+You can define any of these as methods inside objects:
+
+| Operator | Method Name | Trait  |
+| -------- | ----------- | ---------------- |
+| `=`      | `=(other)`  | `::Assignable`   |
+| `==`     | `==(other)` | `::Comparable`   |
+| `+`      | `+(other)`  | `::Addable`      |
+| `-`      | `-(other)`  | `::Subtractable` |
+| `*`      | `*(other)`  | `::Multipliable` |
+| `/`      | `/(other)`  | `::Divisible`    |
+| `%`      | `%(other)`  | `::Modulable`    |
+| `<`      | `<(other)`  | `::Orderable`    |
+| `>`      | `>(other)`  | `::Orderable`    |
+
+You can define visibility, but in this example just public will be used. The following example is also a good case for grouping members with `[]` Meta Intent.
+
+```lua
+.Number <
+  -- Here value is promoted to constructor Lambda
+  (.value:int)
+
+  .[
+    =(other:Number) => Self.value = other.value < 0 ? 0 . other.value
+    ==(other:Number) => Self.value == other.value
+    <(other:Number) => Self.value < other.value
+    >(other:Number) => Self.value > other.value
+    +(other:Number) => Self.value + other.value
+    -(other:Number) => Self.value - other.value
+    *(other:Number) => Self.value * other.value
+    /(other:Number) => Self.value / other.value
+    %(other:Number) => Self.value % other.value
+  ]
+/Self>
+
+a:= Number.(2)
+b:= Number.(3)
+c:= Number.(2)
+
+a:= c
+
+a == b ? "a same value as b" . "a not same value b"
+-- Output "a not same value b"
+
+a < b ? "a less than b" . "a not less than b"
+-- Output "a less than be"
+
+a > b ? "a greater than be" . "a not greater than b"
+-- Output "a not greater than be"
+
+addition:= a + b  -- Result: 5
+subtraction:= a - b -- Result: -1
+multiplication:= a * b -- Result: 6
+division:= (a / b):float -- Result: 0.6666666666666667
+modulus:= b % a -- Result: 1
+```
+
+Once Wide's STL is ready, you'll be able to use Traits from Operator STL.
+
+```lua
+..{Addable} Operator
+
+.Object ::Addable <
+  .value:int
+/>
+```
