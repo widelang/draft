@@ -2231,7 +2231,7 @@ list:= list.-(10, 30, 50)
 In all cases about you can spread the operations and create new Collections besides the current in use:
 
 ```lua
-list = [10, 20, 30]
+list:= [10, 20, 30]
 {old, list} = list.+(40)
 ```
 
@@ -2241,13 +2241,73 @@ And `new` is: [10, 20, 30, 40]
 That's true for all cases, but when removing you have 3 possible entities as result:
 
 ```lua
-list = [10, 20, 30]
+list:= [10, 20, 30]
 {removed, old, list} = list.2.-()
 ```
 
 Now `old` is: [10, 20, 30]
 And `new` is: [10, 30]
 And `removed` is: 20
+
+### Positionals Math
+
+You can perform some maths on Collections using Positionals:
+
+```lua
+list:= [10, 20, 30]
+list:= list * 2
+```
+
+Now list is: [10, 20, 30, 10, 20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list.1 * 3
+```
+
+Now list is: [10, 10, 10, 20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list.1..2 * 3
+```
+
+Now list is: [10, 20, 10, 20, 10, 20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= -list
+```
+
+Now list is: []
+
+```lua
+list:= [10, 20, 30]
+list:= -list.1
+```
+
+Now list is: [20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= -list...
+```
+
+Now list is: []
+
+```lua
+list:= [10, 20, 30]
+list:= -list.2..
+```
+
+Now list is: [10]
+
+```lua
+list:= [10, 20, 30]
+list:= -list..2
+```
+
+Now list is: [30]
 
 ## Iterations
 
