@@ -2048,298 +2048,206 @@ So when you do `..=` or `=..` you are just giving Limits to a Finite Collection.
 
 Hope that makes sense!
 
-### Positional Slices
+## Positionals
 
-You can use slices to insert at, between or after.
+**Positionals** allows you to handle collections in place with simple math operators.
 
-#### At Position
+It use Wide One-based indexes.
 
-Single dotted assignment:
+However, when performing positional transformations, you may use or see a `0` Positional. That doesn't mean it's a real `0` position itself, it's just an alias for a mental read meaning: "Insert/remove/operate" before the start of a Collection. The `0` Positional will make the whole list to be recreated having all its current elements appended after what you passed to `.0` Positional so that what you wanted first to appear in `0` Positional becomes the element at `1` (first) position in that Collection Index.
+
+Now, consider this Immutable List:
 
 ```lua
-list 2.= -10
-list =.2 110
+list:= [10, 20, 30, 40, 50]
 ```
 
-`list` now is:
+You can just create a new list from appending a new item to the end using `+` method on the list name itself:
+
+```lua
+list:= list.+(60)
+```
 
 ```text
-[-2, -10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 110, 12]
+[10, 20, 30, 40, 50, 60]
 ```
 
-You could use Slice syntax:
+But what if you were to prepend to list? `-1` would mean "from last" and would make it inconsistent.
+
+So `0` Positional solves the problem for prepending:
 
 ```lua
-list:2.= -10
-list:=.2 110
+list:= list.0.+(5)
 ```
 
-But that could confuse some people, so choose what better fits to your eyes.
-
-#### After Position
-
-Double dotted assignment:
-
-```lua
-list 2..= -9
-list =..2 109
-```
-
-`list` now is:
+Now index 1 is 5 not 10:
 
 ```text
-[-2, -10, -9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 109, 110, 12]
+[5, 10, 20, 30, 40, 50, 60]
 ```
 
-You could use Slice syntax:
+That's why there's no Zero Index on One-based indexing.
+
+Adding multiple items to a Collection at once is possible.
+
+Imagine you want to create a new list from that appending 7, 8 and 9:
 
 ```lua
-list:2..= -10
-list:=..2 110
+list:= list.+(70, 80, 90) -- variadic values
+-- list:= list.+(..[70, 80, 90]) -- OR collection destructuring
 ```
 
-But, again, that could confuse some people, so choose what better fits to your eyes.
-
-### Between Positions
-
-```lua
-list 1..3= [-3, -2, -1]
-list =1..3 [11, 12, 13]
-```
-
-`list` now is:
+Now, its:
 
 ```text
-[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+[5, 10, 20, 30, 40, 50, 60, 70, 80, 90]
 ```
 
-You could use Slice syntax:
+However, if that was a Mutable List you could do this:
 
 ```lua
-list:1..3= [-3, -2, -1]
-list:=1..3 [11, 12, 13]
+$list:= [10, 20, 30, 40, 50]
+list += 70, 80, 90 -- variadic values
+-- list += ..[70, 80, 90]  -- OR collection destructuring
 ```
 
-But, again, that could confuse some people, so choose what better fits to your eyes.
+Now let's see a lot of examples that handle most Collections manipulations.
 
-If want to use steps you pass them to the slice:
+### Inserting Single Item
+
+Appending - don't pass index and just `+` method:
 
 ```lua
-$listToSlice := [1, 3, 5, 7, 9]
-
-listToSlice 1..:2 = [2, 4, 6, 8,]
+list:= [10, 20, 30, 40, 50]
+list:= list.+(1)
 ```
 
-`list` now is:
+Now, its:
 
 ```text
-[1, 2, 3, 4, 5, 6, 7, 8, 9]
+[10, 20, 30, 40, 50, 1]
 ```
 
-⚠️ Just be creative and you can do amazing things!
-
-### Positional Maths
-
-You can perform some Mathematics with Positionals:
+Prepending - pass `0` Positional and just `+` method:
 
 ```lua
-$list := []
-
-list 2*= 3
+list:= [10, 20, 30, 40, 50]
+list:= list.0.+(1)
 ```
 
-List is [3, 3]
+Now, its:
+
+```text
+[1, 10, 20, 30, 40, 50]
+```
+
+At position - just pass the index and use `=` method:
 
 ```lua
-list += 3
+list:= [10, 20, 30, 40, 50]
+list:= list.1.=(1)
 ```
 
-List is [3, 3, 3]
+Now, its:
+
+```text
+[1, 20, 30, 40, 50]
+```
+
+### Inserting Multiple Items
+
+Appending - don't pass index and just `+` method:
 
 ```lua
-2 *= list
+list:= [10, 20, 30, 40, 50]
+list:= list.+(1, 2, 3) -- variadic values
+-- list:= list.+(..[1, 2, 3])  -- OR collection destructuring
 ```
 
-List is [3, 3, 3, 3, 3, 3]
+Now, its:
+
+```text
+[10, 20, 30, 40, 50, 1, 2, 3]
+```
+
+Prepending - pass `0` Positional and just `+` method:
 
 ```lua
-2 /= list
+list:= [10, 20, 30, 40, 50]
+list:= list.0.+(1, 2, 3) -- variadic values
+-- list:= list.0.+(..[1, 2, 3])  -- OR collection destructuring
 ```
 
-List is [3, 3, 3]
+Now, its:
+
+```text
+[1, 2, 3, 10, 20, 30, 40, 50]
+```
+
+At position - just pass the index and use `=` method:
 
 ```lua
-2 %= list
+list:= [10, 20, 30, 40, 50]
+list:= list.1.=(1, 2, 3) -- variadic values
+-- list:= list.1.=(..[1, 2, 3])  -- OR collection destructuring
 ```
 
-List is [3]
+Now, its:
+
+```text
+[1, 2, 3, 20, 30, 40, 50]
+```
+
+### Removing Items
+
+All the previous rules apply to removing, you just need to use the `-` method without values for not matching any, or passing one or more values to match them.
+
+Some common cases:
+
+```lua
+list:= [10, 20, 30, 40, 50]
+list:= list.-() -- remove last
+-- [10, 20, 30, 40]
+
+list:= [10, 20, 30, 40, 50]
+list:= list.1.-() -- remove first
+-- [20, 30, 40, 50]
+
+list:= [10, 20, 30, 40, 50]
+list:= list.3.-() -- at index 3
+-- [10, 20, 40, 50]
+
+list:= [10, 20, 30, 40, 50]
+list:= list.-(20) -- removes item 20
+-- [10, 30, 40, 50]
+
+list:= [10, 20, 30, 40, 50]
+list:= list.-(10, 30, 50)
+-- [20, 40]
+```
+
+### Positionals Destructuring
 
 In all cases about you can spread the operations and create new Collections besides the current in use:
 
 ```lua
-$current := []
-{before, after} = current 2*= 3
+list = [10, 20, 30]
+{old, list} = list.+(40)
 ```
 
-`before` is []
+Now `old` is: [10, 20, 30]
+And `new` is: [10, 20, 30, 40]
 
-`after` is [3, 3]
-
-`current` is [3, 3]
+That's true for all cases, but when removing you have 3 possible entities as result:
 
 ```lua
-{before, after} = current += 3
+list = [10, 20, 30]
+{removed, old, list} = list.2.-()
 ```
 
-`before` is [3, 3]
-
-`after` is [3, 3, 3]
-
-`current` is [3, 3, 3]
-
-```lua
-{before, after} = 2 *= current
-```
-
-`before` is [3, 3, 3]
-
-`after` is [3, 3, 3, 3, 3, 3]
-
-`current` is [3, 3, 3, 3, 3, 3]
-
-```lua
-{before, after} = 2 /= current
-```
-
-`before` is [3, 3, 3, 3, 3, 3]
-
-`after` is [3, 3, 3]
-
-`current` is [3, 3, 3]
-
-```lua
-{before, after} = 2 %= current
-```
-
-`before` is [3, 3, 3]
-
-`after` is [3]
-
-`current` is [3]
-
-In all cases you can pass multiple elements:
-
-```lua
-$current := []
-current 2*= [1, 2, 3]
-```
-
-`current` is [1, 2, 3, 1, 2, 3]
-
-Or use spread:
-
-```lua
-$current := []
-{before, after} = current 2*= [1, 2, 3]
-```
-
-`before` is []
-
-`after` is [1, 2, 3]
-
-`current` is [1, 2, 3]
-
-### Removing Positions
-
-You can use the same approach for At, After, and Between Positions, but the syntax will resemble an isolated Match Expression arm:
-
-Considering the yet previous `$list` Entity that must be like this as of now:
-
-```text
-[-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-```
-
-You can remove the first and last items:
-
-```lua
--.=list
--=.list
-```
-
-`list` now is:
-
-```text
-[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-```
-
-You can remove at position:
-
-```lua
--2.=list
--2=.list
-```
-
-`list` now is:
-
-```text
-[-2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
-```
-
-You can remove between positions:
-
-```lua
--1..2.=list
--1..2=.list
-```
-
-`list` now is:
-
-```text
-[4, 5, 6]
-```
-
-There is this case where you might want to use negative indexes from the end. In this case you can use parentheses.
-
-So let's create a new list
-
-```lua
-$list = [1, 2, 3, 4, 5, 6]
--(-4..2)=.list
-```
-
-`list` now is:
-
-```text
-[1, 2]
-```
-
-If you destructure you can understand:
-
-```lua
-$list = [1, 2, 3, 4, 5, 6]
-{removed, before, after} = -(-4..2)=.list
-```
-
-`removed` is [3, 4, 5, 6]
-
-`before` is [1, 2, 3, 4, 5, 6]
-
-`after` is [1, 2]
-
-Got it? That's why! You should you parentheses.
-
-But that's Math, right?
-
-```lua
-$list = [1, 2, 3, 4, 5, 6]
-{removed, before, after} = +4..2=.list
-```
-
-Now the compiler knows you are performing a deletion as well because there's no case where + is used in Positionals.
-
-In all cases, when you destructure a removed Positional, you can have 3 possible Entities at your desposal like in the example above.
-
-⚠️ All Positionals can be revisited in the future. But as for now, they are just sugary over core libraries that perform them. So when STL is available, it will al be documented here.
+Now `old` is: [10, 20, 30]
+And `new` is: [10, 30]
+And `removed` is: 20
 
 ## Iterations
 
@@ -6182,11 +6090,18 @@ You can define any of these as methods inside objects:
 | `==`     | `==(other)` | `::Comparable`   |
 | `<`      | `<(other)`  | `::Orderable`    |
 | `>`      | `>(other)`  | `::Orderable`    |
+| `<=`      | `<=(other)`  | `::Orderable`    |
+| `>=`      | `>=(other)`  | `::Orderable`    |
 | `+`      | `+(other)`  | `::Addable`      |
 | `-`      | `-(other)`  | `::Subtractable` |
 | `*`      | `*(other)`  | `::Multipliable` |
 | `/`      | `/(other)`  | `::Divisible`    |
 | `%`      | `%(other)`  | `::Modulable`    |
+| `+=`      | `+=(other)`  | `::Addable`      |
+| `-=`      | `-=(other)`  | `::Subtractable` |
+| `*=`      | `*=(other)`  | `::Multipliable` |
+| `/=`      | `/=(other)`  | `::Divisible`    |
+| `%=`      | `%=(other)`  | `::Modulable`    |
 
 The core Integer Object in Wide is like so:
 
