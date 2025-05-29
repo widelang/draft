@@ -2364,6 +2364,7 @@ list := -list.-1     -- remove last element
 Invalid:
 
 ```lua
+list.1 - 1           -- ambiguous and unsupported
 list.-1 - 0          -- ambiguous and unsupported
 ```
 
