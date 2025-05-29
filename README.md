@@ -2255,6 +2255,34 @@ You can perform some maths on Collections using Positionals:
 
 ```lua
 list:= [10, 20, 30]
+list:= list + 40
+```
+
+Now list is: [10, 20, 30, 40]
+
+```lua
+list:= [10, 20, 30]
+list:= list.0 = 15
+```
+
+Now list is: [15, 20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list.2 + 25
+```
+
+Now list is: [10, 20, 25, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list + 40, 50, 60
+```
+
+Now list is: [10, 20, 30, 40, 50, 60]
+
+```lua
+list:= [10, 20, 30]
 list:= list * 2
 ```
 
@@ -2273,6 +2301,20 @@ list:= list.1..2 * 3
 ```
 
 Now list is: [10, 20, 10, 20, 10, 20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list - 10
+```
+
+Now list is: [20, 30]
+
+```lua
+list:= [10, 20, 30]
+list:= list - 10, 30
+```
+
+Now list is: [20]
 
 ```lua
 list:= [10, 20, 30]
@@ -2308,6 +2350,22 @@ list:= -list..2
 ```
 
 Now list is: [30]
+
+⚠️ Whe working with Positionals subtraction `entity - index` is not valid. Because you can't remove a value from a position. Instead you use slices or destructuring to isolate what you want to remove:
+
+Valid:
+
+```lua
+list := list - 0     -- remove all `0`s
+list := -list.1..3   -- remove slice 1..3
+list := -list.-1     -- remove last element
+```
+
+Invalid:
+
+```lua
+list.-1 - 0          -- ambiguous and unsupported
+```
 
 ## Iterations
 
