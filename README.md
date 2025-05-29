@@ -481,7 +481,7 @@ Hello, Wide!
 
 ⚠️ Yes! There's no need for any function, macro or any voodoo! The `""` is the syntax that does that magic itself if put it alone in a single line or passed alone when Questioning values.
 
-If you need to print `""` double quotes inside a string you just use 2 pairs double quotes instead of one.
+If you need to print `""` double quotes inside a string you can use 2 pairs double quotes:
 
 ```lua
 () => {
@@ -493,6 +493,13 @@ That will output:
 
 ```text
 Hello, "Wide"!
+```
+
+But when you use call a Function, you must use a placeholder:
+
+```lua
+greet(name:string) => "Hello, {name}"
+"{}", greet("World") -- Hello, World!
 ```
 
 ### Printing Multiple lines
@@ -901,7 +908,18 @@ $stats.map(n => n * 2)
 $words.filter(w => w.length > 4)
 ```
 
-⚠️ When using utility methods you just used one. That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
+⚠️ When using utility methods you just used one `.` dot. That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
+
+But you can also bind traits via Entity Extension:
+
+```lua
+..Math Math
+
+() => {
+  values{a=1, b=2}::(Math):int
+  "Max: {} and Min: {}", ..values.max(), ..values.min()
+}
+```
 
 ### Shadowing Exchange
 
@@ -1218,7 +1236,7 @@ doSomething( -- You can't use anywhere): ❌ Error Unterminated line
 
 -- Calculate total fuel needed
 `pure function`calculateFuel(amount:int, efficiency:float) float => {
-    amount * efficiency;
+  | amount * efficiency |
 }
 ```
 
@@ -1331,9 +1349,9 @@ Now look at this:
 
 getArea(shape: Shape) int => {
   shape.kind === "circle" ? {
-    Math.PI * shape.radius ** 2;
+    | Math.PI * shape.radius ** 2 |
   }
-  shape.sideLength ** 2;
+  | shape.sideLength ** 2 |
 }
 ```
 
@@ -2548,6 +2566,22 @@ $counter:= 1
 }
 ```
 
+### `||` Wall Intent
+
+Whenever you see the Wall Intent `||` (2 pipe symbols) you can think:
+
+- It stops flow on Iterators
+- It has return value
+- It yieds 1 or more values
+
+### `>>` Flow Intent
+
+Whenever you see the Flow Intent `>>` (2 greater than symbols) you can think:
+
+- It allows flow on Iterators
+- It pipes values
+- It has return value
+
 ### Interrupting Repetition
 
 ```lua
@@ -2557,24 +2591,32 @@ $counter:= 1
   "Counter value is: {counter}"
 
   $counter == 5 ? {
-    "break, please!"
+    "break, please"
     || -- Wall operator used alone in line inside question body
   }
 
   -- you could do like so:
-  ($counter == 5) || (
+  ($counter == 5) {
     "break, please!"
-  )
+
+    returnValue = 100
+
+    | returnValue | -- Wall operator used as braces return the value
+  }
 
   $counter % 2 == 0 ? {
     "continue, please!"
-     >> -- Flow operator used alone in line inside questoin body
+     >> -- Flow operator used alone in line inside question body
   }
 
   -- you could do like so:
-  ($counter % 2 == 0) >> (
+  ($counter % 2 == 0) {
     "continue, please"
-  )
+
+     returnValue = 200
+
+     > returnValue > -- Flow operator used as braces return the value
+  }
 
   $counter++
 }
@@ -2674,11 +2716,11 @@ Wide automatically connects the nearest iterable to the comprehension loop.
 ```
 
 ```lua
-countries = () ~> {
-  ["Brazil", "BR"];
-  ["Canada", "CA"];
-  ["Japan", "JP"];
-}
+countries = () ~> |
+  ["Brazil", "BR"]
+  ["Canada", "CA"]
+  ["Japan", "JP"]
+|
 
 codes ~= (entry) {
   (name, code) := entry
@@ -2725,11 +2767,11 @@ The marriage of a generator flow with semantic comprehension, using a minimal ye
 Remember that you can create generators like this in Wide:
 
 ```lua
-countries()~> {
-  ["Brazil", "BR"];
-  ["Canada", "CA"];
-  ["Japan", "JP"];
-}
+countries()~> |
+  ["Brazil", "BR"]
+  ["Canada", "CA"]
+  ["Japan", "JP"]
+|
 ```
 
 So you can consume it like this:
@@ -2748,9 +2790,11 @@ codes ~= (entry) {
   (name, code) := entry
   codes.name = code
 } <~> {
-  ["Brazil", "BR"];
-  ["Canada", "CA"];
-  ["Japan", "JP"];
+  |
+    ["Brazil", "BR"]
+    ["Canada", "CA"]
+    ["Japan", "JP"]
+  |
 }
 ```
 
@@ -2761,9 +2805,11 @@ codes ~= (entry) {
   (name, code) := entry
   codes.name = code
 } <~(code)~> {
-  ["Brazil", "BR"];
-  ["Canada", "CA"];
-  ["Japan", "JP"];
+  |
+    ["Brazil", "BR"]
+    ["Canada", "CA"]
+    ["Japan", "JP"]
+  |
 }
 ```
 
@@ -2910,8 +2956,6 @@ welcomeText := user.isLoggedIn ? "Welcome back!" . "Please log in"
 ```
 
 A *Question Statement* used in a returning context (such as inside a function with a returning body) behaves like a Question Expression.
-
-No semicolon `;` is required at the end, unless multiple expressions are present.
 
 This is known as **Question Morphing** — when a `?` block adapts to its return context.
 
@@ -3124,8 +3168,8 @@ message:string = item ? {
   = 11 => "It's 11",
   < 10 => {
     -- if you go newline you'll add
-    -- ';' to the end of line that returns
-    "Less than 10";
+    -- || Wall Operator as braces to the end of line that returns
+    | "Less than 10" |
   },
   > 10 => "Greater than 10" -- , comma is optional as well
   .  => "It's 10" -- cannot end with , comma as well
@@ -3135,7 +3179,7 @@ message:string = item ? {
 "{message}"
 ```
 
-If you want to both return and print you it can you must enclose between `{}` and use the `;` Return Intent in the final of the returning expression.
+If you want to both return and print you it can you must enclose between `{}` and use the `||` Wall Intent in the final of the returning expression.
 
 You can also give a temporary name for the match expression:
 
@@ -3146,27 +3190,27 @@ times10:int = item ? {
   -- create a temporary "eq" name for the match expression case
   (item == 100) {hundred} =>  {
     "It's a hundred"
-    hundred * 100;
+    | hundred * 100 |
   },
   = 11 {eq} => {
     "It's 11"
-    eq * 10;
+    | eq * 10 |
   },
   < 10 {lt} => {
     "Less than 10"
-    lt * 10;
+    | lt * 10 |
   },
   > 10 {gt} {
     "Greater than 10"
-    gt * 10;
+    | gt * 10 |
   }
   . {
     "It's 10"
-    item * 10;
+    | item * 10 |
   }
 }
 
-"{message}"
+"{}", message
 ```
 
 As in the resolution case before, there's no need to name any of those match cases:
@@ -3176,23 +3220,23 @@ times10:int = item ? {
   -- create a temporary "eq" name for the match expression case
   (item == 100) =>  {
     "It's a hundred"
-    item * 100;
+    | item * 100 |
   },
   = 11 => {
     "It's 11"
-    item * 10;
+    | item * 10 |
   },
   < 10 => {
     "Less than 10"
-    item * 10;
+    | item * 10 |
   },
   > 10 {
     "Greater than 10"
-    item * 10;
+    | item * 10 |
   }
   . {
     "It's 10"
-    item * 10;
+    | item * 10 |
   }
 }
 ```
@@ -3266,12 +3310,7 @@ greet(name:string) => {}
 greet("World") -- Output: Hello, World!
 ```
 
-### `;` Return Intent
-
-The `;` Return Intent is used to mean that a value must be return.
-It's the only place where it's used in Wide.
-
-**Returning Values:**
+### Returning Values
 
 When you create a function like this:
 
@@ -3281,15 +3320,26 @@ greet() => {
 }
 ```
 
-It will return an empty tuple `()` by default because there no return type nor a return value defined in the function.
+It will return an empty `||` Wall by default because there's no return type nor a return value defined in the function.
 
-If you want to check if a function doesn't have a type, it means you want to check if it returns an empty tuple:
+If you want to check if a function doesn't have a return type, it means you want to check if it returns an empty Wall, but how there's no such a thing, you can just check against `//` Inclusion intent agains the function call alone:
 
 ```lua
 greet() => {}
 
-() == greet() ?  "Function doesn't return a value"
+// greet() ? "Function doesn't return have a return type and doesn't value"
+
+value = greet
+
+// value ? "Function doesn't return have a return type and doesn't value"
+
+value = greet()
+
+❌ -- Error: cannot match against absence of type on plain Entities name
+// value ? "Function doesn't return have a return type and doesn't value"
 ```
+
+The expression `// greet()` means: **"Match against absence of type."** so you check if the Function DOESN'T HAVE a return type, if not, it returns true. You can lazy check on Entity that's assigned to a Function name, but can't check against a plain Entity name.
 
 You can also check the truthness of if it:
 
@@ -3299,25 +3349,45 @@ greet() => {}
 ?..greet() ?  "Function doesn't return a value"
 ```
 
-If you need to return value(s) you need use the `;` Return Intent at the end of the line that you want to return the value or resulting value from an expression. This is the only place where `;` is used in Wide — for returning values (which also means yielding as you'll see)
+If you need to return value(s) you need use the `||` Wall Intent at the end of the line that you want to return the value(s) or resulting value(s) from an expression.
+
+To return a single value, just enclose that value in between Walls:
+
+```lua
+singleReturn() => {
+  |10|
+}
+
+"{}", singleReturn() -- Output 10
+```
+
+To return multiple values, just enclose values separated by commas between Walls:
+
+```lua
+mutipleReturns() => {
+  |10,20,20|
+}
+
+"{}", mutipleReturns() -- Output 10, 20, 30
+```
 
 Function that returns a message based single on parameter:
 
 ```lua
 greet(name:string) string => {
-  "Hello, {name}!";
+  |"Hello, {name}!"|
 }
 
 greet("World") -- Doesn't output anything, just returned
 
-""{greet("World")}"" -- Hello, World!
+"{}", greet("World") -- Hello, World!
 
 
 message: greet("World")
-"{message}" -- Hello, World!
+"{}", message -- Hello, World!
 ```
 
-As you saw, the `;` Return Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Return Intent on inlined functions.
+As you saw, the `||` Wall Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Return Intent on inlined functions.
 
 ```lua
 -- Inlined function
@@ -3366,7 +3436,7 @@ Back to the case of default `()` returned on functions without return types, whe
 
 ```lua
 sum(n:int, m:int) => {
-  n + m;
+  |n + m|
 }
 
 // sum(1, 1) int ? "It's an int type"
@@ -3433,7 +3503,7 @@ add(..numbers:int) => {
     $sum += number
   }
 
-  $sum;
+  |$sum|
 }
 
 result = sum(10, 20, 30, 50)
@@ -3457,7 +3527,7 @@ add(a:int, b:int, ..numbers:int) => {
     $sum += number
   }
 
-  sum;
+  |$sum|
 }
 
 -- Just for clarity names were used, but no need!
@@ -3526,7 +3596,7 @@ number1:= 10
 number2:= 20
 
 add(a:int, b:int) => {
-  a + b;
+  |a + b|
 }
 
 "{number1}"
@@ -3598,11 +3668,11 @@ greet = (name:string) => { "Hello, {name}!" }
 greet("Wide") -- Hello Wide!
 ```
 
-But when used `{}` and a value must be returned, the `;` Return intent must be used:
+But when used `{}` and a value must be returned, the `||` Wall intent must be used:
 
 ```lua
 add = (n:int, m:int) => {
-  n + m; -- ; return intent
+  |n + m|
 }
 ```
 
@@ -3665,11 +3735,31 @@ You can create functions that return an Iterator just using the `~` Iteration In
 
 ```lua
 generator() ~> {
-    1;
-    2;
-    3;
+  |
+  1
+  2
+  3
+  |
 }
+```
 
+You can also inline it with multiple pipes:
+
+```lua
+generator() ~> {
+  |1|2|3|
+}
+```
+
+And even go Fancy:
+
+```lua
+generator() ~> |1|2|3|
+```
+
+And to consume it:
+
+```lua
 ~(value = generator()) {
     "Value is {value}"
 }
@@ -3677,19 +3767,25 @@ generator() ~> {
 -- Will output: 1 2 3
 ```
 
-You can go really fancy!
+You can create a Generator directly for the consumer:
 
 ```lua
 ~(item = () ~> {
-    1;
-    2;
-    3;
+    |1|2|3|
 }) {
   "{item}"
 }
 ```
 
 ⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
+
+You can also create generators directly to consume in Iterators
+
+```lua
+~(item = |1|2|3|) {
+  "{item}"
+}
+```
 
 ### `@` Event Intent
 
@@ -3713,7 +3809,7 @@ If you want to stop execution immediately on error you can use assertion:
 division(n:int, m:int) int => {
   -- condition, message
   @(m == 0, "Cannot divide by {n} by {m}")
-  n / m;
+  |n / m|
 }
 
 division(10, 0) ❌ -- Execution will stop immediatly
@@ -3724,7 +3820,7 @@ If you want to capture the error you can propagate using the empty `{}` Context 
 ```lua
 division(n:int, m:int) int => {
   @(m == 0, "Cannot divide by {n} by {m}"){}
-  n / m;
+  |n / m|
 }
 -- somewhere else in code
 n:= 10
@@ -3806,7 +3902,7 @@ fetchUserData() []User => {
     users:= query("select name, age from users")
   }
 
-  users;
+  |users|
 }
 ```
 
@@ -3841,7 +3937,7 @@ On Function Call you just prefix the name with `@` and it says `await` event sta
     users:= @query("select name, age from users")
   }
 
-  users;
+  |users|
 }
 ```
 
@@ -3928,9 +4024,9 @@ When working with Web projects that are HTML-heavy, Wide has some niceties for y
 
 Wide makes HTML Functional and Reactive by nature on the Web Browser.
 
-The HTML Fragment `<></>` is used to enclose the HTML Function body no `{}` in this case.
+The HTML Fragment `<></>` is used to enclose the HTML Function body and has no `{}` in this case.
 
-⚠️ When you are building UI's you can also make your Entities reactive by just prefixing them with `@` Event Intent.
+⚠️ When you are building UI's you can also make your Entities reactively by just prefixing them with `@` Event Intent.
 
 Functional Component `<Main />`
 
@@ -3948,7 +4044,7 @@ Greet(name: string) => <>
 </>
 ```
 
-Functional Component can have body and return HTML Fragment.
+Functional Component can have body, but for returning, you must enclose the `<></>` Fragment between `||` Wall Intent.
 
 Component `<HomePage />`:
 
@@ -3968,26 +4064,28 @@ HomePage() => {
     -- userName: "John" ❌ Error, cannot change Immutable state
   }
 
-  <>
-    <Main> -- Functional Component
-      <header>
-        <h1>Welcome!</h1>
-      </header>
-      <Greet name={userName} /> -- Functional Component
-      <button onclick={changeUser}>
-        Change Username
-      </button>
-      <footer>&copy; {currentDate}</footer>
-    </Main>
-  </>;
+  |
+    <>
+      <Main> -- Functional Component
+        <header>
+          <h1>Welcome!</h1>
+        </header>
+        <Greet name={userName} /> -- Functional Component
+        <button onclick={changeUser}>
+          Change Username
+        </button>
+        <footer>&copy; {currentDate}</footer>
+      </Main>
+    </>
+  |
 }
 ```
 
 ## Functional Object Programming 🤣
 
-Here the Functional meet Object-Oriented and they live happy forever!
+Here the Functional meets Object-Oriented and they live happy forever!
 
-You are gonna be presented to the most important concepts of Wide Objects and how they can help your Intentions to Model real world scenarios.
+Wide has full support for advanced object oriented programming, but it has a lot of *Widities*.
 
 ### Objects
 
@@ -4108,8 +4206,9 @@ Think of it like Entities for Data that only Objects can have.
 .Thing <
   -- This is an Immutable Meta Entity .[do] but you don't need to use []
   .[do]:= true
+
   -- same as
-  .do:= true -- no need for []
+  .do:= true -- no need for [] when using on per line
 
   -- this an Object Function
   .doSomething() => {
@@ -4587,7 +4686,7 @@ Protected, Public, Static Entities and Functions can't be abstracted and just us
 
   -- NOT abstract member
   .name() string => {
-    .name ?. thingName(); -- resolvable Function can have body
+    |.name ?. thingName()| -- resolvable Function can have body
   }
 />
 ```
@@ -4610,7 +4709,9 @@ This is how Something will look after abstracting an Extent:
   -- Notice that now "!" turned "."
   .name() string => {
     -- not abstract Function can be modified
-    .name ?. "How is it possible for me not having a name?";
+    |
+    .name ?. "How is it possible for me not having a name?"
+    |
   }
 /Self>
 ```
@@ -4684,7 +4785,7 @@ same as:
 
 ```lua
 Greet() => {
-  -- default return ; or output from body
+  -- default return || or output from body
 
   -- enter slot mode if used
 /
@@ -4708,8 +4809,8 @@ An useful example using the previous Person object together:
 
 ```lua
 Greet(name:string) => {
-  -- default return ; or output from body
-  <p>"Hello, {name} from Function"</p>;
+  -- default return || or output from body
+  |<p>"Hello, {name} from Function"</p>|
 
   -- enter slot mode if used
 /
@@ -5182,6 +5283,39 @@ entityName
   ::(Trait):= </>
 ```
 
+### Flow Extension Entity
+
+When destructuring values like so:
+
+```lua
+..values = [1, 2, 3, 4, 5]
+```
+
+You can Iterate on values or extract each member by index.
+
+With Flow Extension Entity, you can just pass a Trait to a destructive Entity and iterate over it:
+
+```lua
+..Flow Flow -- import Flow trait from Flow Module
+
+..values = [1, 39, 21, 3, 14, 50]
+values.map(x => x + 1).filter(x => x > 10)
+```
+
+But that unnecessary per se, because Lists would already offer such a feature. But it's interesting to work with Functions returned values:
+
+```lua
+getTokens() => {
+  | "one", 1, "two", 2, "three", 3 |
+}
+
+..Flow Flow -- import Flow trait from Flow module
+
+..tokens::(Flow) := getTokens()
+
+tokens.filter(t => t::(Stringable)).join(", ")
+```
+
 In all case, there are some things to be noticed:
 
 - just 1 extension type was used inside `()`, but you can use multiple separated by commas
@@ -5323,7 +5457,7 @@ Multiple type parameters can be defined within the angle brackets {} when declar
 
 ```lua
 processData{T, U}(input1: T, input2: U) T, U => {
-  [input1, input2];
+  |[input1, input2]|
 }
 
 result:= processData{int, string}(10, "hello")
@@ -5334,11 +5468,11 @@ Union types (|) allow a generic type to accept values of different types. This i
 
 ```lua
 handleInput{T}(input: T) T // T: string | int => {
-  input;
+  |input|
 }
 
-strResult:= handleInput("world") -- strResult is of type string
-numResult:= handleInput(20) -- numResult is of type int
+strResult:= handleInput("world") -- input is of type string
+numResult:= handleInput(20) -- input is of type int
 ```
 
 Intersection types (&) combine multiple types into one, requiring a value to satisfy all the specified types. This is useful when a generic type needs to have properties or methods from multiple types.
@@ -5354,7 +5488,7 @@ Intersection types (&) combine multiple types into one, requiring a value to sat
 
 processEntity{T}(entity: T) string
 // T: HasName & HasAge => {
-  "{entity.name} is {entity.age} years old";
+  |"{entity.name} is {entity.age} years old"|
 }
 
 person:= <
@@ -5506,7 +5640,7 @@ process_message{T}(msg: Message{T}) => msg ? {
 }
 
 () => {
-  msg1:= #Message..Text(String::from("Hello!"));
+  msg1:= #Message..Text(String::from("Hello!"))
   msg2:= #Message..Binary([0xDE, 0xAD, 0xBE, 0xEF])
   msg3:= #Message..Control(Command..Ping)
   msg4:= #Message..Text(123)
@@ -5553,7 +5687,7 @@ Could be just the Union of `Success`, `Failure`, and `Uncertainty` constants:
 So you can use in both cases like so:
 
 ```lua
-outcome:Result = #Failure(20, 'X');
+outcome:Result = #Failure(20, 'X')
 
 outcome ? {
     Success {n} => "Success with value: {}", n
@@ -6124,7 +6258,9 @@ You export prefixing what you want to export using the `&` Extern Intent:
 />
 ```
 
-And you import using the `..` Extent Intent passing the path of the file that contains the Entities you just want to import:
+### Importing
+
+You import using the `..` Extent Intent passing the path of the file that contains the Entities you just want to import or the name of a core Wide Module.
 
 ```lua
 -- ./main.wide file
@@ -6235,6 +6371,24 @@ Safari..{
 ```
 
 ⚠️ You can reimport at will, Wide just caches it and ignore what's already imported.
+
+### Wide Modules Import
+
+Whenever a module is available in core Wide STL, you can just import any of its members or itself by their names:
+
+```lua
+..Math Math
+
+() => {
+  -- Direct module call (static): Math's functions are used like a namespace
+  values{a=1, b=2}:int
+  "Max: {} and Min: {}", Math.max(..values), Math.min(..values)
+
+  -- Trait-dispatch call (dynamic): values group is extended with Math's behavior
+  values{a=1, b=2}::(Math):int
+  "Max: {} and Min: {}", values.max(), values.min()
+}
+```
 
 ## Operators Overloading
 
