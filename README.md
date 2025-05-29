@@ -2886,6 +2886,45 @@ That will print:
 Welcome, Alice!
 ```
 
+### Question Expressions and Sentences
+
+There are two structural forms of the `?` Question Intent:
+
+A **Question Statement** when used for side-effect or branching.
+
+It's just a logical branching construct, performs evaluation without returning a value.
+
+```lua
+user.isLoggedIn ? {
+  redirectToDashboard()
+}
+
+```
+
+A **Question Expression** when used to resolve a value.
+
+A logical resolving construct, evaluates to a value and can be used inline.
+
+```lua
+welcomeText := user.isLoggedIn ? "Welcome back!" . "Please log in"
+```
+
+A *Question Statement* used in a returning context (such as inside a function with a returning body) behaves like a Question Expression.
+
+No semicolon `;` is required at the end, unless multiple expressions are present.
+
+This is known as **Question Morphing** — when a `?` block adapts to its return context.
+
+```lua
+getWelcomeText(user:User) => user.isLoggedIn ? "Welcome back!" . "Please log in"
+```
+
+So in summary:
+
+- Call `condition ? { ... }` a Question Statement.
+
+- Call `condition ? "Yes" . "No"` a Question Expression.
+
 ### Checking the Truthness of An Entity
 
 As you saw in the Type-Values section, you can't cast any type into boolean, just numbers into booleans.
