@@ -6176,19 +6176,65 @@ Wide can overload most of its operators when working with Object Entities.
 
 You can define any of these as methods inside objects:
 
-| Operator | Method Name | Trait  |
+| Operator | Method Name | Primitive Trait  |
 | -------- | ----------- | ---------------- |
 | `=`      | `=(other)`  | `::Assignable`   |
 | `==`     | `==(other)` | `::Comparable`   |
+| `<`      | `<(other)`  | `::Orderable`    |
+| `>`      | `>(other)`  | `::Orderable`    |
 | `+`      | `+(other)`  | `::Addable`      |
 | `-`      | `-(other)`  | `::Subtractable` |
 | `*`      | `*(other)`  | `::Multipliable` |
 | `/`      | `/(other)`  | `::Divisible`    |
 | `%`      | `%(other)`  | `::Modulable`    |
-| `<`      | `<(other)`  | `::Orderable`    |
-| `>`      | `>(other)`  | `::Orderable`    |
 
-You can define visibility, but in this example just public will be used. The following example is also a good case for grouping members with `[]` Meta Intent.
+The core Integer Object in Wide is like so:
+
+```lua
+.Integer::(
+  Assignable,
+  Comparable,
+  Addable,
+  Subtractable,
+  Multipliable,
+  Divisible,
+  Modulable,
+  Orderable
+) >
+  .value: int
+/>
+```
+
+Because mostly all primitives in Wide is an Object with traits.
+
+```text
+1 + 2 + 3
+```
+
+is actually:
+
+```lua
+Integer.(1)
+  .+(Integer.(2))
+  .+(Integer.(3))
+```
+
+And that's why even this is valid:
+
+```lua
++(+(1)) == 1
+```
+
+Because it's:
+
+```lua
+Integer.(1).+(Integer.(1)) == Integer.(2)
+Integer.(2).+(Integer.(1)) == Integer.(3)
+```
+
+You can define visibility, but in this example just public will be used.
+
+The following example is also a good case for grouping members with `[]` Meta Intent.
 
 ```lua
 .Number <
@@ -6228,6 +6274,15 @@ subtraction:= a - b -- Result: -1
 multiplication:= a * b -- Result: 6
 division:= (a / b):float -- Result: 0.6666666666666667
 modulus:= b % a -- Result: 1
+```
+
+You can also access those methods directly once they are public:
+
+```lua
+a:= Number.(2)
+b:= Number.(3)
+
+result = a.+(b)
 ```
 
 Once Wide's STL is ready, you'll be able to use Traits from Operator STL.
