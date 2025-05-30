@@ -3729,9 +3729,49 @@ greet("Hello") << $name
 "{$name}" ❌ -- Error '$name' does not exist in this scope
 ```
 
-### Generators
+### Generators and Iterators
 
-You can create functions that return an Iterator just using the `~` Iteration Intent and using multiple return intent lines.
+**Generators** are Suspendable. They have some characteristics:
+
+- Generator or coroutine
+
+- Yields control and value
+
+- Pauses and resumes
+
+- Holds internal state
+
+- Like: Fibonacci, stream processor, async pipelines
+
+```lua
+-- Streaming coroutine (suspendable)
+fibonacci(n:int) ~> {
+  a, b := 1, 1
+  ~ (i = 1..n) {
+    |a|
+    a, b := b, a + b
+  }
+}
+```
+
+**Iterators** are not Suspendable. They have some characteristics:
+
+- Function or iterator
+
+- Yields via |value| (value per flow step)
+
+- Executes to completion immediately per call
+
+- No internal state suspension
+
+- Like: map, reduce, sum
+
+```lua
+-- Fast math generator (returnable)
+~square(n:int) => { |n * n| }
+```
+
+You can create Generator functions that return an Iterator just using the `~>` Iterator Intent arrow and returning (yielding) one or move values.
 
 ```lua
 generator() ~> {
@@ -3742,6 +3782,8 @@ generator() ~> {
   |
 }
 ```
+
+⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
 
 You can also inline it with multiple pipes:
 
@@ -3757,7 +3799,7 @@ And even go Fancy:
 generator() ~> |1|2|3|
 ```
 
-And to consume it:
+And to consume its iterators:
 
 ```lua
 ~(value = generator()) {
@@ -3767,7 +3809,7 @@ And to consume it:
 -- Will output: 1 2 3
 ```
 
-You can create a Generator directly for the consumer:
+You can create an Iterator directly for the a generator Lambda:
 
 ```lua
 ~(item = () ~> {
@@ -3777,13 +3819,36 @@ You can create a Generator directly for the consumer:
 }
 ```
 
-⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
+Fibonacci using generators:
+
+```lua
+fibonacci(n:int) ~> {
+  1, 2 => |1|
+  +.. => |fibonacci(n - 1) + fibonacci(n - 2)|
+}
+
+~(n = fibonacci(10)) {
+  "{}", n
+}
+```
 
 You can also create generators directly to consume in Iterators
 
 ```lua
 ~(item = |1|2|3|) {
   "{item}"
+}
+```
+
+And that drives us to Named Iterators:
+
+```lua
+~square(n:int) => { |n * n| }
+
+squares:= ~(n = [1..5]) { square(n) }
+
+~(x = squares) {
+  "Got: {}", x
 }
 ```
 
