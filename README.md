@@ -3852,6 +3852,10 @@ squares:= ~(n = [1..5]) { square(n) }
 }
 ```
 
+Now you created a function that starts with `~` and yields an Iterator.
+
+You can use that where you'd place a `||` inside a generator.
+
 ### `@` Event Intent
 
 Whenever you see the Type Intent `@` you can think:
