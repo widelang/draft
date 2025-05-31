@@ -3749,7 +3749,7 @@ greet($name, time:10) $ times ❌ -- Error cannot mutate immutable Entity 'times
 greet("John", "Hi") $ (name, message) ❌ -- Error cannot mutate immutable Object String
 ```
 
-**Moving the scope of an Entity:**
+### Moving the scope of an Entity
 
 You can similarly move the scope of an Entity using the `<<` Move Intent:
 
@@ -3784,7 +3784,7 @@ sum:= add(number1, $number2) << $number2 -- $number2 moved to sum Function scope
 
 ## Lambdas
 
-To create a Lambda in Wide you just create an Entity an assign function to it.
+To create a Lambda in Wide you just create an Entity an assign a function to it.
 
 You don't need to use `:=` for lambdas.
 
