@@ -2592,7 +2592,7 @@ $counter:= 1
 
   $counter == 5 ? {
     "break, please"
-    || -- Wall operator used alone in line inside question body
+    || -- Wall Intent used alone in line inside question body
   }
 
   -- you could do like so:
@@ -2601,12 +2601,12 @@ $counter:= 1
 
     returnValue = 100
 
-    | returnValue | -- Wall operator used as braces return the value
+    | returnValue | -- Wall Intent used as braces to return the value
   }
 
   $counter % 2 == 0 ? {
     "continue, please!"
-     >> -- Flow operator used alone in line inside question body
+     >> -- Flow intent used alone in line inside question body
   }
 
   -- you could do like so:
@@ -2615,7 +2615,7 @@ $counter:= 1
 
      returnValue = 200
 
-     > returnValue > -- Flow operator used as braces return the value
+     > returnValue > -- Flow intent used as braces return the value
   }
 
   $counter++
@@ -2973,7 +2973,7 @@ So in summary:
 
 As you saw in the Type-Values section, you can't cast any type into boolean, just numbers into booleans.
 
-But you can check the truthness of an Entity using the `?..` Truthness Intent.
+But you can check the truthness of an Entity using the `..?` Truthness Intent.
 
 Just prefix the name of any Entity with that in a Question, and you'll get a true of false value for that.
 
@@ -2985,10 +2985,10 @@ $age:int
 $salary:double
 $isMarried:bool
 
-?..name ? "Has name"
-?..age ? "Has age"
-?..salary ? "Has salary"
-?..isMarried ? "Is Married"
+name..? "Has name"
+age..? "Has age"
+salary..? "Has salary"
+isMarried..? "Is Married"
 ```
 
 The above will print nothing, because all values ended up to be `falsy` values.
@@ -3001,10 +3001,10 @@ $age = 34
 $salary = 19999.00
 $isMarried = true
 
-?..name ? "Has name"
-?..age ? "Has age"
-?..salary ? "Has salary"
-?..isMarried ? "Is Married"
+name..? "Has name"
+age..? "Has age"
+salary..? "Has salary"
+isMarried..? "Is Married"
 ```
 
 Now it all will print the corresponing questioned text:
@@ -3024,10 +3024,10 @@ $age:int
 $salary:double
 $isMarried:bool
 
-!?..name ? "Has NOT name"
-!?..age ? "Has NOT age"
-!?..salary ? "Has NOT salary"
-!?..isMarried ? "Is NOT Married"
+!name..? "Has NOT name"
+!age..? "Has NOT age"
+!salary..? "Has NOT salary"
+!isMarried..? "Is NOT Married"
 ```
 
 Not it will output, because you negate the question:
@@ -3042,10 +3042,10 @@ Is NOT Married
 But you can get more fancy, and do just like so:
 
 ```lua
-name?.. "Has name" . "Has NOT name"
-age?.. "Has age" . "Has NOT age"
-salary?.. "Has salary" . "Has NOT salary"
-isMarried?.. "Is Married" . "Is NOT married"
+name..? "Has name" . "Has NOT name"
+age..? "Has age" . "Has NOT age"
+salary..? "Has salary" . "Has NOT salary"
+isMarried..? "Is Married" . "Is NOT married"
 ```
 
 Now, look how cool it gets with objects:
@@ -3057,11 +3057,11 @@ Now, look how cool it gets with objects:
 
 $user:User </>
 
-user?.. "Hello, {user.name}" . "Who are you really?"
+user..? "Hello, {user.name}" . "Who are you really?"
 
 $user:= <User name="Alice"/>
 
-user?.. "Hello, {user}" . "Who are you really?"
+user..? "Hello, {user}" . "Who are you really?"
 ```
 
 ⚠️ A table with all possibilities will be created, because it's vague yet!
@@ -3168,7 +3168,7 @@ message:string = item ? {
   = 11 => "It's 11",
   < 10 => {
     -- if you go newline you'll add
-    -- || Wall Operator as braces to the end of line that returns
+    -- || Wall Intent as braces to the end of line that returns
     | "Less than 10" |
   },
   > 10 => "Greater than 10" -- , comma is optional as well
@@ -3341,12 +3341,12 @@ value = greet()
 
 The expression `// greet()` means: **"Match against absence of type."** so you check if the Function DOESN'T HAVE a return type, if not, it returns true. You can lazy check on Entity that's assigned to a Function name, but can't check against a plain Entity name.
 
-You can also check the truthness of if it:
+You can also check the truthness of a function:
 
 ```lua
 greet() => {}
 
-?..greet() ?  "Function doesn't return a value"
+greet()..?  "Function doesn't return a value"
 ```
 
 If you need to return value(s) you need use the `||` Wall Intent at the end of the line that you want to return the value(s) or resulting value(s) from an expression.
@@ -3387,7 +3387,7 @@ message: greet("World")
 "{}", message -- Hello, World!
 ```
 
-As you saw, the `||` Wall Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Return Intent on inlined functions.
+As you saw, the `||` Wall Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Wall Intent on inlined functions.
 
 ```lua
 -- Inlined function
@@ -3432,20 +3432,41 @@ result:= times10(10)
 "{result}" -- 100
 ```
 
-Back to the case of default `()` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthness of the returned value:
+Back to the case of default `||` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthness of the returned value:
 
 ```lua
 sum(n:int, m:int) => {
   |n + m|
 }
 
-// sum(1, 1) int ? "It's an int type"
+/int/ sum(1, 1) ? "It's an int type"
 
 sum(1, 1) == 2 ? "It's 2"
 
-?..sum(1, 1) ? "truthy"
-?..sum(0, 0) ? "falsy"
+sum(1, 1)..? "truthy"
+sum(0, 0)..? "falsy"
 ```
+
+See why the previous `// greet()` checked for `||`? Because there's no returned value inside `||` alone to be checked agains a value type. Be it explicit `greet()=>{||}` or implicit `greet()=>{}`, `||` alone never has a type nor a value, but in the case of `/int/ sum(1, 1)`, sum returns `int` value inside `|n+m|`, so `// sum(1, 1)` would result in false, `// greet()` in true, because `||` has nothing to match againt. So `// == ||` = `true`!
+
+### Early Return
+
+There cases where you may want to just return telling the compiler that you couldn't find a match, of a situation where you just say: "stop from here!". That's the case for what most programming languages call **Early Return**.
+
+Just place the || Wall Intent anywhere you want to early return and you'll obtain the same result.
+
+```lua
+greetUser(name:string) string => {
+  name..? {
+    -- returns message
+    |"Hello, {name}!"|
+  }
+
+  || -- No name, return nothing
+}
+```
+
+In the `greetUser` function the `string` type is enforced, but in this case, the compiler will just ignore that and say: "Okay, I understand that! I'll do nothing `||`".
 
 **Multiple parameters:**
 
