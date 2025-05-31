@@ -3345,20 +3345,88 @@ A Function itself that does nothing other than exist:
 `=>` Lambda Intent is used to sign that the function signature ended.
 `{}` Context Intent is used to create the body of the function.
 
-To invoke a Function you do like so:
+⚠️ In Wide `()=> {}` alone in a file is the **Entry Function** used to tell the compiler that the file can be used as an Entry point to your program.
 
-```lua
-() -- Does nothing
-```
+### Calling Functions
 
-⚠️ In Wide ()=> {} alone in a file is the Entry Function used to tell the compiler that file can be used as an Entry point to your program.
-
-Named Function:
+In order to call a function you must give it a name:
 
 ```lua
 greet() => {}
 greet() -- Does nothing
 ```
+
+Different from Entities you can call Functions before they being created - but they must exist at some point in your scope, of course!
+
+```lua
+greet() -- Called first
+
+greet() => {} -- Defined later
+```
+
+### Shadowing Functions
+
+You can shadow Entities, but that's not true to Functions.
+
+```lua
+greet() => {}
+greet() => {} ❌ -- Error: greet() is defined multiple times
+```
+
+However, you can create functions with the same name in different scopes. The function closer to the scope will win:
+
+```lua
+greet()
+greet() => { "#1 Outer scope" }
+greet()
+
+{
+  greet()
+  greet() => { "#2 Inner scope" }
+  greet()
+
+  {
+    greet()
+    greet() => { "#3 Inner most scope" }
+    greet()
+  }
+
+  greet()
+}
+
+greet()
+```
+
+The above code will print:
+
+```text
+#1 Outer scope
+#1 Outer scope
+#2 Inner scope
+#2 Inner scope
+#3 Inner most scope
+#3 Inner most scope
+#2 Inner scope
+#1 Outer scope
+```
+
+The same is true for:
+
+- Functions
+
+- Objects
+
+- Structs
+
+- Enums
+
+- Consts
+
+- Statics
+
+- Traits
+
+### Printing from Functions
 
 Function that prints a message with no return type:
 
@@ -3411,14 +3479,6 @@ value = greet()
 ```
 
 The expression `// greet()` means: **"Match against absence of type."** so you check if the Function DOESN'T HAVE a return type, if not, it returns true. You can lazy check on Entity that's assigned to a Function name, but can't check against a plain Entity name.
-
-You can also check the truthness of a function:
-
-```lua
-greet() => {}
-
-greet()..?  "Function doesn't return a value"
-```
 
 If you need to return value(s) you need use the `||` Wall Intent at the end of the line that you want to return the value(s) or resulting value(s) from an expression.
 
@@ -3537,9 +3597,7 @@ greetUser(name:string) string => {
 }
 ```
 
-In the `greetUser` function the `string` type is enforced, but in this case, the compiler will just ignore that and say: "Okay, I understand that! I'll do nothing `||`".
-
-**Multiple parameters:**
+### Multiple parameters
 
 You separate parameters using `,` commas. Yes! `,` Separation Intent!
 
@@ -3550,7 +3608,7 @@ result = add(5, 10, 15) -- You also separate values by commas
 "{result}" -- 30
 ```
 
-**Default parameter value:**
+### Default parameter value
 
 ```lua
 greet(name:string = "Stranger") => {
@@ -3562,7 +3620,7 @@ greet() -- Hello, Stranger
 
 When using default parameter values you don't need to pass the Type Intent nor a type, because there's no way to be an Entity declaration.
 
-**Named Parameters:**
+### Named Parameters
 
 ```lua
 greet(name:string, greeting = "Hello", warm = false) => {
@@ -3583,7 +3641,7 @@ greet("Alice", warm: true)
 greet("Alice", greeting: "Hi")
 ```
 
-**Unnamed Parameters**
+### Spread Parameters
 
 If don't want to name your parameters you just do so with the  `..` Extent Intent:
 
@@ -3625,6 +3683,18 @@ add(a:int, b:int, ..numbers:int) => {
 -- Just for clarity names were used, but no need!
 result:= sum(a:10, b:20, 30, 50)
 ```
+
+### Checking Truthiness of a Function
+
+You can also check the truthness of a function like you do for Entities:
+
+```lua
+greet() => {}
+
+greet()..?  "Function doesn't return a value"
+```
+
+In the `greetUser` function the `string` type is enforced, but in this case, the compiler will just ignore that and say: "Okay, I understand that! I'll do nothing `||`".
 
 ### Changing External Entities
 
