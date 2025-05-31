@@ -1493,6 +1493,71 @@ today:int.. = (2025, 5, 6)
 gravity:float.. = (0, -9.81, 0)
 ```
 
+### Named Tuples (Structs + Tuples)
+
+To better understant Name Tuples, it may be useful to check the **Structs** section and **Entity Extension Definition**.
+
+Thanks to Wide keywordless nature, it was possible to create Named Tuples that can have behaviour through traits.
+
+The barebones syntax is like this:
+
+```lua
+Point{} = (float, float)
+```
+
+This is a **Point** Named Tuple that is both an empty Struct Point{} and Typle of types float.
+
+It can be used like so:
+
+```lua
+point:Point = (12.5, 20.3)
+point:= Point(12.5, 20.3)
+
+"{}, {}", point.1, point.2
+```
+
+But that alone would make no sense and it would be interesting if you could have behaviour.
+
+So you could create a Pointable trait with, say, a magnitude method:
+
+```lua
+::Pointable <
+  .magnitude() float => {
+    |(Self.1.powi(2)) + Self.2.powi(2)).sqrt()|
+  }
+/..Self>
+```
+
+And Use Entity Extension Defition instead or raw definition:
+
+```lua
+Point::(Pointable){} = (float, float)
+
+point:Point = (12.5, 20.3)
+point:= Point(12.5, 20.3)
+
+"{}, {}, {}", point.1, point.2, point.magnitude()
+```
+
+Another example with a Mutable:
+
+```lua
+::SafeableString <
+  inner() => {
+    |Self.1|
+  }
+
+  sanitize() => {
+    |Self.1 = Self.1.trim().replace("<", "&lt;").replace(">", "&gt;")|
+  }
+/..$Self>
+
+SafeString::(SafeableString){} = (string)
+
+safe:= SafeString("<script>alert('you are hacked')</script>").sanitize()
+"{}", safe.inner()
+```
+
 ### Set
 
 A Set is created using `{}` symbols and separating values by commas.
@@ -1739,31 +1804,41 @@ message:= "Hello, Wide!"
 
 ### Fixed Size Collections
 
-All Collections in Wide can have a fixed size:
+All Collections in Wide can have a fixed size.
+
+You just pass the number of elements you want appending it with a dot in the Entity name itself.
 
 ```lua
-numbers:[2] = [] -- Same as: [0, 0]
-numbers:[2] = [1] -- Same as: [1, 0]
-numbers:[2] = [1, 2] -- Same as: [1, 2]
-numbers:[2] = [1, 2, 3] ❌ -- Error!
+numbers.2
 ```
 
-Notice that the count is placed in after of the `:` Type Intent and the `=` Assignment Intent must be used forcebly:
+When you don't assign a value you must set the type:
 
 ```lua
-numbers:[2] -- Same as: [2]
-numbers:[2] = [] -- Same as: [0, 0]
+numbers.2:int = [] -- Same as: [0, 0]
+```
+
+But when you assign a value, you don't need to set a type, the compiler can infer it:
+
+```lua
+numbers.2: = [10, 20]
+```
+
+As that's a fixed sized, you can't add more items than defined:
+
+```lua
+numbers.2:int = [10, 20, 30] ❌ -- Error
 ```
 
 #### Multidimensional Collections
 
-You can have multidimensional collections:
+You can have multidimensional collections and you just nest the levels and separate the type with a dot. The following can just be a number alone inside the brackets:
 
 ```lua
-numbers:[3][3][3] = []
+numbers.3.3.3:int = []
 ```
 
-That will create an Array-like:
+That will create an 3x3x3 Array-like:
 
 ```text
 [
@@ -1784,8 +1859,6 @@ But if you want to set just individual members of the structure.
 Per member:
 
 ```lua
-numbers:[3][3][3] = []
-
 numbers.1.1.1 = 1
 numbers.2.2.2 = 2
 numbers.3.3.3 = 3
@@ -1810,14 +1883,12 @@ Output will be:
 Per chunck:
 
 ```lua
-numbers:[3][3][3] = []
-
 numbers.1.1 = [1]..
 numbers.2.2 = [2]..
 numbers.3.3 = [3]..
 ```
 
-⚠️ Notice the `..` is after [].
+⚠️ Notice the `..` is after `[]` and means spread in that matrix.
 
 Output will be:
 
@@ -1838,8 +1909,6 @@ Output will be:
 Per row:
 
 ```lua
-numbers:[3][3][3] = []
-
 numbers.1 = [1]..
 numbers.2 = [2]..
 numbers.3 = [3]..
@@ -1864,12 +1933,10 @@ Output will be:
 Per column:
 
 ```lua
-numbers:[3][3][3] = []
-
-numbers[1][1][1] = ..[9]
+numbers.1.1.1: = ..[9]
 ```
 
-⚠️ Notice the `..` is before [].
+⚠️ Notice the `..` is before `[]` now.
 
 Output will be:
 
@@ -1887,31 +1954,35 @@ Output will be:
 ]
 ```
 
-### Typed Collections
+When working with return types that return a collection you can be explicit.
 
-All Collections in Wide can have an explicit type:
+Spreading to infinity means that you don't how much items will be returned, but that it's a collection of that type:
 
 ```lua
-numbers:[]int
--- Same as: [0, 0]
+.User < />
 
-numbers:[2]int = []
--- Same as: [0, 0]
+getAllUsers() User.. => {
 
-numbers:[]int = [1, 2, 3]
--- Same as: [1, 2, 3]
-
-names:[]string
--- Same as: ["", ""]
-
-names:[2]string = []
--- Same as: ["", ""]
-
-names:[]string = ["Alice", "Mary", "Diane"]
--- Same as: ["Alice", "Mary", "Diane"]
+}
 ```
 
-But of course, why do that if Wide can infer it for you?
+Or you can be restrictive and pass a limited amount:
+
+```lua
+getPaginatedUsers() User.10 => {
+
+}
+```
+
+⚠️ When you pass `User.10` above you are strictly saying you want 10 User objects not more nor less!
+
+But you can be flexible and allow 10 or less:
+
+```lua
+getPaginatedUsers() ..User.10 => {
+
+}
+```
 
 ### `//` Inclusion Intent
 
@@ -1937,7 +2008,7 @@ numbers:= [10, 20, 30, 40, 50]
 And if the Collection has fixed size it works the same way:
 
 ```lua
-numbers:[5] = [10]
+numbers.5: = [10]
 
 "How many elements in 'numbers'?"
 "There are {} elements in 'numbers'", #/numbers/
@@ -4376,6 +4447,38 @@ Assigning value from another Entity:
 doSomething:bool = false
 thing:= <Thing do=doSomething />
 thing.do ? thing.doSomething()
+```
+
+### Spread Alias
+
+When you need to handle Collection Extensions, you can spread the alias and work as if it were a colletion itself
+
+A Named Tuple Point:
+
+```lua
+.Point <
+  (int, int)
+
+  .sum() {
+    |Self.1 + Self.2|
+  }
+/..Self>
+
+point:Point = (10, 20)
+```
+
+The could even be a Name List Point:
+
+```lua
+.Point <
+  [int.2]
+
+  .sum() {
+    |Self.1 + Self.2|
+  }
+/..Self>
+
+point:Point = [10, 20]
 ```
 
 ### Object static scope
