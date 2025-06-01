@@ -4407,7 +4407,7 @@ thing:= Thing.()
 
 You might be questioning why not `Thing()`? That's because functions are called like so. And using `.()` makes it clear it is an object not a function.
 
-**Adding Functions to Objects**
+### Adding Functions to Objects
 
 Objects are Entities that can have their own Entities and Functions.
 
@@ -4550,6 +4550,61 @@ The could even be a Name List Point:
 
 point:Point = [10, 20]
 ```
+
+### `%` Share Intent
+
+Whenever you see the Type Intent `%` (percent symbol) you can think:
+
+- it shares an object
+- it shares a memory address
+
+### Copying and Sharing Objects
+
+Objects are not passed by reference.
+
+If you want to make a reference to an object you must use the `%` Share Intent prefixing the name of the Entity and point to a valid object.
+
+```lua
+.Person <
+  .name:string
+/>
+
+$person:= <Person name="Alice"/>
+otherPerson:= person
+
+otherPerson.name = "John"
+
+"{}", person.name
+"{}", otherPerson.name
+```
+
+That will output:
+
+```text
+Alice
+John
+```
+
+That's because you copied the object Person.
+
+But if you want to just get a reference, you must prefix the entity with `%` Share Intent:
+
+```lua
+%samePerson:= person
+%samePerson.name = "John"
+
+"{}", person.name
+"{}", samePerson.name
+```
+
+The output now will be the same for both:
+
+```text
+John
+John
+```
+
+When using `%` Share Intent you get a shared reference, not a cloned object, and that applies to the entire entity. You cannot bind only a field. Shared references can only mutate the target if the original entity is mutable (declared with `$`). You cannot bind or mutate individual fields through %.
 
 ### Object static scope
 
