@@ -156,7 +156,7 @@ Whenever you see the Assignment Intent `=` (equal symbol) you can think:
 
 ## Entities
 
-From that you cansee how stated is managed in Wide.
+From that you can see how state is managed in Wide.
 
 Everything you can name in Wide is called an Entity.
 
@@ -1505,7 +1505,7 @@ The barebones syntax is like this:
 Point{} = (float, float)
 ```
 
-This is a **Point** Named Tuple that is both an empty Struct Point{} and Typle of types float.
+This is a **Point** Named Tuple that is both an empty Struct Point{} and Tuple of types float.
 
 It can be used like so:
 
