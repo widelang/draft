@@ -3696,62 +3696,90 @@ greet()..?  "Function doesn't return a value"
 
 In the `greetUser` function the `string` type is enforced, but in this case, the compiler will just ignore that and say: "Okay, I understand that! I'll do nothing `||`".
 
-### Changing External Entities
+### Changing Entities From Functions
 
-You can change external Entities by using the `$` State Intent after function invokation and passing the entities you want to allow mutate inside:
+When you need to change an Entity Inside or Outside a Function you must use the `$` State Intent in some specific places.
 
-```lua
-funcCall($name) $ $name
-```
+**First Case** — Shadowing a parameter
 
-Some examples:
+In this case you must place the `$` State Intent when defining a new Entity assigning an already existing parameter as its value:
 
 ```lua
-$name:= "Mary"
-$message:= "Hello"
-times:= 10
+() => {
+  x = 2
 
-greet(name = "Stranger", message = "Hello", times = 5) => {
-  name:= "Alice"
-
-  ~(times) {
-    "{message}, {name}!"
+  print_double(x:int) => {
+    -- here $x is shadowed to x from parameters
+    $x = x * 2
+    "{} from inside", x
   }
+
+  "{} from outside", x
 }
-
-"{message}" -- initial value STILL!
-"{name}" -- initial value STILL
-
-greet($name) -- Ordinary function call
-
-"{message}" -- initial value STILL!
-"{name}" -- initial value STILL
-
-/*
- Here function call will change the outside scope.
-*/
-greet($name) $ $name
-
-"{message}" -- initial value STILL!
-"{name}" -- initial value CHANGED!
-
-greet($name, $message) $ ($name, $message)
-
-"{name}" -- initial value CHANGED!
-"{message}" -- initial value CHANGED!
 ```
 
-There's no way to pass an Immutable!
+Output:
+
+```text
+4 from inside
+2 from outside
+```
+
+**Second Case** — Changing an inside entity
+
+In this case you must place the `$` State Intent like you usually do, be it assigning a constant value or an already existing parameter.
 
 ```lua
-greet($name, time:10) $ times ❌ -- Error cannot mutate immutable Entity 'times'!
+() => {
+  x = 2
 
-greet("John", "Hi") $ (name, message) ❌ -- Error cannot mutate immutable Object String
+  print_double(x:int) => {
+    -- Here $y is assigned the value of x, but not shadowed
+    $y = x
+    $y = y * 2
+    "{} from inside", y
+  }
+
+  "{} from outside", x
+}
 ```
+
+Output:
+
+```text
+4 from inside
+2 from outside
+```
+
+**Third Case** — Changing an external entity:
+
+In this case you place the `$` State Intent directly in the parameter. This will cause the outter Entity passed to the function to be changed as well.
+
+```lua
+() => {
+  x = 2
+
+  print_double($x:int) => {
+    x = x * 2
+    "{} from inside", x
+  }
+
+  "{} from outside", x
+}
+```
+
+Output:
+
+```text
+4 from inside
+4 from outside
+```
+
+⚠️ Notice that in the Third Case, `x` from outside has changed as well.
 
 ### Moving the scope of an Entity
 
-You can similarly move the scope of an Entity using the `<<` Move Intent:
+You can similarly move the scope of an Entity using the `<<` Move Intent before passing an entity to a Function:
 
 ```lua
 number1:= 10
@@ -3761,26 +3789,17 @@ add(a:int, b:int) => {
   |a + b|
 }
 
-"{number1}"
-"{number2}"
-sum:= add(number1, number2) << number1 -- number2 moved to sum Function scope
-"{sum}"
-"{number1}"
-"{number2}" ❌ -- Error 'number2' does not exist in this scope
+"{}", number1
+"{}", number2 ✅ -- Ok number still in scope
+
+sum:= add(number1, <<number2)
+
+"{}", sum
+"{}", number1
+"{}", number2 ❌ -- Error 'number2' does not exist in this scope
 ```
 
-And for moving Mutables:
-
-```lua
-$number2: 20 -- Mutable now
-
-"{number1}"
-"{number2}"
-sum:= add(number1, $number2) << $number2 -- $number2 moved to sum Function scope
-"{sum}"
-"{number1}"
-"{number2}" ❌ -- Error '$number2' does not exist in this scope
-```
+⚠️ The same is true for both Mutables os Immutables.
 
 ## Lambdas
 
@@ -3798,7 +3817,7 @@ fn() -- will print nothing!
 
 msg:= fn()
 
-"{msg}" -- will ouput "Do nothing"
+"{}", msg -- will ouput "Do nothing"
 ```
 
 When directly creating Lambda as values for Entities, it seems more pleasing and Mathematically correct to use the `=` operator.
@@ -3830,7 +3849,7 @@ greet = (name:string) => { "Hello, {name}!" }
 greet("Wide") -- Hello Wide!
 ```
 
-But when used `{}` and a value must be returned, the `||` Wall intent must be used:
+But when used `{}` and a value must be returned, the `||` Wall Intent must be used:
 
 ```lua
 add = (n:int, m:int) => {
@@ -3909,6 +3928,7 @@ greet("Hello") << $name
 -- Streaming coroutine (suspendable)
 fibonacci(n:int) ~> {
   a, b := 1, 1
+
   ~ (i = 1..n) {
     |a|
     a, b := b, a + b
@@ -3930,7 +3950,7 @@ fibonacci(n:int) ~> {
 
 ```lua
 -- Fast math generator (returnable)
-~square(n:int) => { |n * n| }
+~square(n:int) => n * n
 ```
 
 You can create Generator functions that return an Iterator just using the `~>` Iterator Intent arrow and returning (yielding) one or move values.
@@ -3975,7 +3995,7 @@ You can create an Iterator directly for the a generator Lambda:
 
 ```lua
 ~(item = () ~> {
-    |1|2|3|
+  |1|2|3|
 }) {
   "{item}"
 }
@@ -4005,7 +4025,7 @@ You can also create generators directly to consume in Iterators
 And that drives us to Named Iterators:
 
 ```lua
-~square(n:int) => { |n * n| }
+~square(n:int) => n * n
 
 squares:= ~(n = [1..5]) { square(n) }
 
@@ -4040,6 +4060,7 @@ If you want to stop execution immediately on error you can use assertion:
 division(n:int, m:int) int => {
   -- condition, message
   @(m == 0, "Cannot divide by {n} by {m}")
+
   |n / m|
 }
 
@@ -4051,6 +4072,7 @@ If you want to capture the error you can propagate using the empty `{}` Context 
 ```lua
 division(n:int, m:int) int => {
   @(m == 0, "Cannot divide by {n} by {m}"){}
+
   |n / m|
 }
 -- somewhere else in code
@@ -4064,7 +4086,7 @@ m:= 0
 result ? {
   "result is {result}"
 }
-. "{@result}" -- Output the error using the `@`as well
+. "{}", @result -- Output the error using the `@`as well
 ```
 
 You can also check directly agains `@` or destructure:
@@ -4073,7 +4095,7 @@ You can also check directly agains `@` or destructure:
 @(result) = division(n, m)
 
 !@ ? {
-  "Result is {result}"
+  "Result is {}", result
 }
 
 -- or
@@ -4081,7 +4103,7 @@ You can also check directly agains `@` or destructure:
 @{result, error} = division(n, m)
 
 !error ? {
-  "Result is {result}"
+  "Result is {}", result
 }
 ```
 
@@ -4092,7 +4114,7 @@ So can I get just the error? yep!
 
 !@ {
   result = division(n, m)
-  "Result is {result}"
+  "Result is {}", result
 }
 ```
 
@@ -4101,7 +4123,7 @@ You can also default to a value (in this case 0) using question.
 ```lua
 @(result) = division(n, m))?.0
 
-"{result}"
+"{}", result
 ```
 
 You can also self-capture a whole context for the error using `{}` placing the code inside it.
@@ -4113,7 +4135,7 @@ printUserData() => {
     users:= query("select from users")
 
     ~(user = user) {
-      "{user.name}"
+      "{}", user.name
     }
   }
 }
@@ -4146,7 +4168,7 @@ Just destructuring?
   ~({name, age} = users) ? {
     "{name} is {age} years old!"
   }
-} . "{@}" -- Will print "error fetching users" -- if an error occur
+} . "{}", @ -- Will print "error fetching users" -- if an error occur
 ```
 
 ## Async/Await Functions
@@ -4181,7 +4203,7 @@ Just pass the error inside () and its an awaited error checking:
   ~({name, age} = users) {
     "{name} is {age} years old!"
   }
-}  . "{@}"
+}  . "{}", @
 ```
 
 It's both awaiting and capturing the error Events at the same time with just one Intent!
@@ -4193,9 +4215,9 @@ Same as:
 
 !@ ? {
   ~({name, age} = users) {
-    "{name} is {age} years old!"
+    "{} is {} years old!", name, age
   }
-}  . "{@}"
+}  . "{}", @
 ```
 
 ### Concurrency
@@ -4275,7 +4297,7 @@ Greet(name: string) => <>
 </>
 ```
 
-Functional Component can have body, but for returning, you must enclose the `<></>` Fragment between `||` Wall Intent.
+Functional Component can have body, but for returning, you must place the `<></>` Fragment between at the end of the function.
 
 Component `<HomePage />`:
 
@@ -4295,20 +4317,18 @@ HomePage() => {
     -- userName: "John" ❌ Error, cannot change Immutable state
   }
 
-  |
-    <>
-      <Main> -- Functional Component
-        <header>
-          <h1>Welcome!</h1>
-        </header>
-        <Greet name={userName} /> -- Functional Component
-        <button onclick={changeUser}>
-          Change Username
-        </button>
-        <footer>&copy; {currentDate}</footer>
-      </Main>
-    </>
-  |
+  <>
+    <Main> -- Functional Component
+      <header>
+        <h1>Welcome!</h1>
+      </header>
+      <Greet name={userName} /> -- Functional Component
+      <button onclick={changeUser}>
+        Change Username
+      </button>
+      <footer>&copy; {currentDate}</footer>
+    </Main>
+  </>
 }
 ```
 
