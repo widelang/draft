@@ -3757,7 +3757,7 @@ In this case you place the `$` State Intent directly in the parameter. This will
 
 ```lua
 () => {
-  x = 2
+  $x = 2 -- x must be mutable outside as well!
 
   print_double($x:int) => {
     x = x * 2
@@ -3775,7 +3775,7 @@ Output:
 4 from outside
 ```
 
-⚠️ Notice that in the Third Case, `x` from outside has changed as well.
+⚠️ Notice that in the Third Case, `x` from outside has changed as well, but it must also be made Mutable.
 
 ### Moving the scope of an Entity
 
@@ -3800,6 +3800,65 @@ sum:= add(number1, <<number2)
 ```
 
 ⚠️ The same is true for both Mutables os Immutables.
+
+### Objects as Parameters
+
+When working with objects the rules for mutability inside functions also apply. The function will respect the Shared Intent applied outside and won't mutate anything if at least one of them is passed to a Mutable parameter.
+
+```lua
+person:= <Person name="Object"/>
+%otherPerson = person
+%otherPerson.name = "Reference"
+
+printPerson(person:Person, otherPerson:Person) => {
+  otherPerson.name = "Function"
+  "{} meets {}", person.name, otherPerson.name
+}
+
+"{} meets {}", person.name, otherPerson.name
+```
+
+Output:
+
+```text
+Function meets Function
+Alice meets Kyle
+```
+
+Using mutable parameters:
+
+```lua
+$person:= <Person name="Object"/>
+%otherPerson = person
+%otherPerson.name = "Reference"
+
+printPerson($person:Person, $otherPerson:Person) => {
+  otherPerson.name = "Function"
+  "{} meets {}", person.name, otherPerson.name
+}
+
+"{} meets {}", person.name, otherPerson.name
+```
+
+Output:
+
+```text
+Function meets Function
+Function meets Function
+```
+
+But that won't work if `otherPerson` is not mutable:
+
+```lua
+$person:= <Person name="Object"/>
+%otherPerson = person
+%otherPerson.name = "Reference"
+
+printPerson($person:Person, otherPerson:Person) => {
+  otherPerson.name = "Function" ❌ -- Error: Cannot mutate immutable otherPerson
+  "{} meets {}", person.name, otherPerson.name
+}
+```
 
 ## Lambdas
 
