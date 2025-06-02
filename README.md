@@ -2641,9 +2641,52 @@ $counter:= 1
 
 Whenever you see the Wall Intent `||` (2 pipe symbols) you can think:
 
-- It stops flow on Iterators
-- It has return value
-- It yieds 1 or more values
+- It stops flow in Iterators or functions
+
+- It yields one or more values (in generator-like constructs)
+
+- It acts as an early return, with or without a value
+
+Just notice that `||` is not the logical `OR` operator — despite using the same symbol. It's an intent marker, not a boolean operator.
+
+You must pay attention that `||` cannot appear alone as the final token on a line without an explicit return value — it must always be wrapped inside a block if not returning a value.
+
+At a deeper level, a return (or Wall) can be seen as a logical disjunction —
+"If this condition is true, then short-circuit the rest of the function."
+
+Which is precisely what a boolean OR does:
+
+```text
+A || B
+```
+
+Means:
+
+- If A is true, don't evaluate B.
+
+- Just return A's truth.
+
+Now compare this Wide construct:
+
+```lua
+x == 4 ? {
+  ||
+}
+```
+
+That's saying:
+
+If x == 4, don't proceed — short-circuit this path.
+
+So in a way, both are philosophically equivalent:
+
+- One is a logic gate
+
+- The other is a control boundary
+
+But both express:
+
+"If this condition is meaningful, skip the rest."
 
 ### `>>` Flow Intent
 
