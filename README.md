@@ -4683,7 +4683,24 @@ John
 John
 ```
 
-When using `%` Share Intent you get a shared reference, not a cloned object, and that applies to the entire entity. You cannot bind only a field. Shared references can only mutate the target if the original entity is mutable (declared with `$`). You cannot bind or mutate individual fields through %.
+When using `%` Share Intent you get a shared reference, not a cloned object, and that applies to the entire entity. You cannot bind only a field. Shared references can only mutate the target if the original entity is mutable (declared with `$`). You cannot bind or mutate individual fields through `%`.
+
+Wide treats the whole object and its structure as a shared reference, but mutability is not recursive. You must make the object immutable to change its fields.
+
+```lua
+.Person <
+  $name:string
+  age:int
+/>
+
+$person := <Person name="Alice" age=30 />
+%ref := person
+
+ref.name = "Bob"      ✅ -- Allowed: field is mutable
+ref.age = 31          ❌ -- Error: 'age' is not declared as mutable
+```
+
+When passing objects to a function, Wide respects mutability and shareability at the call site — never in the function parameter list.
 
 ### Object static scope
 
