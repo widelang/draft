@@ -37,7 +37,7 @@ It doesn't have keywords (at least not for aliased types).
 
 It lets **humans speak logic** — cleanly, expressively, and across paradigms.
 
-Wide isn’t just about code — it's about communication.
+Wide isn't just about code — it's about communication.
 
 It's about intent — and Wide delivers it.
 
@@ -3582,20 +3582,57 @@ See why the previous `// greet()` checked for `||`? Because there's no returned 
 
 ### Early Return
 
-There cases where you may want to just return telling the compiler that you couldn't find a match, of a situation where you just say: "stop from here!". That's the case for what most programming languages call **Early Return**.
+There are cases where you may want to immediately stop execution and return early — either because the input doesn't match a valid case, or some condition demands an exit. This is commonly called **early return** or **early exit** in many programming languages.
 
-Just place the || Wall Intent anywhere you want to early return and you'll obtain the same result.
+In Wide, you use the `||` **Wall Intent** to express this.
 
 ```lua
-greetUser(name:string) string => {
-  name..? {
-    -- returns message
-    |"Hello, {name}!"|
-  }
+f(x: i32) => {
+  x <= 0 ? { || }
+  x == 4 ?? { || }
+  x == 7 ?? { || }
 
-  || -- No name, return nothing
+  "{}", x
+}
+
+f(5)
+```
+
+You might wonder — can't this be simplified using a compound condition?
+
+```lua
+f(x: i32) => {
+  x <= 0 || x == 4 || x == 7 ? ||  ❌ -- Not allowed!
+  "{}", x
 }
 ```
+
+Yes, it's syntactically tempting — but it's semantically ambiguous. That || could be mistaken as a logical operator rather than an early return.
+
+To avoid this confusion, Wide prohibits inline Wall Intents after complex conditions. The compiler will raise an error and suggest making the intent explicit:
+
+```lua
+f(x: i32) => {
+  x <= 0 || x == 4 || x == 7 ? {
+    ||
+  }
+
+  "{}", x
+}
+```
+
+This ensures that || is always visually interpreted as a control-flow break, not part of a logic chain.
+
+If you're returning an actual value — not a Wall — you can inline safely:
+
+```lua
+f(x: i32) => {
+  x <= 0 || x == 4 || x == 7 ? |0|
+  "{}", x
+}
+```
+
+Returning |0| is unambiguous — it's clearly a value and can be safely inlined.
 
 ### Multiple parameters
 
