@@ -3063,7 +3063,7 @@ So in summary:
 
 As you saw in the Type-Values section, you can't cast any type into boolean, just numbers into booleans.
 
-But you can check the truthness of any Entity using the `..?` or `?..` Truthness Intents.
+But you can check the truthiness of any Entity using the `..?` or `?..` Truthiness Intents.
 
 They are respectively called **Boolean Truthiness** and **Object Truthiness**.
 
@@ -3097,7 +3097,7 @@ The difference from Boolean to Spread Truthiness is that the last will return th
 
 Just prefix the name of any Entity with that in a Question, and you'll get a boolean value from that.
 
-In the following example Mutables will be used to make clear the Intent, because people will mostly check truthness on Entities that might have changed their states, but it will work the same for Immutables, Contants, Functions, Objects, and anything that returns a value.
+In the following example Mutables will be used to make clear the Intent, because people will mostly check truthiness on Entities that might have changed their states, but it will work the same for Immutables, Contants, Functions, Objects, and anything that returns a value.
 
 ```lua
 $name:string
@@ -3666,7 +3666,7 @@ result:= times10(10)
 "{result}" -- 100
 ```
 
-Back to the case of default `||` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthness of the returned value:
+Back to the case of default `||` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthiness of the returned value:
 
 ```lua
 sum(n:int, m:int) => {
@@ -3826,7 +3826,7 @@ result:= sum(a:10, b:20, 30, 50)
 
 ### Checking Truthiness of a Function
 
-You can also check the truthness of a function like you do for Entities:
+You can also check the truthiness of a function like you do for Entities:
 
 ```lua
 greet() => {}
