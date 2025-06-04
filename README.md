@@ -1698,6 +1698,47 @@ initials ~= (word.1) <~ name.split(" ")
 -- Output: "MAS"
 ```
 
+### Infinity Placeholder
+
+Every time you create a Data Structure it you can use the `...` Infinity placeholder to tell others that some Entity will have additional members in the future.
+
+Mostly, you'll use it in Mutables, but you are not restricted to that.
+
+```lua
+$names:= ["Alice", ...]
+
+-- somewhere after 1000 lines of code
+
+$names.+("John")
+$names.+("Mary")
+$names.+("Carol")
+```
+
+The Infinity Placeholde can be used as the only value if none is provided and the compiler can even infer that it will be a data structure or Collection, as you'll see very soon:
+
+```lua
+$names:= ...
+
+-- somewhere after 1000 lines of code
+
+$names.+("Alice")
+$names.+("John")
+$names.+("Mary")
+$names.+("Carol")
+```
+
+You can't reassign a value as `...`:
+
+```lua
+$names:= ...
+
+-- somewhere after 1000 lines of code
+
+$names.+("Alice")
+
+$names = ... ❌ -- Error: cannot reassign to Infinity
+```
+
 ## Collections
 
 Wide has some basic Data Structure that can have their types inferred. But you can be explicit and set them. You must use the `..` Extent after the type name, for example: `:string..` in order to say that they are of those types.
@@ -1712,7 +1753,7 @@ myDictionary{string}:string.. = {}
 myString:string.. = ""
 ```
 
-But the compiler is mostly able to infer it, so you can just use their symbols:
+But the compiler is able to infer it, so you can just use their symbols:
 
 ```lua
 myList:= ["a", "b", "c"]
@@ -1757,7 +1798,7 @@ Under the hook they are all an extension of Collection:
 
 Wide doesn't now what Data Structure to use yet!
 
-So you can you the `...` Infinity itself as the initial value, and in both cases, you don't need to use `..` Extent because it's why the `..` was there before:
+So as cited in the Infinty Placeholder section, you can use `...` Infinity itself as the initial value , and in both cases, you don't need to use `..` Extent because it's why the `..` was there before:
 
 ```lua
 myList:List{string} = ...
@@ -5117,7 +5158,7 @@ Every object can have 4 ways for you to access them called:
 - static *(in Isolation Intent - has no symbol - and doesn't preserve scope characteristics)*
 - public *(using `.` preserves scope characteristics)*
 - protected *(using `..` preserves scope characteristics)*
-- private *(using `...` - local to object)*
+- private *(using `!` - local to object)*
 
 ⚠️ In this documentation it made sense keep the OOP jargons, but for Wide core it has other names:
 
@@ -5128,15 +5169,6 @@ Every object can have 4 ways for you to access them called:
 
 They mean the same thing as in every OOPL.
 
-Visibility is just how many dots you use:
-
-| Symbol | Level | Meaning             | Phrase                            |
-|--------|--------|---------------------|------------------------------------|
-| *(none)* | 0      | Static              | **no dot means static**            |
-| `.`      | 1      | Public              | **one dot shares it**              |
-| `..`     | 2      | Protected           | **two dots guards it**             |
-| `...`    | 3      | Private (Self-only) | **three dots hides it**            |
-
 Example of extending an Object:
 
 ```lua
@@ -5145,12 +5177,12 @@ Example of extending an Object:
   .name:string -- public
   ..value:obj -- protected
 
-  ...instance:Thing -- private
+  !instance:Thing -- private
 
   count() int => count -- static
   .name() string => .name -- public
   ..value() obj => .value -- protected
-  ...instance() Thing => .instance ?.. <Thing /> -- private
+  !instance() Thing => .instance ?.. <Thing /> -- private
 />
 
 -- Thing is extended by Something
@@ -5164,12 +5196,12 @@ In the above example Something becomes:
   count:int
   .name:string
   ..value:obj
-  `...instance:Thing` -- not extended
+  `!instance:Thing` -- not extended
 
   count() int: count
   .name() string: .name
   ..value() obj: .value
-  `...instance():Thing` -- not extended
+  `!instance():Thing` -- not extended
 />
 ```
 
@@ -5224,7 +5256,7 @@ Promoting Meta Entities from Constructor Lambda
   (
     .do:bool, -- Has Acessor, is promoted to Meta Entity
     ..what:string, -- Has Acessor, is promoted to Meta Entity
-    ...when:string = "Never!", -- Has Acessor, is promoted to Meta
+    !when:string = "Never!", -- Has Acessor, is promoted to Meta
     nothing: false, -- Has NOT, is NOT promoted
   ) => nothing ? "Doing nothing"
 
@@ -5256,7 +5288,7 @@ But you can make explict you intentions and separate constructor promoted entiti
 .Thing <
   .(do:bool)
   ..(what:string)
-  ...(when:string = "Never!")
+  !(when:string = "Never!")
 
   -- Object Function
   .doSomething() => {
@@ -5322,19 +5354,22 @@ Both cases the output will be:
 
 ### Abstract Extent Objects
 
-If want to just blueprint an Object's Intents that provides or not some default behaviour you can abstract placing a `!` Not Intent before the Object's name, its Entities and/or Functions.
+Abstract Objects are objects that you use to Model other objects.
 
-Protected, Public, Static Entities and Functions can't be abstracted and just used inside the abstract extent content.
+Their member entities may or not have values and their member methods may or not have body. When this happen these members must be both assign a value or have a body implemented.
+
+All of its member respect the same visibility rules for Objects (public, protected, and private). The only exception is for static members that can't be used in object that use abstract objects as blueprints.
+
+When entities have a value or methods have a body, you can use them as is. But if are free to change them respecting their signatures and structures.
 
 ```lua
--- Notice that ".." turned ".!"
-.!Thing <
+Thing <
   -- static Entity cannot be abstracted but used in context
   thingName: "Thing"
 
-  .!name:string
+  .name:string
 
-  .!instance:obj
+  .instance:obj
 
   -- static Function cannot be abstracted but used in context
   thingName() => thingName
@@ -5349,28 +5384,17 @@ Protected, Public, Static Entities and Functions can't be abstracted and just us
 />
 ```
 
-❌ If you don't provide implementation for everything marked as `.!` Wide will break with an error.
-
-This is how Something will look after abstracting an Extent:
+This is how Something will look after abstracting an Abstract Object:
 
 ```lua
 .SomeThing .!Thing <
-  -- Notice that now "!" turned "."
   .name:string = "Something"
-
-  -- Notice that now "!" turned "."
   .instance:Something = </>
 
-  -- Notice that now "!" turned "."
   .instance() => Self.instance
-
-  -- Notice that now "!" turned "."
-  .name() string => {
-    -- not abstract Function can be modified
-    |
+  .name() string => {|
     .name ?.. "How is it possible for me not having a name?"
-    |
-  }
+  |}
 /Self>
 ```
 
@@ -5688,7 +5712,7 @@ You can change Trait's visibility:
 .Talker <
   ::(A, B) {
     B.smallTalk(): B.., -- just change the Accessor
-    A.bigTalk(): A... -- just change the Accessor
+    A.bigTalk(): A! -- just change the Accessor
   }
 />
 ```
@@ -5699,8 +5723,8 @@ You can mix conflict resolution and aliasing
 .Talker <
   ::(A, B) {
     B.smallTalk(): A.., -- Like if A<..smallTalk()/>
-    A.bigTalk(): B..., -- Like if B<...bigTalk()/>
-    B.bigTalk(): ...talk -- like if B<...talk()/>
+    A.bigTalk(): B!, -- Like if B<!bigTalk()/>
+    B.bigTalk(): !talk -- like if B<!talk()/>
   }
 />
 ```
@@ -5988,7 +6012,7 @@ When extending Entities using inline Entity Extension Definition, naming conflic
 Wide allows you to resolve these conflicts using an explicit resolution block, but with a key restriction:
 
 - Only public members `.` can be inherited or resolved.
-- Protected `..` and private `...` members are not allowed in this context.
+- Protected `..` and private `!` members are not allowed in this context.
 
 This design ensures that Entity Extensions are purely public-facing compositions, safe and visible to users, and free from encapsulation complexity.
 
@@ -6082,7 +6106,7 @@ Another example:
 
 ```lua
 .Stack{T} <
-  ...stack: T..
+  !stack: T..
 
   .push(item: T) => {
     Self.stack.(push item)
@@ -6114,9 +6138,9 @@ stringStack.push(aNumber)
 Multiple type parameters can be defined within the angle brackets {} when declaring a generic function, interface, trait, enum, struct or object. Each type parameter represents a distinct type that can be specified when the generic is used.
 
 ```lua
-processData{T, U}(input1: T, input2: U) T, U => {
-  |[input1, input2]|
-}
+processData{T, U}(input1: T, input2: U) T, U => {|
+  [input1, input2]
+|}
 
 result:= processData{int, string}(10, "hello")
 --  above result is of type [int, string]
@@ -6125,9 +6149,7 @@ result:= processData{int, string}(10, "hello")
 Union types (|) allow a generic type to accept values of different types. This is useful when a function or component needs to handle a variety of input types.
 
 ```lua
-handleInput{T}(input: T) T // T: string | int => {
-  |input|
-}
+handleInput{T}(input: T) T // T: string | int => {|input|}
 
 strResult:= handleInput("world") -- input is of type string
 numResult:= handleInput(20) -- input is of type int
@@ -6144,9 +6166,9 @@ Intersection types (&) combine multiple types into one, requiring a value to sat
   .age: int
 />
 
-processEntity{T}(entity: T) string // T::(HasName & HasAge) => {
-  |"{entity.name} is {entity.age} years old"|
-}
+processEntity{T}(entity: T) string // T::(HasName & HasAge) => {|
+  "{entity.name} is {entity.age} years old"
+|}
 
 person:= <
   name: "John",
@@ -6679,13 +6701,27 @@ You can go Async with Pipes:
   >> saveToDB()
 ```
 
-## Infinity
+## `...` Infinity and Chrono Intent
 
-In Wide the Infinity is represented by `...`.
+Infinity and Chrono are tweens but mean different but ambiguous things.
 
-The `..` Extent Intent is a cousing of it.
+Infinity means: "This has no upper bound. It continues." Used in mathematics and symbolic constructs to represent openness, non-finiteness, or future extension.
 
-Wide has 3 symbols for representing Infinity:
+Chrono means: "This relates to time itself. The present. The unfolding of moments." Used in object declarations or invocations, shifts from infinity into time semantics.
+
+Both are represented by `...`.
+
+Despite being semantically distinct, both meanings share the same symbolic form — because Wide is a language of intent.
+
+There are only three foundational Intent symbols in Wide that govern entity behavior, called the **Product Roots** of Wide:
+
+The `.` Resolution Intent
+The `..` Extent Intent
+The `...` Infinty Intent (itself)
+
+### Mathematical Infinity
+
+Wide has 3 symbols for representing Mathematical Infinity:
 
 `..-` is like a number that's unbelievably small (negative).
 
@@ -6723,6 +6759,36 @@ And you can even specify the types you wanna to work with:
   Inf:int = ...,
   +Inf:int = +..,
 }
+```
+
+### Chronos Object
+
+When used as a Chronos, the `...` symbols acts like a Date and Time library of sorts!
+
+Take its method `now()` as an example:
+
+```lua
+now = ...now()
+```
+
+You can't use `:=` Infer Intent, nor the `$` State Intent with Chronos, just the `=` Assignment Intent, because you just can't change it.
+
+You can destructure the whole `...` object or its members alone:
+
+```lua
+
+now = ...
+"{}", now() -- 2030-10-27T14:30:00.123
+
+year, month, day, hour, minute, second = ...now()
+
+"The date is {}-{}-{} and the time is {}:{}:{}.",
+year,
+month,
+day,
+hour,
+minute,
+second
 ```
 
 ## Type Checking
