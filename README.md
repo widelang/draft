@@ -1698,6 +1698,140 @@ initials ~= (word.1) <~ name.split(" ")
 -- Output: "MAS"
 ```
 
+## Collections
+
+Wide has some basic Data Structure that can have their types inferred. But you can be explicit and set them. You must use the `..` Extent after the type name, for example: `:string..` in order to say that they are of those types.
+
+Here are all the basic Data Structure typed for string:
+
+```lua
+myList:string.. = []
+myTuple:string.. = ()
+mySet:string.. = {}
+myDictionary{string}:string.. = {}
+myString:string.. = ""
+```
+
+But the compiler is mostly able to infer it, so you can just use their symbols:
+
+```lua
+myList:= ["a", "b", "c"]
+myTuple:= ("a", "b", "c")
+mySet:= {"a", "b", "c"}
+myDictionary:= {"a": "1", "b": "2", "c": "3"}
+myString:= "a b c"
+```
+
+But the good news is that their also Collections in Wide, and you can do this:
+
+```lua
+myList:List{string} = []
+myTuple:Tuple{string} = ()
+mySet:Set{string} = {}
+myDictionary:Dict{string,string} = {}
+-- myString:String{string} = ""
+myString:String = ""
+```
+
+Notice that there's no `..` Extent Intent for them. That's because they use Generics behind the scenes.
+
+In the case of String, there's a necessary redundancy at syntax level, and for it you don't need to type it, but the commented line is valid.
+
+Their type can be inferred as well when you pass values to them:
+
+```lua
+myList:List = ["a", "b", "c"]
+myTuple:Tuple = ("a", "b", "c")
+mySet:Set = {"a", "b", "c"}
+myDictionary:Dict = {"a": "1", "b": "2", "c": "3"}
+myString:String = "a b c"
+```
+
+Under the hook they are all an extension of Collection:
+
+```lua
+..Collection{T} <
+  .items:T..
+>
+```
+
+Wide doesn't now what Data Structure to use yet!
+
+So you can you the `...` Infinity itself as the initial value, and in both cases, you don't need to use `..` Extent because it's why the `..` was there before:
+
+```lua
+myList:List{string} = ...
+myTuple:Tuple{string} = ...
+mySet:Set{string} = ...
+myDictionary:Dict{string,string} = ...
+myString:String = ...
+
+myList:List = ...
+myTuple:Tuple = ...
+mySet:Set = ...
+myDictionary:Dict = ...
+myString:String = ...
+```
+
+### Custom Types and Collections
+
+You can create custom types that can be used along with Collections of any Data Structure.
+
+Imagine a basic object called User:
+
+```lua
+.User < />
+```
+
+When you create an object it automatically translates to a custom type that you can mentally imagine like an **Entity Extension Definition** for types:
+
+```lua
+:User.(User) = </>
+```
+
+And now you can use it like so:
+
+```lua
+users:User.. = []
+users:User.. = ()
+users:User.. = {}
+users:Dict{string, User} = ...
+
+-- or just:
+users:User = ...
+
+usersList:List{User} = ...
+usersTuple:Tuple{User} = ...
+usersSet:Set{User} = ...
+usersDictionary:Dict{string, User} = ...
+```
+
+### Collection used as return type
+
+When working with return types that return a collection you can use Type Spread.
+
+Spreading a type means that you don't how much items will be returned, but that it's a collection of that type:
+
+```lua
+.User < />
+
+getAllUsers() User.. => {}
+```
+
+Or you can be restrictive and pass a limited amount:
+
+```lua
+getPaginatedUsers() User.10 => {}
+```
+
+⚠️ When you pass `User.10` above you are strictly saying you want 10 User objects not more nor less!
+
+But you can be flexible and allow 10 or less:
+
+```lua
+getPaginatedUsers() ..User.10 => {}
+```
+
 ## Destructuring
 
 Destructuring in a way to unpack values from arrays and objects into distinct Entities.
@@ -1710,7 +1844,7 @@ Depending on the Collection order will not be preserved.
 
 Entities created by destructuring a Collection will cause to create Constant-like Immutable Entities.
 
-**List**
+### List
 
 ```lua
 user:= ["Mary", 35, 10000.00]
@@ -1733,7 +1867,7 @@ Entities created at destructuring are all Immutable and can be shadowed.
 
 For Tuples, Sets, and Dictionaries you'll mostly do the same, but Sets won't preserve the order.
 
-**Tuple**
+### Tuple
 
 ```lua
 {name, age, city}:= ("Alice", 25, "New York")
@@ -1745,7 +1879,7 @@ For Tuples, Sets, and Dictionaries you'll mostly do the same, but Sets won't pre
 "{user.1} is {user.2} years old and ives in {user.3}"
 ```
 
-**Set**
+### Set
 
 ```lua
 lotteryCompetitors:= {"Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"}
@@ -1765,7 +1899,7 @@ lotteryCompetitors:= {"Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"}
 " #3 {winners.3}"
 ```
 
-**Dictionary**
+### Dictionary
 
 ```lua
 post:= {
@@ -1785,7 +1919,7 @@ post:= {
 "- {tags.3}"
 ```
 
-**String**
+### String
 
 Strings are Immutable, but can accessed like Lists.
 
@@ -1802,7 +1936,7 @@ message:= "Hello, Wide!"
 "{letter.5}" -- o
 ```
 
-### Fixed Size Collections
+## Fixed Size Collections
 
 All Collections in Wide can have a fixed size.
 
@@ -1830,7 +1964,7 @@ As that's a fixed sized, you can't add more items than defined:
 numbers.2:int = [10, 20, 30] ❌ -- Error
 ```
 
-#### Multidimensional Collections
+## Multidimensional Collections
 
 You can have multidimensional collections and you just nest the levels and separate the type with a dot. The following can just be a number alone inside the brackets:
 
@@ -1952,36 +2086,6 @@ Output will be:
     [9, 9, 9], [0, 0, 0], [0, 0, 0]
   ],
 ]
-```
-
-When working with return types that return a collection you can be explicit.
-
-Spreading to infinity means that you don't how much items will be returned, but that it's a collection of that type:
-
-```lua
-.User < />
-
-getAllUsers() User.. => {
-
-}
-```
-
-Or you can be restrictive and pass a limited amount:
-
-```lua
-getPaginatedUsers() User.10 => {
-
-}
-```
-
-⚠️ When you pass `User.10` above you are strictly saying you want 10 User objects not more nor less!
-
-But you can be flexible and allow 10 or less:
-
-```lua
-getPaginatedUsers() ..User.10 => {
-
-}
 ```
 
 ### `//` Inclusion Intent
@@ -5978,15 +6082,15 @@ Another example:
 
 ```lua
 .Stack{T} <
-  ...stack: []T
+  ...stack: T..
 
   .push(item: T) => {
     Self.stack.(push item)
   }
 /{Self}>
 
-numberStack:Stack = <{Int}/>
-stringStack:Stack = <{string}/>
+numberStack:Stack{int} = </>
+stringStack:Stack{string} = </>
 
 aString:= "A String"
 aNumber:= 100
@@ -6040,8 +6144,7 @@ Intersection types (&) combine multiple types into one, requiring a value to sat
   .age: int
 />
 
-processEntity{T}(entity: T) string
-// T: HasName & HasAge => {
+processEntity{T}(entity: T) string // T::(HasName & HasAge) => {
   |"{entity.name} is {entity.age} years old"|
 }
 
@@ -6223,7 +6326,7 @@ You can also bind traits to Enums:
 ### Constant-like Enums
 
 ```lua
-# Result <
+#Result <
   Success(u8)
   Failure(u16, char)
   Uncertainty
@@ -6233,7 +6336,7 @@ You can also bind traits to Enums:
 Could be just the Union of `Success`, `Failure`, and `Uncertainty` constants:
 
 ```lua
-# Result = Success{u8} | Failure{u16, char} | Uncertainty
+#Result = Success{u8} | Failure{u16, char} | Uncertainty
 ```
 
 😮 That proves WHY enums are just constants grouped in Wide.
