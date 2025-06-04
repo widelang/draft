@@ -3022,30 +3022,6 @@ In the above example, you must use {} to nest, because that could mean totally d
 
 Wide has no null, nil, void, None, Option madness keywords to mean voidness.
 
-If you need to check the existence of a value, you check agains it's state just passing the Entity and using the `?.` symbols together.
-
-```lua
-name:string  -- string is a type (alias), not the value
-""Welcome, {name ?. "Stranger"}!""
-```
-
-That will print:
-
-```text
-Welcome, Stranger
-```
-
-```lua
-name:= "Alice"
-""Welcome, {name ?. "Stranger"}!""
-```
-
-That will print:
-
-```text
-Welcome, Alice!
-```
-
 ### Question Expressions and Sentences
 
 There are two structural forms of the `?` Question Intent:
@@ -3083,13 +3059,43 @@ So in summary:
 
 - Call `condition ? "Yes" . "No"` a Question Expression.
 
-### Checking the Truthness of An Entity
+### Checking the Truthiness of An Entity
 
 As you saw in the Type-Values section, you can't cast any type into boolean, just numbers into booleans.
 
-But you can check the truthness of an Entity using the `..?` Truthness Intent.
+But you can check the truthness of any Entity using the `..?` or `?..` Truthness Intents.
 
-Just prefix the name of any Entity with that in a Question, and you'll get a true of false value for that.
+They are respectively called **Boolean Truthiness** and **Object Truthiness**.
+
+In both cases, when checking the Truthiness there the evaluated value can return true or false:
+
+| **Entity / Value**         | **Type**           | **Truthy / Falsy** | **Check**       | **Notes**                                                       |
+| -------------------------- | ------------------ | ------------------ | --------------- | --------------------------------------------------------------- |
+| `true`, `1`, `yes`, `on`   | `bool`             | ✅ Truthy           | `bool..?`       | Aliases of truth                                                |
+| `false`, `0`, `no`, `off`  | `bool`             | ❌ Falsy            | `bool..?`       | Aliases of false                                                |
+| `""`                       | `string`           | ❌ Falsy            | `name..?`       | Empty string                                                    |
+| `"Alice"`                  | `string`           | ✅ Truthy           | `name..?`       | Any non-empty string                                            |
+| `0`                        | `int`              | ❌ Falsy            | `value..?`      | Zero is falsy                                                   |
+| Non-zero int               | `int`              | ✅ Truthy           | `value..?`      | Including negatives                                             |
+| `0.0`, `0.00`              | `float`, `double`  | ❌ Falsy            | `value..?`      | Literal zero floats                                             |
+| Non-zero float             | `float`, `double`  | ✅ Truthy           | `value..?`      |                                                                 |
+| `[]`, `{}`, `()`           | List, Set, Tuple   | ❌ Falsy            | `collection..?` | Empty collections                                               |
+| Non-empty `[]`, `{}`, `()` | List, Set, Tuple   | ✅ Truthy           | `collection..?` | Length > 0                                                      |
+| `</>`                      | Object             | ❌ Falsy            | `obj..?`        | Uninstantiated / empty object                                   |
+| `<Person name="Alice"/>`   | Object             | ✅ Truthy           | `obj..?`        | At least one assigned field                                     |
+| `null`, `undefined`        | ❌ Not in Wide      | ❌ N/A              |                 | Wide does not support null/undefined                            |
+| `function() {}`            | `fn`               | ✅ Truthy           | `fn..?`         | All valid functions                                             |
+| Unassigned function        | `fn`               | ❌ Falsy            | `fn..?`         | No body                                                         |
+| `::TraitObject`            | Trait-bound object | ✅ Truthy           | `obj..?`        | Traits don't affect truthiness                                  |
+| `%ref`                     | Shared reference   | Mirrors source     | `%x..?`         | Depends on truthiness of original                               |
+| `$value`                   | Mutable Entity     | ❌ until assigned   | `$value..?`     | Must be assigned to be truthy                                   |
+| `value?..`                 | —                  | ✅ if truthy        | `value?..`      | Spread variant: returns actual value or triggers fallback logic |
+
+The difference from Boolean to Spread Truthiness is that the last will return the value that can be used like a chain.
+
+#### Boolean Truthiness
+
+Just prefix the name of any Entity with that in a Question, and you'll get a boolean value from that.
 
 In the following example Mutables will be used to make clear the Intent, because people will mostly check truthness on Entities that might have changed their states, but it will work the same for Immutables, Contants, Functions, Objects, and anything that returns a value.
 
@@ -3162,7 +3168,13 @@ salary..? "Has salary" . "Has NOT salary"
 isMarried..? "Is Married" . "Is NOT married"
 ```
 
-Now, look how cool it gets with objects:
+#### Spread Truthiness
+
+The Boolean Truthiness is great if you want to check if an Entity has a value or if an Object has state.
+
+But there are cases where you must immediately chain logic, here is where the `?..` Spread Truthiness has a special place because it allows to you to chain logic or even spread an Object members.
+
+Consider this basic object and it's resolution:
 
 ```lua
 .User <
@@ -3170,15 +3182,63 @@ Now, look how cool it gets with objects:
 />
 
 $user:User </>
-
-user..? "Hello, {user.name}" . "Who are you really?"
-
-$user:= <User name="Alice"/>
-
-user..? "Hello, {user}" . "Who are you really?"
 ```
 
-⚠️ A table with all possibilities will be created, because it's vague yet!
+You can use the previous `..?` Boolean Truthiness to check if it has state:
+
+```lua
+user..? "Hello, {}!", user.name
+      . "Who are you really?"
+
+$user:= <User name="Alice"/>
+user..? "Hello, {}!", user.name
+      . "Who are you really?"
+```
+
+The output will be:
+
+```text
+Who are you really?
+
+Hello, Alice!
+```
+
+That's verbose if you just want to handle the Truthiness check and usage of object inline at the same time.
+
+```lua
+$user:= <User name="Alice"/>
+"Hello, {}", user?..name
+```
+
+And you can chain it to resolve all your edge cases when an object has state but its member doesn't have a truthy value:
+
+```lua
+$user:= <User name="" age=34/>
+"Hello, {}!", user?..name?.."Nameless"
+```
+
+When using with scalar values the rule is the same, but your edge case is just one:
+
+```lua
+$number:int = 0
+
+"{}", number?..10
+```
+
+Which is much better than:
+
+```lua
+$number:int = 0
+
+number..? {
+  "{}", number
+}
+. "{}", 10
+```
+
+⚠️ Why two forms for checking Truthiness? Because when using Boolean Truthiness you can nest Question; if using the Spread you can't!
+
+The position you place the Spread Truthiness check doesn't matter once there's no way to it mean another thing in Wide.
 
 ### Regular Question Expression 🤣
 
@@ -4260,7 +4320,7 @@ So can I get just the error? yep!
 You can also default to a value (in this case 0) using question.
 
 ```lua
-@(result) = division(n, m))?.0
+@(result) = division(n, m))?..0
 
 "{}", result
 ```
@@ -4286,8 +4346,8 @@ printUserData()
 What about capture and propagate? Just place an `_` where in the place of a condition.
 
 ```lua
-fetchUserData() []User => {
-  users:[]User
+fetchUserData() User.. => {
+  users:User..
 
   -- no named condition will do the
   @(_, "error fetching users") {
@@ -4986,7 +5046,7 @@ Example of extending an Object:
   count() int => count -- static
   .name() string => .name -- public
   ..value() obj => .value -- protected
-  ...instance() Thing => .instance ?. <Thing /> -- private
+  ...instance() Thing => .instance ?.. <Thing /> -- private
 />
 
 -- Thing is extended by Something
@@ -5180,7 +5240,7 @@ Protected, Public, Static Entities and Functions can't be abstracted and just us
 
   -- NOT abstract member
   .name() string => {
-    |.name ?. thingName()| -- resolvable Function can have body
+    |.name ?.. thingName()| -- resolvable Function can have body
   }
 />
 ```
@@ -5204,7 +5264,7 @@ This is how Something will look after abstracting an Extent:
   .name() string => {
     -- not abstract Function can be modified
     |
-    .name ?. "How is it possible for me not having a name?"
+    .name ?.. "How is it possible for me not having a name?"
     |
   }
 /Self>
@@ -5250,7 +5310,7 @@ They work like Static Functions and are accessed by `..`.
   (.name:string = "Stranger")
 /
   (slot) => {
-    slot?.<div id="person-slot">
+    slot?..<div id="person-slot">
       <p>"Welcome, {Self.name}"</p>
     </div>
   }
@@ -5333,17 +5393,17 @@ But you can have multiple slots, but in this case, they must all be manually cal
   (.name:string = "Stranger")
 /
   (slot) => {
-    slot?.<div id="person-slot">
+    slot?..<div id="person-slot">
       <p>"Welcome, {Self.name}"</p>
     </div>
   }
 
   header(slot) => {
-    slot?.<header>"My App"</header>
+    slot?..<header>"My App"</header>
   }
 
   footer(slot) => {
-    slot?.<footer>"My Footer"</footer>
+    slot?..<footer>"My Footer"</footer>
   }
 /Self>
 ```
