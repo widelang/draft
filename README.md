@@ -1,35 +1,41 @@
-**🤡 WARNING: This file is a hot mess and will embarrass me in public.**
-
-***⚠️⚠️⚠️ This is a draft illustrating potential syntax, not a beginner's tutorial. There is no current implementation; it's a preliminary concept open to feedback. This syntax may evolve based on your input, and there's no guarantee of future implementation. I'm gathering opinions and constructive criticism to assess its viability. Feel free to share this link with AI language models for syntax validation. This is envisioned as a web-first language. I'm an independent developer exploring potential solutions, not promoting a product or representing a large corporation. Wide prioritizes its own design principles and is not tied to any programming language. Ultimately, Wide aims to extend HTML functionality as full programming language.***
-
 # 🧩 Wide Language
 
 ```html
-<!-- hello.wide.html -->
-()=> {
+<!-- hello.html -->
+
+<!--
+  "html wide" is used to say the current
+  file must be parsed as a Wide file
+  and everything inside {} becomes
+  the context of a Wide file.
+-->
+<!DOCTYPE html wide>
+{
   greet() => <p>"Hello, {name}!"</p>
 }
-
-<!-- html wide is used to say it must be parsed as Wide -->
-<!DOCTYPE html wide>
 <html>
   <body>
     <h1>{ greet("World") }</h1>
-    <p>HTML first language!</p>
-  </body>
-</html>
-
-<!-- output -->
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>Hello, World!</h1>
-    <p>HTML first language!</p>
+    <p>|{ HTML first language! }|</p>
   </body>
 </html>
 ```
 
-Welcome to **Intent-Oriented Programming**.
+When running **wide run hello.html** it will produce this output:
+
+ ```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Hello, World!</h1>
+    <p>{ HTML first language! }</p>
+  </body>
+</html>
+```
+
+When running **wide run  8080 hello.html** will serve to be opened on <http://localhost:8080>
+
+## Intent-Oriented Programming
 
 Wide is a symbol-based, declarative, paradigm-unifying programming language designed to feel natural, composable, and deeply readable just using symbols you already know.
 
@@ -215,6 +221,22 @@ You might be thinking that you can't change an Entity's value in Wide, and it's 
 
 ⚠️ You will learn how to handle **Mutable Entities** and **Constant Entities** as you will see later.
 
+### `::=` Predicate Intent
+
+Besides the `:=` Infer Intent Wide also has the `::=` Predicate Intent that's used for name things that can only have 2 possible values (true or false).
+
+They are distinguishable from Infer Intent but they are cited here for completeness so that whenever you ever see an expression like so:
+
+```lua
+isEven(n:int) ::= n % 2 == 0
+
+isEven(4)? "Even!" . "Odd."
+```
+
+You now know that it is a Predicate.
+
+You can check the section on **Predicates** later for understanding how powerful they are and how they can simplify everywhere propositions (conditions).
+
 ----
 
 ## Built-in Data Types - Type-Values
@@ -259,6 +281,8 @@ In wide you can create a **Custom Type** opening a context or not and where to p
 But that would serve no purpose! It's lost in the vaccumm of nonsense!
 
 For core Wide **Type-Values** you can give it the aliasesname you want them to be:
+
+/\
 
 ```lua
 ?:bool
@@ -1235,7 +1259,7 @@ doSomething( -- You can't use anywhere): ❌ Error Unterminated line
 `final class`.AircraftController </>
 
 -- Calculate total fuel needed
-`pure function`calculateFuel(amount:int, efficiency:float) float => {
+`pure function`calculateFuel(amount:int, efficiency:float) => float {
   | amount * efficiency |
 }
 ```
@@ -1347,7 +1371,7 @@ Now look at this:
 -- interface Shape
 :Shape = Circle | Square
 
-getArea(shape: Shape) int => {
+getArea(shape: Shape) => int {
   shape.kind === "circle" ? {
     | Math.PI * shape.radius ** 2 |
   }
@@ -1522,7 +1546,7 @@ So you could create a Pointable trait with, say, a magnitude method:
 
 ```lua
 ::Pointable <
-  .magnitude() float => {
+  .magnitude() => float {
     |(Self.1.powi(2)) + Self.2.powi(2)).sqrt()|
   }
 /..Self>
@@ -1856,13 +1880,13 @@ Spreading a type means that you don't how much items will be returned, but that 
 ```lua
 .User < />
 
-getAllUsers() User.. => {}
+getAllUsers() => User.. {}
 ```
 
 Or you can be restrictive and pass a limited amount:
 
 ```lua
-getPaginatedUsers() User.10 => {}
+getPaginatedUsers() => User.10 {}
 ```
 
 ⚠️ When you pass `User.10` above you are strictly saying you want 10 User objects not more nor less!
@@ -1870,7 +1894,7 @@ getPaginatedUsers() User.10 => {}
 But you can be flexible and allow 10 or less:
 
 ```lua
-getPaginatedUsers() ..User.10 => {}
+getPaginatedUsers() => ..User.10 {}
 ```
 
 ## Destructuring
@@ -2657,7 +2681,7 @@ numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
  but here's a simple Function  to return a squared number
  and inlined to look like a Lambda
 */
-squared(number:int) int => number ** 2
+squared(number:int) => number ** 2
 
 -- or passing function to transform directly
 ~(squared(number) = numbers) {
@@ -3565,7 +3589,7 @@ times10:int = item ? {
 You'll soon see Functions, but it's interesting to mark it here. When scoped alone inside a function you can do like so:
 
 ```lua
-verifyNumber(x:int) string => x ? {
+verifyNumber(x:int) => x ? {
   = 11 => "It's 11"
   < 10 => "Less than 10"
   > 10 => "Greater than 10"
@@ -3593,7 +3617,7 @@ A Function itself that does nothing other than exist:
 `=>` Lambda Intent is used to sign that the function signature ended.
 `{}` Context Intent is used to create the body of the function.
 
-⚠️ In Wide `()=> {}` alone in a file is the **Entry Function** used to tell the compiler that the file can be used as an Entry point to your program.
+⚠️ In Wide `() => {}` alone in a file is the **Entry Function** used to tell the compiler that the file can be used as an Entry point to your program.
 
 ### Calling Functions
 
@@ -3753,7 +3777,7 @@ mutipleReturns() => {
 Function that returns a message based single on parameter:
 
 ```lua
-greet(name:string) string => {
+greet(name:string) => string {
   |"Hello, {name}!"|
 }
 
@@ -3770,7 +3794,7 @@ As you saw, the `||` Wall Intent is used to return a value from a Function, but 
 
 ```lua
 -- Inlined function
-greet(name:string) string => "Hello, {name}!"
+greet(name:string) => "Hello, {name}!"
 ```
 
 ⚠️ Pay attention when inlining a Function that returns a string which the type is inferred by Wide!
@@ -4233,14 +4257,16 @@ Lamdas can change also the state of Mutable entities alike functions, but just f
 ```lua
 $name:= "Wide"
 
-greet = (greet: string) /$name/ => {
-  $name: "World"
+greet = ($greet: string) /$name/ => {
+  $greet:= greet != "Hello" ?. "Hi
+  $name:= "World"
+
   "{greet}, {name}!"
 }
 
 "{name}" -- initial state STILL
 
-greet("Hello") $ $name
+greet("Hello")
 "{name}" -- initial state CHANGED
 ```
 
@@ -4382,6 +4408,74 @@ Now you created a function that starts with `~` and yields an Iterator.
 
 You can use that where you'd place a `||` inside a generator.
 
+## Predicates
+
+In mathematics, a predicate is a statement that becomes either true or false depending on its input.
+
+For example:
+
+```text
+P(n) ::= n is even
+```
+
+This defines a family of statements:
+
+"4 is even" -> true
+"5 is even" -> false
+
+In Wide, you can define predicates using `::=` Predicate Intent:
+
+```lua
+isEven(n:int) ::= n % 2 == 0
+```
+
+This isn't a function that returns a value — it's a truth generator.
+
+Since predicates defined using `::=` always return a boolean (true or false), just use the ? Question Intent (not `..?`) to evaluate them:
+
+```lua
+isEven(4)? "Even!" . "Odd."
+```
+
+The `..?` form is reserved for checking the presence or truthiness of entities (e.g., optional objects, maybe-null fields, lazy evaluations).
+
+Take a look at this real life example:
+
+```lua
+User <
+  .name:string
+  .age:int
+  .active:bool
+/>
+
+isAdult(u:User)::= u.age >= 18
+isActive(u:User)::= u.active
+
+users := db.users.getAll()
+
+~(u = users) {
+  isEligible(isAdult(u) & isActive(u))? {
+    "User {} is eligible", u.name
+  }
+}
+```
+
+Predicates can be very interesting in systems-level programming:
+
+```lua
+sendHeader(flags:boolean) => {}
+
+hasWritePerm(p:Process)::= p.permissions & 0b100
+hasReadPerm(p:Process)::= p.permissions & 0b010
+hasExecPerm(p:Process)::= p.permissions & 0b001
+
+flags:= hasReadPerm(proc) << 0
+       | hasWritePerm(proc) << 1
+       | hasExecPerm(proc) << 2
+
+sendHeader(flags)
+```
+
 ### `@` Event Intent
 
 Whenever you see the Type Intent `@` you can think:
@@ -4396,44 +4490,55 @@ Whenever you see the Type Intent `@` you can think:
 
 ## Error Handling
 
-In Wide if you want to control if an Error has happened you just need to capture that event.
+In Wide if you want to control if an Error has happened or just assert for an case, you just need to capture that event using the `@()` Error Intent  — it is an event, so you could call it Error Event.
 
-If you want to stop execution immediately on error you can use assertion:
+Wide uses the @() form to handle error scenarios with three expressive variations, based on the presence and position of {}.
+
+| Form                | Name             | Description                                                                 |
+| ------------------- | ---------------- | --------------------------------------------------------------------------- |
+| `@(cond, "msg")`    | **Assertion**    | Basic check — triggers an error if `cond` fails. No capture.                |
+| `@(cond, "msg") {}` | **Capture**      | Like assertion, but **captures** the error into `@` for later use.          |
+| `@("msg") { body }` | **Self-Capture** | Runs `body`, and if it fails, captures error into `@` with message `"msg"`. |
+
+### Asserting
+
+When asserting you pass the assertion and a message:
 
 ```lua
 division(n:int, m:int) int => {
-  -- condition, message
   @(m == 0, "Cannot divide by {n} by {m}")
-
   |n / m|
 }
 
 division(10, 0) ❌ -- Execution will stop immediatly
 ```
 
-If you want to capture the error you can propagate using the empty `{}` Context Intent. When you want to check for the error you just prefix the entity name with `@` Event intent.
+### Capturing
+
+When capturing the error you propagate an assertion adding an empty `{}` Context Intent after the assertion. That will cause the error to be captured for later propagation.
 
 ```lua
 division(n:int, m:int) int => {
   @(m == 0, "Cannot divide by {n} by {m}"){}
-
   |n / m|
 }
--- somewhere else in code
+
+-- 1000 later some where else in code
 n:= 10
 m:= 0
 
 -- no need for : Type intent, just assignment.
 -- @ will check for the error
+
 @(result) = division(n, m)
 
-result ? {
-  "result is {result}"
-}
-. "{}", @result -- Output the error using the `@`as well
+result? "result is {result}"
+      . "{}", @result -- Output the error using the `@`as well
 ```
 
-You can also check directly agains `@` or destructure:
+When you want to get the propagated error, you that is Immutable by default, so you don't use the `:=` Infer Intent, just the `=` Assignment. You don't need to use the `?.. ..?` Truthiness Intents for the entity, nor for the spread entities as you'll see,  because the compiler does some sugary for you because it knows there can't be another entity name like that. But if you shadow any of them, then you must!
+
+But, you can also check directly agains `@`:
 
 ```lua
 @(result) = division(n, m)
@@ -4441,9 +4546,11 @@ You can also check directly agains `@` or destructure:
 !@ ? {
   "Result is {}", result
 }
+```
 
--- or
+and even destructure:
 
+```lua
 @{result, error} = division(n, m)
 
 !error ? {
@@ -4451,7 +4558,7 @@ You can also check directly agains `@` or destructure:
 }
 ```
 
-So can I get just the error? yep!
+So can you get just the error? Yep!
 
 ```lua
 @ = division(n, m)
@@ -4462,7 +4569,7 @@ So can I get just the error? yep!
 }
 ```
 
-You can also default to a value (in this case 0) using question.
+You can also default to a value (in this case 0) using checking for truthiness:
 
 ```lua
 @(result) = division(n, m))?..0
@@ -4474,7 +4581,6 @@ You can also self-capture a whole context for the error using `{}` placing the c
 
 ```lua
 printUserData() => {
-  -- notice just the error message!
   @("error fetching data") {
     users:= query("select from users")
 
@@ -4484,17 +4590,21 @@ printUserData() => {
   }
 }
 
--- If an error occur it will break execution immediatly
 printUserData()
 ```
 
-What about capture and propagate? Just place an `_` where in the place of a condition.
+Notice that in this case, there's not a condition to check as the first parameter of the Error Intent, just the message, so if an error occur it will break execution immediatly, and as there is not a condition to assert, it you check:
 
 ```lua
-fetchUserData() User.. => {
+@(result) = printUserData() ❌ -- Error: no assertion found in printUserData()
+```
+
+What about capture and propagate? In this case, you can fake the compiler and just place an `_` placeholder in the place of a condition.
+
+```lua
+fetchUserData() => User.. {
   users:User..
 
-  -- no named condition will do the
   @(_, "error fetching users") {
     users:= query("select name, age from users")
   }
@@ -4503,10 +4613,10 @@ fetchUserData() User.. => {
 }
 ```
 
-Just destructuring?
+Just destructuring `@`?
 
 ```lua
-@(result) = fetchUserData()
+@ = fetchUserData()
 
 !@ ? {
   ~({name, age} = users) ? {
@@ -4515,54 +4625,54 @@ Just destructuring?
 } . "{}", @ -- Will print "error fetching users" -- if an error occur
 ```
 
-## Async/Await Functions
-
-Wide can handle async/await like in many contexts, but in Functions it's kinda magical!
-
-On Function Declaration you just prefix the name with `@` and it says `async` event started.
-
-On Function Call you just prefix the name with `@` and it says `await` event started.
+That's possible only there's an assertion condition inside fetchUserData(), otherwide that would trigger an error:
 
 ```lua
-@fetchUserData() []User => {
-  users:[]User
+fetchUserData() => User.. {
+  users:User..
+  users:= query("select name, age from users")
+  |users|
+}
+```
 
-  !@(
-    error,
-    "error fetching users"
-  ) {
-    users:= @query("select name, age from users")
+```lua
+@ = fetchUserData() ❌ -- Error: no assertion found in printUserData()
+```
+
+## Async/Await
+
+Wide can handle async/await like in many contexts.
+
+For async just prefix a name with `@..` and it says `async` event started. When using it you are sending an event to the Future (...).
+
+For await just prefix a name with `..@` and it says `await` event started. When using it you are spreading an event to the Present (...).
+
+```lua
+@..fetchUserData() => User.. {
+
+  users:User..
+
+  @(error, "error fetching users") {
+    users:= ..@query("select name, age from users")
   }
 
   |users|
 }
 ```
 
-But look how magical things get now checking for Error on an Async Function.
-
-Just pass the error inside () and its an awaited error checking:
+But look how magical things get now checking for Error on an Async Function:
 
 ```lua
-@(fetchUserData()) ? {
+
+..@fetchUserData() ? {
   ~({name, age} = users) {
     "{name} is {age} years old!"
   }
-}  . "{}", @
+}
+. "{}", @
 ```
 
-It's both awaiting and capturing the error Events at the same time with just one Intent!
-
-Same as:
-
-```lua
-@result = fetchUserData()
-
-!@ ? {
-  ~({name, age} = users) {
-    "{} is {} years old!", name, age
-  }
-}  . "{}", @
-```
+The fact is that when you use `..@` to create async operation it is a spread operation at the end, and fact that it has an assertion inside, it also extracts the error that you can use later to catch the message!
 
 ### Concurrency
 
@@ -5035,7 +5145,7 @@ Some examples using static:
   newLambdaEntity:Thing = () => <Thing/>
 
   -- static Function
-  newStaticFunction() Thing => () => <Thing/>
+  newStaticFunction() => () => <Thing/>
 />
 
 
@@ -5179,10 +5289,10 @@ Example of extending an Object:
 
   !instance:Thing -- private
 
-  count() int => count -- static
-  .name() string => .name -- public
-  ..value() obj => .value -- protected
-  !instance() Thing => .instance ?.. <Thing /> -- private
+  count() => count -- static
+  .name() => .name -- public
+  ..value() => .value -- protected
+  !instance() => .instance ?.. <Thing /> -- private
 />
 
 -- Thing is extended by Something
@@ -5378,7 +5488,7 @@ Thing <
   .!instance() Thing -- abstract Function doesnt have body
 
   -- NOT abstract member
-  .name() string => {
+  .name() => string {
     |.name ?.. thingName()| -- resolvable Function can have body
   }
 />
@@ -5392,7 +5502,7 @@ This is how Something will look after abstracting an Abstract Object:
   .instance:Something = </>
 
   .instance() => Self.instance
-  .name() string => {|
+  .name() => string {|
     .name ?.. "How is it possible for me not having a name?"
   |}
 /Self>
@@ -6039,7 +6149,9 @@ You create Generics in Wide using `{}` Context Intent, because guess what? - you
 You can pass the use Generics with Functions, Objects, Interfaces, Traits, Enums, and Structs.
 
 ```lua
-calculateAverage{T}(a:T, b:T) T => (a + b) / 2
+calculateAverage{T}(a:T, b:T) => T {
+  |(a + b) / 2|
+}
 
 a:int = 32
 b:int = 50
@@ -6058,7 +6170,9 @@ Example using Object
 
 ```lua
 .Calculate{T} <
-  .average(a:T b:T) T => (a + b) / 2
+  .average(a:T b:T) => T {
+    |(a + b) / 2|
+  }
 />
 ```
 
@@ -6138,7 +6252,7 @@ stringStack.push(aNumber)
 Multiple type parameters can be defined within the angle brackets {} when declaring a generic function, interface, trait, enum, struct or object. Each type parameter represents a distinct type that can be specified when the generic is used.
 
 ```lua
-processData{T, U}(input1: T, input2: U) T, U => {|
+processData{T, U}(input1: T, input2: U) => T, U {|
   [input1, input2]
 |}
 
@@ -6149,7 +6263,10 @@ result:= processData{int, string}(10, "hello")
 Union types (|) allow a generic type to accept values of different types. This is useful when a function or component needs to handle a variety of input types.
 
 ```lua
-handleInput{T}(input: T) T // T: string | int => {|input|}
+handleInput{T}(input: T) =>
+T // T: string | int {
+  |input|
+}
 
 strResult:= handleInput("world") -- input is of type string
 numResult:= handleInput(20) -- input is of type int
@@ -6166,9 +6283,10 @@ Intersection types (&) combine multiple types into one, requiring a value to sat
   .age: int
 />
 
-processEntity{T}(entity: T) string // T::(HasName & HasAge) => {|
-  "{entity.name} is {entity.age} years old"
-|}
+processEntity{T}(entity: T) =>
+string // T::(HasName & HasAge) {
+  |"{entity.name} is {entity.age} years old"|
+}
 
 person:= <
   name: "John",
@@ -6389,7 +6507,7 @@ Attributes are declared using `@[]` Intents and contain one or more calls to fun
 
 ```lua
 @[route(path: "/aircraft/{id}")]
-show(id:int) View => "..."
+show(id:int) => View {||}
 ```
 
 ```lua
@@ -6462,7 +6580,7 @@ Since attributes are objects, they can **implement traits** or even **use other 
 
 ```lua
 ::Auditable<
-  .auditLog(message:string) => "..."
+  .auditLog(message:string) => {||}
 />
 
 :AuditAttribute ::Auditable<
@@ -6509,7 +6627,7 @@ For example:
  * @returns string
  */
 @[attrFunc(value1: "value 01", value2: "value 02", value3: "value 03")]
-yourFunc(arg1:string, arg2:string, arg3:string = "arg 03") string => ""
+yourFunc(arg1:string, arg2:string, arg3:string = "arg 03") => ""
 ```
 
 Using instropection and reflection at the same time is indistinguishable:
@@ -6905,7 +7023,7 @@ You can also force final result casting (expression-level):
 You can also use in function calls:
 
 ```lua
-sum(a:i32, b:i32) i32 => a + b
+sum(a:i32, b:i32) => a + b
 
 printSum(a:i32, b:i32) => {
   "Sum is {}", a + b
