@@ -11,7 +11,7 @@
 -->
 <!DOCTYPE html wide>
 {
-  greet() => <p>"Hello, {name}!"</p>
+  greet() -> <p>"Hello, {name}!"</p>
 }
 <html>
   <body>
@@ -90,7 +90,7 @@ That's why Objects in Wide are <> and </> symbols, because in Wide you can do th
 
 ```html
 <!-- looping.wide -->
-() => {
+() -> {
   <ul>
     <~(counter <= 10)>
       <li>
@@ -118,7 +118,7 @@ That's why Objects in Wide are <> and </> symbols, because in Wide you can do th
 But if you were just vanilla Wide cli you could do just so:
 
 ```lua
-() => {
+() -> {
   ~(counter <= 10) {
     counter == 1 ? "{ counter } is one"
     counter == 2 ?? "{ counter } is two"
@@ -461,7 +461,7 @@ You haven't been presented to them yet, but Wide has an entry function - more pr
 That's like so:
 
 ```lua
-() => {
+() -> {
 
 }
 ```
@@ -479,7 +479,7 @@ This is how you would do that for `:string` custom type presented previously:
 :Text = string
 :MyText = myText
 
-() => {
+() -> {
   name:string = "Alice"
   name:Text = "Alice"
 }
@@ -492,7 +492,7 @@ That seems nice, but how do you print on screen?
 To print on screen you just enclose what you want to print inside double quotes `""` alone in a single line and depending on were you are running wide it will be printed.
 
 ```lua
-() => {
+() -> {
   "Hello, Wide!"
 }
 ```
@@ -508,7 +508,7 @@ Hello, Wide!
 If you need to print `""` double quotes inside a string you can use 2 pairs double quotes:
 
 ```lua
-() => {
+() -> {
   ""Hello, "Wide"!""
 }
 ```
@@ -522,7 +522,7 @@ Hello, "Wide"!
 But when you use call a Function, you must use a placeholder:
 
 ```lua
-greet(name:string) => "Hello, {name}"
+greet(name:string) -> "Hello, {name}"
 "{}", greet("World") -- Hello, World!
 ```
 
@@ -531,7 +531,7 @@ greet(name:string) => "Hello, {name}"
 When printing multiple lines you can use `\` character to ignore line break, or just break the line to include line break.
 
 ```text
-() => {
+() -> {
   "
   This is paragraph 1.\
   This is paragraph 2.\
@@ -578,7 +578,7 @@ And the last will print a tab before every paragraph and a new line with a tab:
 You can use curly braces inside those quotes `"{}"` to dinamically output values inside text output or just to compose dynamic strings of text:
 
 ```lua
-() => {
+() -> {
   name:= "Wide"
   "Hello, {name}!"
 
@@ -598,7 +598,7 @@ It's, $9.99.
 You can also just use {} as placeholders and pass a list of values you want to place in them:
 
 ```lua
-() => {
+() -> {
   name:= "Wide"
   "Hello, {}!",  name
 
@@ -634,7 +634,7 @@ salary
 Wheneven you wanna know the type of an Entity you enclose the Entity name with `:` and you can get its string type name:
 
 ```lua
-() => {
+() -> {
   number:= 10
   name:= "Alice"
   isActive:= true
@@ -657,7 +657,7 @@ Wheneven you wanna know the name of an Entity:
 - `::<ENTITY>::` prints the string name of the value of an Entity in case it's been aliased.
 
 ```lua
-() => {
+() -> {
   number:= 10
   "{:<number>:} value is {number}" -- number value is 10
   "{} value is {}", :<number>:, number
@@ -928,8 +928,8 @@ $nums.toList()    -- [1, 2, 3]
 $name{ first = "Alice", last = "Smith" }:string
 $name.join(" ")    -- "Alice Smith"
 
-$stats.map(n => n * 2)
-$words.filter(w => w.length > 4)
+$stats.map((n) -> n * 2)
+$words.filter((w) -> w.length > 4)
 ```
 
 ⚠️ When using utility methods you just used one `.` dot. That's because you are calling the Object corresponding to the data type itself, not the static context of the group.
@@ -939,7 +939,7 @@ But you can also bind traits via Entity Extension:
 ```lua
 ..Math Math
 
-() => {
+() -> {
   values{a=1, b=2}::(Math):int
   "Max: {} and Min: {}", ..values.max(), ..values.min()
 }
@@ -1119,7 +1119,7 @@ Take a look at Enums section later, but the most comparison that we can make now
   Friday,
   Saturday
 
-  clip() => Day ? {
+  clip() -> Day ? {
     Monday => "Mon",
     Tuesday => "Tue",
     Wednesday => "Wed",
@@ -1184,7 +1184,7 @@ Following the message Entity inside Function does not exist because Function has
 message:= "Hi"
 "Message is: {message}" ✅ -- Ok, same context
 
-printMessage() => {
+printMessage() -> {
   #CONSTANT ? {  ✅ -- Ok, CONSTANT previously defined
     "Message is: {message}" ❌ -- Error: Entity "message" is not defined in printMessage() context
   }
@@ -1196,7 +1196,7 @@ printMessage()
 You can't do this as well (message is inside Function context):
 
 ```lua
-printMessage() => {
+printMessage() -> {
   message:= "Hi"
 }
 
@@ -1209,7 +1209,7 @@ Nor this (message here is only a Function parameter):
 
 ```lua
 
-printMessage(message:string) => {
+printMessage(message:string) -> {
   "Message is: {message}"  ✅ -- Ok, same context
 }
 
@@ -1223,7 +1223,7 @@ You can move the context of an Entity using the Move Intent, but you can't move 
 message:= "Hi"
 "Message is: {message}" ✅ -- Ok, same context
 
-printMessage(message:string) => {
+printMessage(message:string) -> {
   "Message is: {message}" ✅ -- Ok, context will be moved ahead
 }
 
@@ -1259,7 +1259,7 @@ doSomething( -- You can't use anywhere): ❌ Error Unterminated line
 `final class`.AircraftController </>
 
 -- Calculate total fuel needed
-`pure function`calculateFuel(amount:int, efficiency:float) => float {
+`pure function`calculateFuel(amount:int, efficiency:float) -> float {
   | amount * efficiency |
 }
 ```
@@ -1274,7 +1274,7 @@ This is a multiline comment
 that can have, as it name implies,
 multiple line!
 */
-doSomething(/* You can use anywhere */) => {
+doSomething(/* You can use anywhere */) -> {
   /* but don't forget to close it */
 }
 ```
@@ -1312,7 +1312,7 @@ $value = 123
 But on more specialized operations Unions came make sense!
 
 ```lua
-printId(id: number | string) => {
+printId(id: number | string) -> {
   "Your ID is: {id}"
 }
 
@@ -1328,7 +1328,7 @@ printId(
   id:
   | number
   | string
-) => {
+) -> {
   "Your ID is: {id}"
 }
 ```
@@ -1336,7 +1336,7 @@ printId(
 You can check the type:
 
 ```lua
-printId(id: int | string) => {
+printId(id: int | string) -> {
   // id string  ? "{id.upper()}" . "{id}"
 }
 ```
@@ -1371,7 +1371,7 @@ Now look at this:
 -- interface Shape
 :Shape = Circle | Square
 
-getArea(shape: Shape) => int {
+getArea(shape: Shape) -> int {
   shape.kind === "circle" ? {
     | Math.PI * shape.radius ** 2 |
   }
@@ -1546,7 +1546,7 @@ So you could create a Pointable trait with, say, a magnitude method:
 
 ```lua
 ::Pointable <
-  .magnitude() => float {
+  .magnitude() -> float {
     |(Self.1.powi(2)) + Self.2.powi(2)).sqrt()|
   }
 /..Self>
@@ -1567,11 +1567,11 @@ Another example with a Mutable:
 
 ```lua
 ::SafeableString <
-  inner() => {
+  inner() -> {
     |Self.1|
   }
 
-  sanitize() => {
+  sanitize() -> {
     |Self.1 = Self.1.trim().replace("<", "&lt;").replace(">", "&gt;")|
   }
 /..$Self>
@@ -1880,13 +1880,13 @@ Spreading a type means that you don't how much items will be returned, but that 
 ```lua
 .User < />
 
-getAllUsers() => User.. {}
+getAllUsers() -> User.. {}
 ```
 
 Or you can be restrictive and pass a limited amount:
 
 ```lua
-getPaginatedUsers() => User.10 {}
+getPaginatedUsers() -> User.10 {}
 ```
 
 ⚠️ When you pass `User.10` above you are strictly saying you want 10 User objects not more nor less!
@@ -1894,7 +1894,7 @@ getPaginatedUsers() => User.10 {}
 But you can be flexible and allow 10 or less:
 
 ```lua
-getPaginatedUsers() => ..User.10 {}
+getPaginatedUsers() -> ..User.10 {}
 ```
 
 ## Destructuring
@@ -2681,7 +2681,7 @@ numbers:= [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
  but here's a simple Function  to return a squared number
  and inlined to look like a Lambda
 */
-squared(number:int) => number ** 2
+squared(number:int) -> number ** 2
 
 -- or passing function to transform directly
 ~(squared(number) = numbers) {
@@ -2697,7 +2697,7 @@ uniqueColors:= {"red", "green" , "blue" }
 }
 
 -- simple Function to make the string upper case.
-upper(input:string) => string.upper()
+upper(input:string) -> string.upper()
 
 -- or passing function to lambda
 ~(upper(color) = uniqueColors) {
@@ -3219,7 +3219,7 @@ A *Question Statement* used in a returning context (such as inside a function wi
 This is known as **Question Morphing** — when a `?` block adapts to its return context.
 
 ```lua
-getWelcomeText(user:User) => user.isLoggedIn ? "Welcome back!" . "Please log in"
+getWelcomeText(user:User) -> user.isLoggedIn ? "Welcome back!" . "Please log in"
 ```
 
 So in summary:
@@ -3409,6 +3409,13 @@ number..? {
 
 The position you place the Spread Truthiness check doesn't matter once there's no way to it mean another thing in Wide.
 
+### `=>` Match Intent
+
+Whenever you see the Match Intent you can think:
+
+- it matches a case
+- it resolves a case
+
 ### Regular Question Expression 🤣
 
 Regular Expression in Wide is done using the `//` Inclusion Intent.
@@ -3589,10 +3596,10 @@ times10:int = item ? {
 You'll soon see Functions, but it's interesting to mark it here. When scoped alone inside a function you can do like so:
 
 ```lua
-verifyNumber(x:int) => x ? {
-  = 11 => "It's 11"
-  < 10 => "Less than 10"
-  > 10 => "Greater than 10"
+verifyNumber(x:int) -> x ? {
+  = 11 => "It's 11",
+  < 10 => "Less than 10",
+  > 10 => "Greater than 10",
   . => "It's 10"
 }
 
@@ -3611,20 +3618,20 @@ In its nature Functions are related to Lambdas in Wide, and they are reusable bl
 A Function itself that does nothing other than exist:
 
 ```lua
-() => {}
+() -> {}
 ```
 
 `=>` Lambda Intent is used to sign that the function signature ended.
 `{}` Context Intent is used to create the body of the function.
 
-⚠️ In Wide `() => {}` alone in a file is the **Entry Function** used to tell the compiler that the file can be used as an Entry point to your program.
+⚠️ In Wide `() -> {}` alone in a file is the **Entry Function** used to tell the compiler that the file can be used as an Entry point to your program.
 
 ### Calling Functions
 
 In order to call a function you must give it a name:
 
 ```lua
-greet() => {}
+greet() -> {}
 greet() -- Does nothing
 ```
 
@@ -3633,7 +3640,7 @@ Different from Entities you can call Functions before they being created - but t
 ```lua
 greet() -- Called first
 
-greet() => {} -- Defined later
+greet() -> {} -- Defined later
 ```
 
 ### Shadowing Functions
@@ -3641,25 +3648,25 @@ greet() => {} -- Defined later
 You can shadow Entities, but that's not true to Functions.
 
 ```lua
-greet() => {}
-greet() => {} ❌ -- Error: greet() is defined multiple times
+greet() -> {}
+greet() -> {} ❌ -- Error: greet() is defined multiple times
 ```
 
 However, you can create functions with the same name in different scopes. The function closer to the scope will win:
 
 ```lua
 greet()
-greet() => { "#1 Outer scope" }
+greet() -> { "#1 Outer scope" }
 greet()
 
 {
   greet()
-  greet() => { "#2 Inner scope" }
+  greet() -> { "#2 Inner scope" }
   greet()
 
   {
     greet()
-    greet() => { "#3 Inner most scope" }
+    greet() -> { "#3 Inner most scope" }
     greet()
   }
 
@@ -3703,7 +3710,7 @@ The same is true for:
 Function that prints a message with no return type:
 
 ```lua
-greet() => {
+greet() -> {
   "Hello, Wide!" -- No return value, will just print to screen
 }
 
@@ -3715,7 +3722,7 @@ greet() -- Output: Hello, Wide!
 Function that prints a message based on single parameter:
 
 ```lua
-greet(name:string) => {}
+greet(name:string) -> {}
   "Hello, {name}!" -- Will print a dynamic message on the screen
 
 greet("World") -- Output: Hello, World!
@@ -3726,7 +3733,7 @@ greet("World") -- Output: Hello, World!
 When you create a function like this:
 
 ```lua
-greet() => {
+greet() -> {
 
 }
 ```
@@ -3736,7 +3743,7 @@ It will return an empty `||` Wall by default because there's no return type nor 
 If you want to check if a function doesn't have a return type, it means you want to check if it returns an empty Wall, but how there's no such a thing, you can just check against `//` Inclusion intent agains the function call alone:
 
 ```lua
-greet() => {}
+greet() -> {}
 
 // greet() ? "Function doesn't return have a return type and doesn't value"
 
@@ -3757,7 +3764,7 @@ If you need to return value(s) you need use the `||` Wall Intent at the end of t
 To return a single value, just enclose that value in between Walls:
 
 ```lua
-singleReturn() => {
+singleReturn() -> {
   |10|
 }
 
@@ -3767,7 +3774,7 @@ singleReturn() => {
 To return multiple values, just enclose values separated by commas between Walls:
 
 ```lua
-mutipleReturns() => {
+mutipleReturns() -> {
   |10,20,20|
 }
 
@@ -3777,7 +3784,7 @@ mutipleReturns() => {
 Function that returns a message based single on parameter:
 
 ```lua
-greet(name:string) => string {
+greet(name:string) -> string {
   |"Hello, {name}!"|
 }
 
@@ -3794,7 +3801,7 @@ As you saw, the `||` Wall Intent is used to return a value from a Function, but 
 
 ```lua
 -- Inlined function
-greet(name:string) => "Hello, {name}!"
+greet(name:string) -> "Hello, {name}!"
 ```
 
 ⚠️ Pay attention when inlining a Function that returns a string which the type is inferred by Wide!
@@ -3802,13 +3809,13 @@ greet(name:string) => "Hello, {name}!"
 This:
 
 ```lua
-greet(name:string) => "Hello, {name}!" -- Type is inferred to be "string"
+greet(name:string) -> "Hello, {name}!" -- Type is inferred to be "string"
 ```
 
 Is not the same as this:
 
 ```lua
-greet(name:string) => {
+greet(name:string) -> {
   "Hello, {name}!" -- No : Type Intent here, will just print to screen
 }
 ```
@@ -3818,7 +3825,7 @@ greet(name:string) => {
 Again:
 
 ```lua
-greet(name:string) => {
+greet(name:string) -> {
   "Hello, {name}!" -- Will print to screen, will just print to screen
 }
 ```
@@ -3828,7 +3835,7 @@ For all other data or structure types it's okay since they can't be printed dire
 ```lua
 -- Wide knows when it's another type other then "" and there's no confusion
 -- int return inferred (no => "{number * 10}" here)
-times10(number:int) => number * 10
+times10(number:int) -> number * 10
 
 result:= times10(10)
 
@@ -3838,7 +3845,7 @@ result:= times10(10)
 Back to the case of default `||` returned on functions without return types, when you HAVE a return type, be it explicit or inferred, you can check the type returned by the function, the value, or the truthiness of the returned value:
 
 ```lua
-sum(n:int, m:int) => {
+sum(n:int, m:int) -> {
   |n + m|
 }
 
@@ -3850,7 +3857,7 @@ sum(1, 1)..? "truthy"
 sum(0, 0)..? "falsy"
 ```
 
-See why the previous `// greet()` checked for `||`? Because there's no returned value inside `||` alone to be checked agains a value type. Be it explicit `greet()=>{||}` or implicit `greet()=>{}`, `||` alone never has a type nor a value, but in the case of `/int/ sum(1, 1)`, sum returns `int` value inside `|n+m|`, so `// sum(1, 1)` would result in false, `// greet()` in true, because `||` has nothing to match againt. So `// == ||` = `true`!
+See why the previous `// greet()` checked for `||`? Because there's no returned value inside `||` alone to be checked agains a value type. Be it explicit `greet() -> {||}` or implicit `greet() -> {}`, `||` alone never has a type nor a value, but in the case of `/int/ sum(1, 1)`, sum returns `int` value inside `|n+m|`, so `// sum(1, 1)` would result in false, `// greet()` in true, because `||` has nothing to match againt. So `// == ||` = `true`!
 
 ### Early Return
 
@@ -3859,7 +3866,7 @@ There are cases where you may want to immediately stop execution and return earl
 In Wide, you use the `||` **Wall Intent** to express this.
 
 ```lua
-f(x: i32) => {
+f(x: i32) -> {
   x <= 0 ? { || }
   x == 4 ?? { || }
   x == 7 ?? { || }
@@ -3873,7 +3880,7 @@ f(5)
 You might wonder — can't this be simplified using a compound condition?
 
 ```lua
-f(x: i32) => {
+f(x: i32) -> {
   x <= 0 || x == 4 || x == 7 ? ||  ❌ -- Not allowed!
   "{}", x
 }
@@ -3884,7 +3891,7 @@ Yes, it's syntactically tempting — but it's semantically ambiguous. That || co
 To avoid this confusion, Wide prohibits inline Wall Intents after complex conditions. The compiler will raise an error and suggest making the intent explicit:
 
 ```lua
-f(x: i32) => {
+f(x: i32) -> {
   x <= 0 || x == 4 || x == 7 ? {
     ||
   }
@@ -3898,7 +3905,7 @@ This ensures that || is always visually interpreted as a control-flow break, not
 If you're returning an actual value — not a Wall — you can inline safely:
 
 ```lua
-f(x: i32) => {
+f(x: i32) -> {
   x <= 0 || x == 4 || x == 7 ? |0|
   "{}", x
 }
@@ -3911,7 +3918,7 @@ Returning |0| is unambiguous — it's clearly a value and can be safely inlined.
 You separate parameters using `,` commas. Yes! `,` Separation Intent!
 
 ```lua
-add(n:int, m:int, o:int) => n + m + o
+add(n:int, m:int, o:int) -> n + m + o
 
 result = add(5, 10, 15) -- You also separate values by commas
 "{result}" -- 30
@@ -3920,7 +3927,7 @@ result = add(5, 10, 15) -- You also separate values by commas
 ### Default parameter value
 
 ```lua
-greet(name:string = "Stranger") => {
+greet(name:string = "Stranger") -> {
   "Hello, {name}!"
 }
 
@@ -3932,7 +3939,7 @@ When using default parameter values you don't need to pass the Type Intent nor a
 ### Named Parameters
 
 ```lua
-greet(name:string, greeting = "Hello", warm = false) => {
+greet(name:string, greeting = "Hello", warm = false) -> {
   "{greeting}, {name}!"
   warm ? "You are awesome!"
 }
@@ -3955,7 +3962,7 @@ greet("Alice", greeting: "Hi")
 If don't want to name your parameters you just do so with the  `..` Extent Intent:
 
 ```lua
-add(..numbers:int) => {
+add(..numbers:int) -> {
   $sum:= 0
 
   ~(number = numbers) {
@@ -3980,7 +3987,7 @@ result = sum()
 You can also mix with positional once they come first:
 
 ```lua
-add(a:int, b:int, ..numbers:int) => {
+add(a:int, b:int, ..numbers:int) -> {
   $sum:= 0
   ~(number = numbers) {
     $sum += number
@@ -3998,7 +4005,7 @@ result:= sum(a:10, b:20, 30, 50)
 You can also check the truthiness of a function like you do for Entities:
 
 ```lua
-greet() => {}
+greet() -> {}
 
 greet()..?  "Function doesn't return a value"
 ```
@@ -4014,10 +4021,10 @@ When you need to change an Entity Inside or Outside a Function you must use the 
 In this case you must place the `$` State Intent when defining a new Entity assigning an already existing parameter as its value:
 
 ```lua
-() => {
+() -> {
   x = 2
 
-  print_double(x:int) => {
+  print_double(x:int) -> {
     -- here $x is shadowed to x from parameters
     $x = x * 2
     "{} from inside", x
@@ -4039,10 +4046,10 @@ Output:
 In this case you must place the `$` State Intent like you usually do, be it assigning a constant value or an already existing parameter.
 
 ```lua
-() => {
+() -> {
   x = 2
 
-  print_double(x:int) => {
+  print_double(x:int) -> {
     -- Here $y is assigned the value of x, but not shadowed
     $y = x
     $y = y * 2
@@ -4065,10 +4072,10 @@ Output:
 In this case you place the `$` State Intent directly in the parameter. This will cause the outter Entity passed to the function to be changed as well.
 
 ```lua
-() => {
+() -> {
   $x = 2 -- x must be mutable outside as well!
 
-  print_double($x:int) => {
+  print_double($x:int) -> {
     x = x * 2
     "{} from inside", x
   }
@@ -4094,7 +4101,7 @@ You can similarly move the scope of an Entity using the `<<` Move Intent before 
 number1:= 10
 number2:= 20
 
-add(a:int, b:int) => {
+add(a:int, b:int) -> {
   |a + b|
 }
 
@@ -4119,7 +4126,7 @@ person:= <Person name="Object"/>
 %otherPerson = person
 %otherPerson.name = "Reference"
 
-printPerson(person:Person, otherPerson:Person) => {
+printPerson(person:Person, otherPerson:Person) -> {
   otherPerson.name = "Function"
   "{} meets {}", person.name, otherPerson.name
 }
@@ -4141,7 +4148,7 @@ $person:= <Person name="Object"/>
 %otherPerson = person
 %otherPerson.name = "Reference"
 
-printPerson($person:Person, $otherPerson:Person) => {
+printPerson($person:Person, $otherPerson:Person) -> {
   otherPerson.name = "Function"
   "{} meets {}", person.name, otherPerson.name
 }
@@ -4163,7 +4170,7 @@ $person:= <Person name="Object"/>
 %otherPerson = person
 %otherPerson.name = "Reference"
 
-printPerson($person:Person, otherPerson:Person) => {
+printPerson($person:Person, otherPerson:Person) -> {
   otherPerson.name = "Function" ❌ -- Error: Cannot mutate immutable otherPerson
   "{} meets {}", person.name, otherPerson.name
 }
@@ -4178,7 +4185,7 @@ You don't need to use `:=` for lambdas.
 Using `{}` will prevent the Lambda from returning the String ""
 
 ```lua
-fn = () => { "Do nothing" }
+fn = () -> { "Do nothing" }
 
 fn() -- will print nothing!
 
@@ -4191,12 +4198,12 @@ msg:= fn()
 When directly creating Lambda as values for Entities, it seems more pleasing and Mathematically correct to use the `=` operator.
 
 ```lua
-fn = () => { "Do nothing" }
+fn = () -> { "Do nothing" }
 fn()
 
 -- or
 
-fn:= () => { "Do nothing" }
+fn:= () -> { "Do nothing" }
 fn()
 
 ```
@@ -4206,13 +4213,13 @@ You can use any! Your choice!
 Lambda without `{}` return implicit value:
 
 ```lua
-add = (n:int, m:int) => n + m
+add = (n:int, m:int) -> n + m
 ```
 
 Lambdas can have parameters:
 
 ```lua
-greet = (name:string) => { "Hello, {name}!" }
+greet = (name:string) -> { "Hello, {name}!" }
 
 greet("Wide") -- Hello Wide!
 ```
@@ -4220,7 +4227,7 @@ greet("Wide") -- Hello Wide!
 But when used `{}` and a value must be returned, the `||` Wall Intent must be used:
 
 ```lua
-add = (n:int, m:int) => {
+add = (n:int, m:int) -> {
   |n + m|
 }
 ```
@@ -4232,7 +4239,7 @@ With regular Functions you can't access the outter scope, with Lambdas you can u
 ```lua
 name:= "Wide"
 
-greet = (greet: string) /name/ => {
+greet = (greet: string) /name/ -> {
   "{greet}, {name}!"
 }
 
@@ -4257,7 +4264,7 @@ Lamdas can change also the state of Mutable entities alike functions, but just f
 ```lua
 $name:= "Wide"
 
-greet = ($greet: string) /$name/ => {
+greet = ($greet: string) /$name/ -> {
   $greet:= greet != "Hello" ?. "Hi
   $name:= "World"
 
@@ -4320,7 +4327,7 @@ fibonacci(n:int) ~> {
 
 ```lua
 -- Fast math generator (returnable)
-~square(n:int) => n * n
+~square(n:int) -> n * n
 ```
 
 You can create Generator functions that return an Iterator just using the `~>` Iterator Intent arrow and returning (yielding) one or move values.
@@ -4335,7 +4342,7 @@ generator() ~> {
 }
 ```
 
-⚠️ Notice it does not use `=>` like normal functions but `~>` instead.
+⚠️ Notice it does not use `->` like normal functions but `~>` instead.
 
 You can also inline it with multiple pipes:
 
@@ -4395,7 +4402,7 @@ You can also create generators directly to consume in Iterators
 And that drives us to Named Iterators:
 
 ```lua
-~square(n:int) => n * n
+~square(n:int) -> n * n
 
 squares:= ~(n = [1..5]) { square(n) }
 
@@ -4463,7 +4470,7 @@ users := db.users.getAll()
 Predicates can be very interesting in systems-level programming:
 
 ```lua
-sendHeader(flags:boolean) => {}
+sendHeader(flags:boolean) -> {}
 
 hasWritePerm(p:Process)::= p.permissions & 0b100
 hasReadPerm(p:Process)::= p.permissions & 0b010
@@ -4505,7 +4512,7 @@ Wide uses the @() form to handle error scenarios with three expressive variation
 When asserting you pass the assertion and a message:
 
 ```lua
-division(n:int, m:int) int => {
+division(n:int, m:int) -> int {
   @(m == 0, "Cannot divide by {n} by {m}")
   |n / m|
 }
@@ -4518,7 +4525,7 @@ division(10, 0) ❌ -- Execution will stop immediatly
 When capturing the error you propagate an assertion adding an empty `{}` Context Intent after the assertion. That will cause the error to be captured for later propagation.
 
 ```lua
-division(n:int, m:int) int => {
+division(n:int, m:int) -> int {
   @(m == 0, "Cannot divide by {n} by {m}"){}
   |n / m|
 }
@@ -4580,7 +4587,7 @@ You can also default to a value (in this case 0) using checking for truthiness:
 You can also self-capture a whole context for the error using `{}` placing the code inside it.
 
 ```lua
-printUserData() => {
+printUserData() -> {
   @("error fetching data") {
     users:= query("select from users")
 
@@ -4602,7 +4609,7 @@ Notice that in this case, there's not a condition to check as the first paramete
 What about capture and propagate? In this case, you can fake the compiler and just place an `_` placeholder in the place of a condition.
 
 ```lua
-fetchUserData() => User.. {
+fetchUserData() -> User.. {
   users:User..
 
   @(_, "error fetching users") {
@@ -4628,7 +4635,7 @@ Just destructuring `@`?
 That's possible only there's an assertion condition inside fetchUserData(), otherwide that would trigger an error:
 
 ```lua
-fetchUserData() => User.. {
+fetchUserData() -> User.. {
   users:User..
   users:= query("select name, age from users")
   |users|
@@ -4648,7 +4655,7 @@ For async just prefix a name with `@..` and it says `async` event started. When 
 For await just prefix a name with `..@` and it says `await` event started. When using it you are spreading an event to the Present (...).
 
 ```lua
-@..fetchUserData() => User.. {
+@..fetchUserData() -> User.. {
 
   users:User..
 
@@ -4738,7 +4745,7 @@ The HTML Fragment `<></>` is used to enclose the HTML Function body and has no `
 Functional Component `<Main />`
 
 ```lua
-Main(children:HTML) => <>
+Main(children:HTML) -> <>
   {children}
 </>
 ```
@@ -4746,7 +4753,7 @@ Main(children:HTML) => <>
 Functional Component `<Greet />`
 
 ```lua
-Greet(name: string) => <>
+Greet(name: string) -> <>
   <p>Hello, {name}</p>
 </>
 ```
@@ -4756,12 +4763,12 @@ Functional Component can have body, but for returning, you must place the `<></>
 Component `<HomePage />`:
 
 ```lua
-HomePage() => {
+HomePage() -> {
   userName:= "Mary"
   currentDate:= 2025
 
   -- Function used in button onclick
-  (changeUser) => {
+  (changeUser) -> {
     -- When you prefix an Entity with @ is reactive "shadowing", you mean:
     -- "React Asyncronously to it in-place" and update the UI
 
@@ -4837,7 +4844,7 @@ When aliasing anonymous objects, you are indeed just creating a new variable tha
   name: string,
   age: int
 
-  .printInfo() => {
+  .printInfo() -> {
     "{}, "",
     $person.name,
     $person.age
@@ -4888,7 +4895,7 @@ Objects are Entities that can have their own Entities and Functions.
 ```lua
 .Thing <
   -- this an Object Function
-  .doSomething() => {
+  .doSomething() -> {
     "Doing something!"
   }
 />
@@ -4916,7 +4923,7 @@ Think of it like Entities for Data that only Objects can have.
   .do:= true -- no need for [] when using on per line
 
   -- this an Object Function
-  .doSomething() => {
+  .doSomething() -> {
     .do ? "Do something!"
   }
 />
@@ -4928,7 +4935,7 @@ thing.do ? thing.doSomething() -- "Do something!"
 Everything thing from an Object that is not static IS self-referenced using `.` before it's name as in this line:
 
 ```lua
---.(doSomething) => {
+--.(doSomething) -> {
   .do ? "Do something!"
 --}
 ```
@@ -4936,7 +4943,7 @@ Everything thing from an Object that is not static IS self-referenced using `.` 
 `.do` means: `Thing.do` and that could be done inside the object.
 
 ```lua
---.(doSomething) => {
+--.(doSomething) -> {
   Thing.do ? "Do something!"
 --}
 ```
@@ -4948,7 +4955,7 @@ Objects can also be self-aliased like so:
 ```lua
 .Thing <
   .do:= true
-  .doSomething() => {
+  .doSomething() -> {
     Self.do ? "Do something!"
   }
 /Self>
@@ -4959,7 +4966,7 @@ Objects can also be self-aliased like so:
 ```lua
 .Thing <
   .do:= true
-  .doSomething() => {
+  .doSomething() -> {
     this.do ? "Do something!"
   }
 /this>
@@ -4972,7 +4979,7 @@ And now things can get weird for some and amazing for others:
   -- Make Meta Entity Mutable
   .$do:bool = true
 
-  .doSomething() => {
+  .doSomething() -> {
     .$do ? "Do something!"
   }
 />
@@ -5107,7 +5114,7 @@ Objects can have static scope internally themselves just removing the (.) access
   do:= true  -- No (.) means
 
   -- This is an ordinary Function, so it's static
-  doSomething() => { -- NO (.)
+  doSomething() -> { -- NO (.)
     do ? "Do something!"
   }
 />
@@ -5137,15 +5144,15 @@ Some examples using static:
 .Thing <
   .do:= true
 
-  .doSomething() => {
+  .doSomething() -> {
     .do ? "Do something!"
   }
 
   -- static Entity
-  newLambdaEntity:Thing = () => <Thing/>
+  newLambdaEntity:Thing = () -> <Thing/>
 
   -- static Function
-  newStaticFunction() => () => <Thing/>
+  newStaticFunction() -> () -> <Thing/>
 />
 
 
@@ -5175,8 +5182,8 @@ Example:
 
 ```lua
 .Dog <
-  new() => () => <Dog/>
-  makeSound() => "A dog is barking!"
+  new() -> () -> <Dog/>
+  makeSound() -> "A dog is barking!"
 />
 
 dog:= Dog.new()
@@ -5196,8 +5203,8 @@ Builder style:
 >
 
 .Dog <
-  new(name: string) => () => <Animal name/>
-  makeSound() => "{.name} is barking!"
+  new(name: string) -> () -> <Animal name/>
+  makeSound() -> "{.name} is barking!"
 />
 
 Dog..new("Marley").makeSound()
@@ -5206,7 +5213,7 @@ Dog..new("Marley").makeSound()
 Factory-style:
 
 ```lua
-makeDog(name: string) => <Dog name/>
+makeDog(name: string) -> <Dog name/>
 
 dog := makeDog("Marley")
 dog.makeSound()
@@ -5289,10 +5296,10 @@ Example of extending an Object:
 
   !instance:Thing -- private
 
-  count() => count -- static
-  .name() => .name -- public
-  ..value() => .value -- protected
-  !instance() => .instance ?.. <Thing /> -- private
+  count() -> count -- static
+  .name() -> .name -- public
+  ..value() -> .value -- protected
+  !instance() -> .instance ?.. <Thing /> -- private
 />
 
 -- Thing is extended by Something
@@ -5368,9 +5375,9 @@ Promoting Meta Entities from Constructor Lambda
     ..what:string, -- Has Acessor, is promoted to Meta Entity
     !when:string = "Never!", -- Has Acessor, is promoted to Meta
     nothing: false, -- Has NOT, is NOT promoted
-  ) => nothing ? "Doing nothing"
+  ) -> nothing ? "Doing nothing"
 
-  .doSomething() => {
+  .doSomething() -> {
     .do ? "{.what} will be done {.where}"
   }
 />
@@ -5401,7 +5408,7 @@ But you can make explict you intentions and separate constructor promoted entiti
   !(when:string = "Never!")
 
   -- Object Function
-  .doSomething() => {
+  .doSomething() -> {
     .do ? "{.what} will be done {.where}"
   }
 />
@@ -5417,7 +5424,7 @@ With NOT promoted Entities you enclose them between parentheses normally and acc
     entityOne:bool,
     entityTwo:bool,
     entityThree:bool
-  ) => {
+  ) -> {
     entityOne ? "Do One thing"
     entityTwo ? "Do Two thing"
     entityThree ? "Do Three thing"
@@ -5439,7 +5446,7 @@ When NOT promoted parameters are used you can also segment it like unnamed param
 
 ```lua
 .Thing <
-  (..params:int ) => {
+  (..params:int ) -> {
     ~(param = params) {
       "{param}\n"
     }
@@ -5482,13 +5489,13 @@ Thing <
   .instance:obj
 
   -- static Function cannot be abstracted but used in context
-  thingName() => thingName
+  thingName() -> thingName
 
   -- Notice that "." turned "!"
   .!instance() Thing -- abstract Function doesnt have body
 
   -- NOT abstract member
-  .name() => string {
+  .name() -> string {
     |.name ?.. thingName()| -- resolvable Function can have body
   }
 />
@@ -5501,8 +5508,8 @@ This is how Something will look after abstracting an Abstract Object:
   .name:string = "Something"
   .instance:Something = </>
 
-  .instance() => Self.instance
-  .name() => string {|
+  .instance() -> Self.instance
+  .name() -> string {|
     .name ?.. "How is it possible for me not having a name?"
   |}
 /Self>
@@ -5525,7 +5532,7 @@ same as:
 .Person <
 /
   -- enter slot mode if used
-  (slot) => slot
+  (slot) -> slot
 />
 ```
 
@@ -5547,7 +5554,7 @@ They work like Static Functions and are accessed by `..`.
 .Person <
   (.name:string = "Stranger")
 /
-  (slot) => {
+  (slot) -> {
     slot?..<div id="person-slot">
       <p>"Welcome, {Self.name}"</p>
     </div>
@@ -5570,18 +5577,18 @@ You can emulate the same behaviour on Functions as well, but in this case you do
 Like Objects you get them for free:
 
 ```lua
-Greet() => {}
+Greet() -> {}
 ```
 
 same as:
 
 ```lua
-Greet() => {
+Greet() -> {
   -- default return || or output from body
 
   -- enter slot mode if used
 /
-  (slot) => slot
+  (slot) -> slot
 /}
 ```
 
@@ -5600,13 +5607,13 @@ That alone would be senseless!
 An useful example using the previous Person object together:
 
 ```lua
-Greet(name:string) => {
+Greet(name:string) -> {
   -- default return || or output from body
   |<p>"Hello, {name} from Function"</p>|
 
   -- enter slot mode if used
 /
-  () => <p>"Hello, {name} from Function Slot"</p>
+  () -> <p>"Hello, {name} from Function Slot"</p>
 /}
 
 <Person ("Alice")>
@@ -5630,17 +5637,17 @@ But you can have multiple slots, but in this case, they must all be manually cal
 .Person <
   (.name:string = "Stranger")
 /
-  (slot) => {
+  (slot) -> {
     slot?..<div id="person-slot">
       <p>"Welcome, {Self.name}"</p>
     </div>
   }
 
-  header(slot) => {
+  header(slot) -> {
     slot?..<header>"My App"</header>
   }
 
-  footer(slot) => {
+  footer(slot) -> {
     slot?..<footer>"My Footer"</footer>
   }
 /Self>
@@ -5663,9 +5670,9 @@ All the above cases where done at runtime, but you can access slots at compile t
 Use ! after a function or object name to invoke its slot expansion logic at compile time. This allows components or functions to act as macros without losing runtime behavior.
 
 ```lua
-println(input:obj, ..args) => {
+println(input:obj, ..args) -> {
 /
-  (slot)=> {
+  (slot) -> {
     output:string = ""
     ~(arg = args) {
       output+= input.replace("{}", arg)
@@ -5707,18 +5714,18 @@ To use in objects just compose and implement Interface's Functions:
 ```lua
 .Person :Speaker <
 
-  .speak() => {
+  .speak() -> {
     "Shit!"
   }
 />
 
 .Robot :Speaker, Mover <
 
-  .speak() => {
+  .speak() -> {
     "Bits and Shits!"
   }
 
-  .move() => {
+  .move() -> {
     "Shifting bits >>>>>"
   }
 />
@@ -5727,11 +5734,11 @@ To use in objects just compose and implement Interface's Functions:
 
   .name:string = "Talking Car"
 
-  .speak() => {
+  .speak() -> {
     "Beep beep!"
   }
 
-  .move() => {
+  .move() -> {
     "Rolling tyres..."
   }
 />
@@ -5751,13 +5758,13 @@ You create traits using `::` symbols.
 
 ```lua
 ::Hello <
-  .sayHello() => {
+  .sayHello() -> {
     "Hello "
   }
 />
 
 ::Wide <
-  .sayWide() => {
+  .sayWide() -> {
     "Wide!"
   }
 />
@@ -5774,7 +5781,7 @@ You can use Traits like this for extending and simulating Multiple Inheritance:
   ::Hello
   ::Wide
 
-  .exclamation() => "!"
+  .exclamation() -> "!"
 />
 
 obj:HelloWide = </>
@@ -5787,21 +5794,21 @@ obj.exclamation()
 
 ```lua
 ::A <
-  .smallTalk() => {
+  .smallTalk() -> {
     "a"
   }
 
-  .bigTalk() => {
+  .bigTalk() -> {
     "A"
   }
 />
 
 ::B <
-  .smallTalk() => {
+  .smallTalk() -> {
     "b"
   }
 
-  .bigTalk() => {
+  .bigTalk() -> {
     "B"
   }
 />
@@ -5956,12 +5963,12 @@ In this section let's use this 3 named Objects structures:
 ```lua
 .Talker <
   .name:string = "Stranger"
-  .talk()=> "{} is talking...", Self.name
+  .talk() -> "{} is talking...", Self.name
 /Self>
 
 .Eater <
   .name:string = "Stranger"
-  .eat()=> "{} is eating...", Self.name
+  .eat() -> "{} is eating...", Self.name
 /Self>
 
 .Person <.[
@@ -6091,13 +6098,13 @@ With Flow Extension Entity, you can just pass a Trait to a destructive Entity an
 ..Flow Flow -- import Flow trait from Flow Module
 
 ..values = [1, 39, 21, 3, 14, 50]
-values.map(x => x + 1).filter(x => x > 10)
+values.map((x) -> x + 1).filter((x) -> x > 10)
 ```
 
 But that unnecessary per se, because Lists would already offer such a feature. But it's interesting to work with Functions returned values:
 
 ```lua
-getTokens() => {
+getTokens() -> {
   | "one", 1, "two", 2, "three", 3 |
 }
 
@@ -6105,7 +6112,7 @@ getTokens() => {
 
 ..tokens::(Flow) := getTokens()
 
-tokens.filter(t => t::(Stringable)).join(", ")
+tokens.filter((t) -> t::(Stringable)).join(", ")
 ```
 
 In all case, there are some things to be noticed:
@@ -6149,7 +6156,7 @@ You create Generics in Wide using `{}` Context Intent, because guess what? - you
 You can pass the use Generics with Functions, Objects, Interfaces, Traits, Enums, and Structs.
 
 ```lua
-calculateAverage{T}(a:T, b:T) => T {
+calculateAverage{T}(a:T, b:T) -> T {
   |(a + b) / 2|
 }
 
@@ -6170,7 +6177,7 @@ Example using Object
 
 ```lua
 .Calculate{T} <
-  .average(a:T b:T) => T {
+  .average(a:T b:T) -> T {
     |(a + b) / 2|
   }
 />
@@ -6222,7 +6229,7 @@ Another example:
 .Stack{T} <
   !stack: T..
 
-  .push(item: T) => {
+  .push(item: T) -> {
     Self.stack.(push item)
   }
 /{Self}>
@@ -6252,7 +6259,7 @@ stringStack.push(aNumber)
 Multiple type parameters can be defined within the angle brackets {} when declaring a generic function, interface, trait, enum, struct or object. Each type parameter represents a distinct type that can be specified when the generic is used.
 
 ```lua
-processData{T, U}(input1: T, input2: U) => T, U {|
+processData{T, U}(input1: T, input2: U) -> T, U {|
   [input1, input2]
 |}
 
@@ -6263,7 +6270,7 @@ result:= processData{int, string}(10, "hello")
 Union types (|) allow a generic type to accept values of different types. This is useful when a function or component needs to handle a variety of input types.
 
 ```lua
-handleInput{T}(input: T) =>
+handleInput{T}(input: T) ->
 T // T: string | int {
   |input|
 }
@@ -6283,7 +6290,7 @@ Intersection types (&) combine multiple types into one, requiring a value to sat
   .age: int
 />
 
-processEntity{T}(entity: T) =>
+processEntity{T}(entity: T) ->
 string // T::(HasName & HasAge) {
   |"{entity.name} is {entity.age} years old"|
 }
@@ -6305,13 +6312,13 @@ Type constraints can be used with generics to specify that a type parameter must
   .print()
 />
 
-printItem{T: Printable}(item: T) => {
+printItem{T: Printable}(item: T) -> {
   item.print()
 }
 
 
 .Document :Printable <
-  .print() => {
+  .print() -> {
     "Printing Document"
   }
 />
@@ -6364,7 +6371,7 @@ currentDirection:= #CardinalDirections..East
   NumberValue: 1
 />
 
-handleResponse(code: StatusCodes) => code ? {
+handleResponse(code: StatusCodes) -> code ? {
   #StatusCodes..OK => {
     -- Handle successful response
   },
@@ -6388,7 +6395,7 @@ You can be quite creative with them:
   Friday,
   Saturday
 
-  clip() => Day ? {
+  clip() -> Day ? {
     -- Day.. in the match expresions are not necessary
     -- because Members of Enum are static themselves
     Day..Monday => "Mon",
@@ -6427,7 +6434,7 @@ Enum members have Lambda Constructors like Objects, so you can push your creativ
   Disconnect,
 />
 
-process_message{T}(msg: Message{T}) => msg ? {
+process_message{T}(msg: Message{T}) -> msg ? {
   #Message..Text(content) => { "Text message: {content}" },
   #Message..Binary(data) => { "Binary message of {data.len()} bytes" },
   #Message..Control(cmd) => cmd ? {
@@ -6436,7 +6443,7 @@ process_message{T}(msg: Message{T}) => msg ? {
   },
 }
 
-() => {
+() -> {
   msg1:= #Message..Text(String::from("Hello!"))
   msg2:= #Message..Binary([0xDE, 0xAD, 0xBE, 0xEF])
   msg3:= #Message..Control(Command..Ping)
@@ -6507,7 +6514,7 @@ Attributes are declared using `@[]` Intents and contain one or more calls to fun
 
 ```lua
 @[route(path: "/aircraft/{id}")]
-show(id:int) => View {||}
+show(id:int) -> View {||}
 ```
 
 ```lua
@@ -6549,7 +6556,7 @@ Attributes can inherit from one another using `:` Interfaces or `::` Traits just
 
 .BookController <
   @[<GetRoute path:"/books" />]
-  .listBooks() => {
+  .listBooks() -> {
     -- list books...
   }
 />
@@ -6580,7 +6587,7 @@ Since attributes are objects, they can **implement traits** or even **use other 
 
 ```lua
 ::Auditable<
-  .auditLog(message:string) => {||}
+  .auditLog(message:string) -> {||}
 />
 
 :AuditAttribute ::Auditable<
@@ -6627,7 +6634,7 @@ For example:
  * @returns string
  */
 @[attrFunc(value1: "value 01", value2: "value 02", value3: "value 03")]
-yourFunc(arg1:string, arg2:string, arg3:string = "arg 03") => ""
+yourFunc(arg1:string, arg2:string, arg3:string = "arg 03") -> ""
 ```
 
 Using instropection and reflection at the same time is indistinguishable:
@@ -6747,20 +6754,20 @@ Output:
 
 ```lua
 .Callback <
-  () => {
+  () -> {
     "I'm Callback Object"
   }
 />
-anotherCallback() => {
+anotherCallback() -> {
   "I'm another callback Function"
 }
 
-callback(anotherCallback:fn) => {
+callback(anotherCallback:fn) -> {
   "I'm callback Function"
 }
 
 @[callback, Callback]
-myFunc() => {}
+myFunc() -> {}
 
 
 myFunc@..callback() -- Output: "I'm callback Function"
@@ -6778,8 +6785,8 @@ Pipe operator in wide is `>>` with is itself an Intent.
 userInput:= [12 7 9 33 8]
 
 result:= userInput
-  >> .filter(n) => n % 2 = 0
-  >> .map(n) => n * n
+  >> .filter((n) -> n % 2 = 0)
+  >> .map((n) -> n * n)
   >> .sum()
 ```
 
@@ -6791,8 +6798,8 @@ The `.` Resolution Intention knows that `>>` Pipe Intent, but if Wide had a reso
 userInput:= [12 7 9 33 8]
 
 result:= userInput
-  >> List.filter(n) => n % 2 = 0
-  >> List.map(n) => n * n
+  >> List.filter((n) -> n % 2 = 0)
+  >> List.map((n) -> n * n)
   >> List.sum()
 ```
 
@@ -6802,8 +6809,8 @@ What indeed is internally is like this:
 userInput:= [12 7 9 33 8]
 
 result: userInput
-  >> [].filter(n) => n % 2 = 0
-  >> [].map(n) => n * n
+  >> [].filter((n) -> n % 2 = 0)
+  >> [].map((n) -> n * n)
   >> [].sum()
 ```
 
@@ -7023,13 +7030,13 @@ You can also force final result casting (expression-level):
 You can also use in function calls:
 
 ```lua
-sum(a:i32, b:i32) => a + b
+sum(a:i32, b:i32) -> a + b
 
-printSum(a:i32, b:i32) => {
+printSum(a:i32, b:i32) -> {
   "Sum is {}", a + b
 }
 
-() => {
+() -> {
   x:i64 = 100
   y:i64 = 200
 
@@ -7045,7 +7052,7 @@ printSum(a:i32, b:i32) => {
 Just going creative:
 
 ```lua
-printSum(a: int | float, b: int | float) => (a, b) ? {
+printSum(a: int | float, b: int | float) -> (a, b) ? {
   /a/ float => {
     /b/ float ? "Sum is {}", a + b . "Sum is {}", a + b:i32
   },
@@ -7053,7 +7060,7 @@ printSum(a: int | float, b: int | float) => (a, b) ? {
   . => "Sum is {}", a + b
 }
 
-printSum(a: int | float, b: int | float) => (a, b) ? {
+printSum(a: int | float, b: int | float) -> (a, b) ? {
   // a float => {
     // b float ? "Sum is {}", a + b . "Sum is {}", a + b:i32
   },
@@ -7089,7 +7096,7 @@ You export prefixing what you want to export using the `&` Extern Intent:
 & .Animal <
   ...animals: []string
 
-  .add(name:string) => {
+  .add(name:string) -> {
     .animals[] = name
   }
 />
@@ -7111,7 +7118,7 @@ You import using the `..` Extent Intent passing the path of the file that contai
 ..{Status} ./libs/Zoo
 -- ..{ZooKeeper} ./libs/Zoo ❌ -- Error: Cannot import not exported entity ZooKeeper
 
-() => {
+() -> {
   zooName:= zoo
   zooStatus:= #Status..Open
 
@@ -7185,7 +7192,7 @@ Safari..{
   Status
 } ./libs/Zoo
 
-() => {
+() -> {
   -- using named import
   Zoo.zooName:= zoo
   Zoo.zooStatus:= #Status..Open
@@ -7220,7 +7227,7 @@ Whenever a module is available in core Wide STL, you can just import any of its 
 ```lua
 ..Math Math
 
-() => {
+() -> {
   -- Direct module call (static): Math's functions are used like a namespace
   values{a=1, b=2}:int
   "Max: {} and Min: {}", Math.max(..values), Math.min(..values)
@@ -7310,15 +7317,15 @@ The following example is also a good case for grouping members with `[]` Meta In
   (.value:int)
 
   .[
-    =(other:Number) => Self.value = other.value < 0 ? 0 . other.value
-    ==(other:Number) => Self.value == other.value
-    <(other:Number) => Self.value < other.value
-    >(other:Number) => Self.value > other.value
-    +(other:Number) => Self.value + other.value
-    -(other:Number) => Self.value - other.value
-    *(other:Number) => Self.value * other.value
-    /(other:Number) => Self.value / other.value
-    %(other:Number) => Self.value % other.value
+    =(other:Number) -> Self.value = other.value < 0 ? 0 . other.value
+    ==(other:Number) -> Self.value == other.value
+    <(other:Number) -> Self.value < other.value
+    >(other:Number) -> Self.value > other.value
+    +(other:Number) -> Self.value + other.value
+    -(other:Number) -> Self.value - other.value
+    *(other:Number) -> Self.value * other.value
+    /(other:Number) -> Self.value / other.value
+    %(other:Number) -> Self.value % other.value
   ]
 /Self>
 
