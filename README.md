@@ -7314,6 +7314,144 @@ Whenever a module is available in core Wide STL, you can just import any of its 
 }
 ```
 
+## Operators
+
+Wide mostly uses the common operators in other programming languages with some custom ones
+
+⚠️ Operators marked with `$` must be Mutables prefixed with the State Intent
+
+### Arithmetic Operators
+
+| Operator | Name |
+|:---:|----|
+| - | Addition |
+| - | Subtraction |
+| - | Multiplication |
+| / | Division |
+| % | Remainder (modulo) |
+
+### Assignment Operators
+
+| Operator | Name |
+|:---:|----|
+| =  | Assignment (special cases) |
+| =  | Reassignment ($) |
+| =  | Destructuring (on iterations) |
+| := | Assignment (birth and shadowning only) |
+| := | Predicate |
+| += | Add and assign ($) |
+| -= | Subtract and assign ($) |
+| *= | Multiply and assign ($) |
+| /= | Divide and assign ($) |
+| %= | Remainder and assign ($) |
+| ~= | Iterator Assignment |
+| <~ | Generator Assignment |
+
+### Bitwise Operators
+
+| Operator | Name |
+|:---:|----|
+| !  | Bitwise NOT |
+| &  | Bitwise AND |
+| \| | Bitwise OR |
+| ^  | Bitwise XOR |
+| << | Left shift |
+| >> | Right shift |
+
+### Bitwise Assignment Operators
+
+| Operator | Name |
+|:---:|----|
+| &=  | AND and assign ($) |
+| \|= | OR and assign ($) |
+| ^=  | XOR and assign ($) |
+| <<= | Left shift and assign ($) |
+| >>= | Right shift and assign ($) |
+| >>= | Right shift and assign ($) |
+
+### Logical Operators
+
+| Operator | Name |
+|:---:|----|
+| &&  | Logical AND (& in predicates) |
+| \|\|  | Logical OR (\| in predicates) |
+| !   | Logical NOT (same as bitwise NOT) |
+
+### Comparison Operators
+
+| Operator | Name |
+|:---:|----|
+| == | Equal to |
+| != | Not equal to |
+| <  | Less than |
+| >  | Greater than |
+| <= | Less than or equal |
+| >= | Greater than or equal |
+
+### Casting Operators
+
+| Operator | Name |
+|:---:|----|
+| :  | Type cast (`fromType:toType`) |
+
+### Range Operators
+
+Wide is one-based and always include edges
+
+| Operator | Name |
+|:---:|----|
+| ..  |Inclusive range |
+
+### Other Symbolic Operators
+
+| Operator | Name |
+|:---:|----|
+| @   | Error Checking |
+| :   | Type |
+| ::  | Trait |
+| #  | Enum |
+| ->  | Return |
+| ~>  | Generator |
+| =>  | Match |
+| _   | Wildcard |
+| ?   | Question |
+| .   | Resolution |
+| ..  | Extent |
+| ..  | Spread |
+| ... | Continuous |
+
+### Reference and Dereference Operators
+
+| Operator | Name |
+|:---:|----|
+| %  | Share |
+| $  | Mutable |
+| * | Dereference |
+
+### Pointers and Raw Pointers
+
+| Operator | Name |
+|:---:|----|
+| * | Memory Pointer ($ also) |
+
+### Function, Closure and Predictade Operators
+
+| Operator | Name |
+|:---:|----|
+| //  | Inclusion |
+| ()  | Call |
+| {}  | Context |
+| ::  | Predicate |
+
+### Structural Matching Operators
+
+| Operator | Name |
+|:---:|----|
+| ?  | Question |
+| ?? | Chain (Question) |
+| .  | Last (Question) (alias for Resolution) |
+| ~  | Iterator |
+
 ## Operators Overloading
 
 Wide can overload most of its operators when working with Object Entities.
