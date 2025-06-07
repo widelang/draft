@@ -3733,9 +3733,7 @@ greet("World") -- Output: Hello, World!
 When you create a function like this:
 
 ```lua
-greet() -> {
-
-}
+greet() -> {}
 ```
 
 It will return an empty `||` Wall by default because there's no return type nor a return value defined in the function.
@@ -3764,21 +3762,11 @@ If you need to return value(s) you need use the `||` Wall Intent at the end of t
 To return a single value, just enclose that value in between Walls:
 
 ```lua
-singleReturn() -> {
+singleReturn() -> int {
   |10|
 }
 
 "{}", singleReturn() -- Output 10
-```
-
-To return multiple values, just enclose values separated by commas between Walls:
-
-```lua
-mutipleReturns() -> {
-  |10,20,20|
-}
-
-"{}", mutipleReturns() -- Output 10, 20, 30
 ```
 
 Function that returns a message based single on parameter:
@@ -3797,7 +3785,7 @@ message: greet("World")
 "{}", message -- Hello, World!
 ```
 
-As you saw, the `||` Wall Intent is used to return a value from a Function, but you can inline Functions when using the `=>` Lambda Intent alone. You don't need to use the Wall Intent on inlined functions.
+As you saw, the `||` Wall Intent is used to return a value from a Function, but you can inline Functions when using the `->` Lambda Intent alone. You don't need to use the Wall Intent on inlined functions.
 
 ```lua
 -- Inlined function
@@ -3834,7 +3822,7 @@ For all other data or structure types it's okay since they can't be printed dire
 
 ```lua
 -- Wide knows when it's another type other then "" and there's no confusion
--- int return inferred (no => "{number * 10}" here)
+-- int return inferred (no -> "{number * 10}" here)
 times10(number:int) -> number * 10
 
 result:= times10(10)
@@ -3859,6 +3847,26 @@ sum(0, 0)..? "falsy"
 
 See why the previous `// greet()` checked for `||`? Because there's no returned value inside `||` alone to be checked agains a value type. Be it explicit `greet() -> {||}` or implicit `greet() -> {}`, `||` alone never has a type nor a value, but in the case of `/int/ sum(1, 1)`, sum returns `int` value inside `|n+m|`, so `// sum(1, 1)` would result in false, `// greet()` in true, because `||` has nothing to match againt. So `// == ||` = `true`!
 
+### Multiple Return Values
+
+To return multiple values, just enclose values separated by commas between Walls:
+
+```lua
+mutipleReturns() -> int.3 {
+  |10,20,20|
+}
+
+"{}", mutipleReturns() -- Output 10, 20, 30
+```
+
+If you don't know how many values your are gona return, just spread the return:
+
+```lua
+mutipleReturns() -> int.. {
+  |10,20,20,30,40,50|
+}
+```
+
 ### Early Return
 
 There are cases where you may want to immediately stop execution and return early — either because the input doesn't match a valid case, or some condition demands an exit. This is commonly called **early return** or **early exit** in many programming languages.
@@ -3867,7 +3875,7 @@ In Wide, you use the `||` **Wall Intent** to express this.
 
 ```lua
 f(x: i32) -> {
-  x <= 0 ? { || }
+  x <= 0 ?  { || }
   x == 4 ?? { || }
   x == 7 ?? { || }
 
@@ -3900,7 +3908,7 @@ f(x: i32) -> {
 }
 ```
 
-This ensures that || is always visually interpreted as a control-flow break, not part of a logic chain.
+This ensures that `||` is always visually interpreted as a control-flow break, not part of a logic chain.
 
 If you're returning an actual value — not a Wall — you can inline safely:
 
@@ -5629,6 +5637,7 @@ When using objects like HTML tags, you got free slots:
 
 ```lua
 .Person <
+  -- body here
 />
 ```
 
@@ -7210,7 +7219,7 @@ contents:=  .//hello.txt
 To get the file lines you just spread the file lines:
 
 ```lua
-..lines:=  .//hello.txt
+..lines:=  ./hello.txt
 
 ~(line = lines) {
   "{}\n", line
@@ -7226,7 +7235,7 @@ Ending lines "\n" or "\t\n" will be removed on spread.
 To write to Files you must open the file using a Mutable entity:
 
 ```lua
-$contents:=  .//hello.txt
+$contents:=  ./hello.txt
 $contents = "Hello, Wide!"
 ```
 
@@ -7235,7 +7244,7 @@ That will override all the file contents and replace everything by "Hello, Wide!
 If you just want to append you must use `+=` operator:
 
 ```lua
-$contents:=  .//hello.txt
+$contents:=  ./hello.txt
 $contents += "Hello, Wide!"
 ```
 
@@ -7246,7 +7255,7 @@ That will keep the previous file contents and append a new line with "Hello, Wid
 You can add content to to a file spreading multiple lines into it using a collection:
 
 ```lua
-$contents:=  .//hello.txt
+$contents:=  ./hello.txt
 
 lines:= [
   "Hello, Wide",
@@ -7276,13 +7285,13 @@ Files are closed in the end of the scope their opened respecting the same rules 
 
 ```lua
 -- First opening
-contents:=  .//hello.txt
+contents:=  ./hello.txt
 {
   -- Second opening
-  contents:=  .//hello.txt
+  contents:=  ./hello.txt
   {
     -- Third opening
-    contents:=  .//hello.txt
+    contents:=  ./hello.txt
     -- Third closing
   }
   -- Second closing
@@ -7458,7 +7467,7 @@ Just to show one possible example:
 }
 
 error ? {
-  "{}", error?.. -- Will output the any error
+  "{}", error?.. -- Will output any error if any provided by Wide
   |1| -- |1| means: Exit if error 1
 }
 ```
