@@ -2243,9 +2243,11 @@ There's more to slices, but that's just a taste for you to meat Ranges after Ite
 
 ## Positionals
 
-You can change Collections in Wide using Positionals. They are like Slices alike that can change the Collections.
+You can change Collections in Wide using Positionals.
 
-In all examples will be using this list:
+They are like Slices and can change Collections.
+
+In all examples we'll be using this list:
 
 ```lua
 $list := [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -2305,8 +2307,6 @@ positiveInfinity:= ..+
 So when you do `..=` or `=..` you are just giving Limits to a Finite Collection.
 
 Hope that makes sense!
-
-## Positionals
 
 **Positionals** allows you to handle collections in place with simple math operators.
 
@@ -4427,8 +4427,10 @@ P(n) ::= n is even
 
 This defines a family of statements:
 
+```text
 "4 is even" -> true
 "5 is even" -> false
+```
 
 In Wide, you can define predicates using `::=` Predicate Intent:
 
@@ -4801,13 +4803,53 @@ Wide has full support for advanced object oriented programming, but it has a lot
 
 ### Objects
 
-⚠️ Wide has no keywords but naming is necessary, so English was choosen for naming Entities in Wide and its core Objects, Functions, Types and others.
-
 Every Entity in Wide is an Object behind the scenes.
+
+You can create your own objects.
+
+To create an Object you use the symbols `<` to start the body and `/>` to close the body of it.
+
+```lua
+<
+  -- body here
+/>
+```
+
+To initialize an object you just `</>`:
+
+```lua
+myObject:= </>
+```
+
+That's an anonymous object per se! But can name your objects:
+
+```lua
+MyObject <
+  -- body here
+/>
+```
+
+The above is Abstract and can't be used alone, so you must prefix it with a `.` resolution operator:
+
+```lua
+.MyObject <
+  -- body here
+/>
+```
+
+And now you can use in any of the following forms:
+
+```lua
+myObject:MyObject = </>
+myObject:= <MyObject/>
+myObject:= MyObject.()
+```
+
+You'll see more about creating objects in wide in the next sections.
 
 ### Anonymous Objects
 
-Every time you see it `</>` alone you are seeing an object it's an anonymous object:
+Every time you see it `</>` alone you are seeing a representation of an anonymous object:
 
 ```lua
 $person:= < -- Unnamed Objects is an Anonymous Object
@@ -4864,7 +4906,9 @@ They are objects that you use to create concrete Object Entities and you can res
 You create a concrete object by prefixing its name with `.`:
 
 ```lua
-.Thing </>
+.Thing <
+  -- body here
+/>
 ```
 
 And resolve it like this:
@@ -5247,6 +5291,32 @@ When you have multiple Meta Entities you can just group them using the `[]` Meta
 />
 ```
 
+### Object Predicates
+
+Wide support for predicates can be applied to Objects.
+
+When used in objects they are accessed via the `::` Predicate operator:
+
+```lua
+.User <
+  .email:string
+  .age:int
+  .active:bool
+
+  isAdult()::= Self.age >= 18
+  hasEmail()::= Self.email..?
+  canLogin()::= Self.active | Self::hasEmail
+/Self>
+
+user:= User.()
+
+user::canLogin? {
+  showDashboard()
+} . {
+  doLogout()
+}
+```
+
 ### Extent Objects
 
 They are objects that you create to use in other Object Entities and you can't resolve them directly.
@@ -5258,9 +5328,13 @@ You can use several Interfaces and Traits when creating Resolution Objects as yo
 You create Extent Objects using `..` before its name:
 
 ```lua
-..Thing</>
+..Thing<
+  -- body here
+/>
 
-.SomeThing ..Thing </>
+.SomeThing ..Thing <
+  -- body here
+/>
 
 thing:Something = </> -- Ok,  no problem!
 thing:Thing = </> ❌ -- Error you cannot resolve Extent Object Thing
@@ -5303,7 +5377,9 @@ Example of extending an Object:
 />
 
 -- Thing is extended by Something
-.SomeThing ..Thing </>
+.SomeThing ..Thing <
+  -- body here
+/>
 ```
 
 In the above example Something becomes:
