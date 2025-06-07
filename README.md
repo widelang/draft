@@ -4648,6 +4648,36 @@ fetchUserData() -> User.. {
 @ = fetchUserData() ❌ -- Error: no assertion found in printUserData()
 ```
 
+### Catch-all Error
+
+To catch all errors you can capture:
+
+```lua
+@(error) {
+  result = 1 / 0
+}
+
+"{}", error
+```
+
+That will catch the Division by Zero error but won't break the program.
+
+### Forcing exit on Error
+
+To force exit on error you must use `|ERROR_CODE|`:
+
+```lua
+@(error) {
+  result = 1 / 0
+}
+
+error ? {
+  doSomeCleanup()
+  "{}", error
+  |1|
+}
+```
+
 ## Async/Await
 
 Wide can handle async/await like in many contexts.
@@ -7145,6 +7175,294 @@ printSum(a: int | float, b: int | float) -> (a, b) ? {
 }
 ```
 
+## File Handling
+
+Wide has a very simple and effective way to handle files and directories.
+
+### `./` File Intent
+
+Whenever you see the `./` File Intent, you can think:
+
+- It resolves to a file
+
+### Opening Files
+
+To open file, just define an Entity and pass the path to the file:
+
+```lua
+contents:=  ./hello.txt
+"{}", contents
+```
+
+The above example will output the contents of "hello.txt" as a string.
+
+Using `./` alone means "**relative path**".
+
+If need to open an **absolute path**, just add one more `/`:
+
+```lua
+contents:=  .//hello.txt
+"{}", contents
+```
+
+### File Lines
+
+To get the file lines you just spread the file lines:
+
+```lua
+..lines:=  .//hello.txt
+
+~(line = lines) {
+  "{}\n", line
+}
+```
+
+That will open the file and extract all lines.
+
+Ending lines "\n" or "\t\n" will be removed on spread.
+
+### Writing to Files
+
+To write to Files you must open the file using a Mutable entity:
+
+```lua
+$contents:=  .//hello.txt
+$contents = "Hello, Wide!"
+```
+
+That will override all the file contents and replace everything by "Hello, Wide!".
+
+If you just want to append you must use `+=` operator:
+
+```lua
+$contents:=  .//hello.txt
+$contents += "Hello, Wide!"
+```
+
+That will keep the previous file contents and append a new line with "Hello, Wide!" to the end of the file.
+
+### Writing to Files by Line
+
+You can add content to to a file spreading multiple lines into it using a collection:
+
+```lua
+$contents:=  .//hello.txt
+
+lines:= [
+  "Hello, Wide",
+  "Hello, You",
+  "Hello, Dog",
+  "Hello, Whatever"
+]
+
+-- Appending
+$contents += ..lines
+
+-- Replacing whole file
+$contents = ..lines
+```
+
+In both cases Wide will iterate over the Collection and insert line by line.
+
+The resulting file contents will depend on the operator you use:
+
+- appended if you use `+=`
+
+- replaced if you use `=`
+
+### Closing Files
+
+Files are closed in the end of the scope their opened respecting the same rules for Entities.
+
+```lua
+-- First opening
+contents:=  .//hello.txt
+{
+  -- Second opening
+  contents:=  .//hello.txt
+  {
+    -- Third opening
+    contents:=  .//hello.txt
+    -- Third closing
+  }
+  -- Second closing
+}
+-- First closing
+```
+
+In the above example the file will be opened 3 times and closed 3 times.
+
+### Directories
+
+Directories are treated the same way files are, you just pass a directory path and Wide will provide an iterator for you:
+
+```lua
+files:= ./scripts
+
+~(file = files) {
+  // . file ? {
+    "File is dot, continue"
+    >>
+  }
+  file += "\n" -- just append an empty line to each file
+}
+```
+
+### Adding Files to Directories
+
+To add files, just use `+=` operator or `+()` method on a Mutable entity that opened a directory along with the file content:
+
+```lua
+$files:= ./scripts
+
+contents:= "Hello, wide!\n"
+
+$files += ./newfile.js, contents
+
+$files.+(./anotherFile.js, contents)
+```
+
+When adding contents to files manually you must provide line breaks where you want them.
+
+If you don't pass the file content it will create an empty file:
+
+```lua
+$files:= ./scripts
+
+$files += ./newfile.js
+
+$files.+(./anotherFile.js)
+```
+
+If you don't want an existing file to be overriden, you must prefix the file name with `!` Not Intent:
+
+```lua
+$files:= ./scripts
+
+$files += !./newfile.js
+
+$files.+(!./anotherFile.js)
+```
+
+### Directories to Directories
+
+You can add directories the same way, as adding files, with the exception that they don't have content:
+
+```lua
+$files:= ./scripts
+
+$files += !./shared
+
+$files.+(!./admin)
+```
+
+And you can remove:
+
+```lua
+$files:= ./scripts
+
+$files -= ./shared
+
+$files.-(./admin)
+```
+
+### Moving
+
+To move files or directories you must create a Mutable entities with the path to where and use `<<=` operator or `<<()` method to move the paths you want to:
+
+```lua
+$to:= ./folder1
+
+$to <<= ./folder2
+$to << ./../../other.txt
+
+--or
+
+$to.<<(./folder2)
+$to.<<(./../../other.txt)
+```
+
+And if you don't want to override an existing, just use `!` Not Intent:
+
+```lua
+$to:= ./folder1
+
+$to <<= !./folder2
+$to << !./../../other.txt
+
+--or
+
+$to.<<(!./folder2)
+$to.<<(!./../../other.txt)
+```
+
+### Checking if a file or directory exists
+
+To check the existence of a file or a directory you just question its name. You don't check for truthiness of file handlers:
+
+```lua
+./file.js ? {
+  $file:= ./file.js
+}
+```
+
+Or you can do both at the same time:
+
+```lua
+$file:= ./file.js ? {
+  $file += "\n"
+}
+```
+
+The same is true for diretories.
+
+```lua
+$shared:= ./shared ? {
+  $shared += ./newfile.js, "\n"
+}
+```
+
+### Removing Files from Directories
+
+To add files, just use `-=` operator or `-()` method on a Mutable entity that opened a directory:
+
+```lua
+files:= ./scripts
+files -= ./newfile.js
+files.-(./anotherFile.js)
+```
+
+### Handling Files and Directories Asynchronously
+
+To handle any operation on files or directories you just se the `..@/` Await Intent:
+
+```lua
+$shared:= ..@/shared ? {
+  $shared += ..@/newfile.js, "\n"
+  $shared -= ..@/newfile.js
+}
+```
+
+### Handling Error on File
+
+You handle errors the default way in Wide.
+
+Just to show one possible example:
+
+```lua
+@(error) {
+  $shared:= ..@/shared ? {
+    $shared += ..@/newfile.js, "\n"
+    $shared -= ..@/newfile.js
+  }
+}
+
+error ? {
+  "{}", error?.. -- Will output the any error
+  |1| -- |1| means: Exit if error 1
+}
+```
+
 ## Exports and Imports
 
 Wide has a very simple system for importing with `..` and exporting with `&`.
@@ -7396,7 +7714,7 @@ Wide mostly uses the common operators in other programming languages with some c
 
 ### Range Operators
 
-Wide is one-based and always include edges
+Wide is one-based and always includes edges
 
 | Operator | Name |
 |:---:|----|
