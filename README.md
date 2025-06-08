@@ -1,5 +1,7 @@
 # 🧩 Wide Language
 
+Wide was created to allow reactive HTML to happen...
+
 ```html
 <!-- hello.html -->
 
@@ -34,6 +36,40 @@ When running **wide run hello.html** it will produce this output:
 ```
 
 When running **wide run  8080 hello.html** will serve to be opened on <http://localhost:8080>
+
+But it ended up becoming capable of this:
+
+```lua
+::Modulo <
+  .dividend:int
+  .divisor:int
+
+  .%(other: Modulo) -> Self.dividend % other.divisor
+/Self>
+
+PairInt{T::Modulo} {
+  quotient: T,
+  remainder: T
+}
+
+PairFloat{T} {
+  quotient: T
+}
+
+:Pair = PairInt|PairFloat
+
+divide{T}(dividend: T, divisor: T)
+// T: Divisible | Modulo -> Pair:Module
+  ? Pair {
+    quotient: dividend / divisor,
+    remainder: dividend % divisor
+  }
+  . Pair {
+    quotient: dividend / divisor
+  }
+```
+
+If you wanna know more about Wide, just continue!
 
 ## Intent-Oriented Programming
 
@@ -3847,6 +3883,54 @@ sum(0, 0)..? "falsy"
 
 See why the previous `// greet()` checked for `||`? Because there's no returned value inside `||` alone to be checked agains a value type. Be it explicit `greet() -> {||}` or implicit `greet() -> {}`, `||` alone never has a type nor a value, but in the case of `/int/ sum(1, 1)`, sum returns `int` value inside `|n+m|`, so `// sum(1, 1)` would result in false, `// greet()` in true, because `||` has nothing to match againt. So `// == ||` = `true`!
 
+### Function Lambda Return
+
+Wide allows to reduce the return as you've seen:
+
+```lua
+sum(..args:int) -> int {
+  |args.sum()|
+}
+```
+
+Could be reduced to:
+
+```lua
+sum(..args:int) -> args.sum()
+```
+
+But there are cases where things get really cool, specially when returning compound types.
+
+The divide function below:
+
+```lua
+Pair {
+  quotient: int,
+  remainder: int
+}
+
+divide(dividend: int, divisor: int) -> Pair {|
+  Pair {
+    quotient: dividend / divisor,
+    remainder: dividend % divisor
+  }
+|}
+```
+
+Could be reduced to:
+
+```lua
+Pair {
+  quotient: int,
+  remainder: int
+}
+
+divide(dividend: int, divisor: int) -> Pair {
+  quotient: dividend / divisor,
+  remainder: dividend % divisor
+}
+```
+
 ### Multiple Return Values
 
 To return multiple values, just enclose values separated by commas between Walls:
@@ -6020,7 +6104,7 @@ rectangle: Rectangle = {
 }
 ```
 
-When type is inferred it's mandatory to Name the struct, since that would be Set.
+When type is inferred it's mandatory to Name the struct, since that would be a Set instead.
 
 ```lua
 point:= Point{10, 20}
