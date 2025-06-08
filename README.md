@@ -37,40 +37,6 @@ When running **wide run hello.html** it will produce this output:
 
 When running **wide run  8080 hello.html** will serve to be opened on <http://localhost:8080>
 
-But it ended up becoming capable of this:
-
-```lua
-::Modulo <
-  .dividend:int
-  .divisor:int
-
-  .%(other: Modulo) -> Self.dividend % other.divisor
-/Self>
-
-PairInt{T::Modulo} {
-  quotient: T,
-  remainder: T
-}
-
-PairFloat{T} {
-  quotient: T
-}
-
-:Pair = PairInt|PairFloat
-
-divide{T}(dividend: T, divisor: T)
-// T: Divisible | Modulo -> Pair:Module
-  ? Pair {
-    quotient: dividend / divisor,
-    remainder: dividend % divisor
-  }
-  . Pair {
-    quotient: dividend / divisor
-  }
-```
-
-If you wanna know more about Wide, just continue!
-
 ## Intent-Oriented Programming
 
 Wide is a symbol-based, declarative, paradigm-unifying programming language designed to feel natural, composable, and deeply readable just using symbols you already know.
@@ -163,6 +129,40 @@ But if you were just vanilla Wide cli you could do just so:
   }
 }
 ```
+
+But it ended up becoming capable of this:
+
+```lua
+::Modulo <
+  .dividend:int
+  .divisor:int
+
+  .%(other: Modulo) -> Self.dividend % other.divisor
+/Self>
+
+PairInt{T::Modulo} {
+  quotient: T,
+  remainder: T
+}
+
+PairFloat{T} {
+  quotient: T
+}
+
+:Pair = PairInt|PairFloat
+
+divide{T}(dividend: T, divisor: T)
+// T: Divisible | Modulo -> Pair:Module
+  ? Pair {
+    quotient: dividend / divisor,
+    remainder: dividend % divisor
+  }
+  . Pair {
+    quotient: dividend / divisor
+  }
+```
+
+So take your time to see if it fits your need.
 
 ## Symbols and keywords
 
